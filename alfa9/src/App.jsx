@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import './styles/theme.css';
@@ -151,12 +153,14 @@ function App() {
   );
 }
 
-// Renders the floating chat widget on every page EXCEPT the admin panel/login,
-// where it would overlap the admin UI.
+// Renders the floating chat widget on every page EXCEPT the admin panel/login
+// and the games (e.g. Boom Mines), where its floating icon overlaps the
+// game's own UI (menu button, bet bar, etc).
 function ChatWidgetGate() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
-  if (isAdminPage) return null;
+  const isGamePage = location.pathname.startsWith('/games/');
+  if (isAdminPage || isGamePage) return null;
   return <ChatWidget />;
 }
 

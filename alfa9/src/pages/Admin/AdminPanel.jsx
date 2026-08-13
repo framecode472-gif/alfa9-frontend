@@ -155,11 +155,14 @@ const INITIAL_BONUSES = [
   { key: 'rebate', title: 'Betting rebate', desc: 'Percentage of daily turnover returned as bonus balance.', enabled: false, value: 1.5, unit: '%', cap: 2000 },
 ];
 
-// Only the 3 real games — same images/keys used on the Home page.
+// Same images/keys used on the Home page. gameName on the backend
+// (GameSetting/Bet models) already supports 'boom' — this just surfaces
+// its win-rate/maintenance/bet-limit controls in the admin UI too.
 const INITIAL_GAMES = [
   { key: 'wingo', name: 'Win Go', img: '/image/wingo.png', enabled: true, winRate: 50, maintenance: false },
   { key: 'k3', name: 'K3', img: '/image/k3.png', enabled: true, winRate: 50, maintenance: false },
   { key: '5d', name: '5D', img: '/image/5D.png', enabled: true, winRate: 50, maintenance: false },
+  { key: 'boom', name: 'Booms Mines', img: '/image/Booms.png', enabled: true, winRate: 50, maintenance: false },
 ];
 
 export default function AdminPanel() {
