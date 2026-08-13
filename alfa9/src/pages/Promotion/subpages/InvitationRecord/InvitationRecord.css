@@ -1,0 +1,64 @@
+/* ===== Invitation Record page (scoped under .invitation-record-page) ===== */
+
+.invitation-record-page .page-wrapper {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: #0D0704;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.invitation-record-page .top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(160deg, #7A581C 0%, #C9971F 25%, #D4AF37 45%, #B8860B 70%, #7A581C 100%);
+  height: 52px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 15px rgba(212, 175, 55, 0.4);
+}
+.invitation-record-page .back-btn {
+  position: absolute; left: 14px; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; background: rgba(20, 10, 3, 0.18); border-radius: 50%;
+}
+.invitation-record-page .top-title { font-size: 17px; font-weight: 800; color: #140A03; }
+
+/* EMPTY STATE */
+.invitation-record-page .empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 90px 30px 40px;
+}
+.invitation-record-page .empty-icon-wrap {
+  width: 130px; height: 130px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0) 70%);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+}
+.invitation-record-page .empty-label { font-size: 14px; color: #C3A675; font-weight: 700; letter-spacing: 0.3px; }
+.invitation-record-page .empty-sub { font-size: 12px; color: #6B5A3E; margin-top: 6px; text-align: center; max-width: 240px; }
+
+/* LIST (populated state) — one card per invited member */
+.invitation-record-page .record-list { padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 12px; }
+.invitation-record-page .record-card {
+  background: linear-gradient(165deg, #1C1109, #241505 85%);
+  border: 1px solid #3A2812; border-radius: 14px;
+  padding: 14px 16px 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.invitation-record-page .record-card-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding-bottom: 12px; margin-bottom: 10px; border-bottom: 1px solid #3A2812;
+}
+.invitation-record-page .record-card-name { font-size: 14.5px; font-weight: 800; color: #FFF3CD; }
+.invitation-record-page .record-card-uid { font-size: 12px; font-weight: 700; color: #8B7355; }
+
+.invitation-record-page .record-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0;
+}
+.invitation-record-page .record-row-label { font-size: 12.5px; color: #8B7355; font-weight: 600; }
+.invitation-record-page .record-row-value { font-size: 13px; font-weight: 700; color: #C3A675; }
+.invitation-record-page .record-row-value.green { color: #4ADE80; }
+.invitation-record-page .record-row-value.red { color: #EF6B6B; }
+.invitation-record-page .record-row-value.gold { color: #D4AF37; }
+
+.invitation-record-page .bottom-spacer { height: 40px; }

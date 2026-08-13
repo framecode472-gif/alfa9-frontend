@@ -1,0 +1,90 @@
+.betting-rebate-page {
+  max-width: 430px; margin: 0 auto; background: #0D0704; min-height: 100vh;
+}
+.betting-rebate-page .top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(160deg, #7A581C 0%, #C9971F 25%, #D4AF37 45%, #B8860B 70%, #7A581C 100%);
+  height: 52px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 15px rgba(212,175,55,0.4);
+}
+.betting-rebate-page .back-btn {
+  position: absolute; left: 14px; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1.5px solid rgba(212,175,55,0.35);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.betting-rebate-page .back-btn:hover { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.7); }
+.betting-rebate-page .top-title { font-size: 17px; font-weight: 800; color: #140A03; }
+
+.betting-rebate-page .tabs-wrap { background: #140A03; padding: 10px 10px 0; display: flex; gap: 5px; border-bottom: 2px solid #2A1A08; }
+.betting-rebate-page .tab-pill {
+  flex: 1; padding: 9px 4px 10px; border-radius: 10px 10px 0 0; border: 1px solid #2A1A08; border-bottom: none;
+  font-size: 11px; font-weight: 700; cursor: pointer; background: #1C1109; color: #6A5030;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.2s; position: relative;
+}
+.betting-rebate-page .tab-pill svg { width: 20px; height: 20px; }
+.betting-rebate-page .tab-pill.active {
+  background: linear-gradient(160deg, #7A581C 0%, #C9971F 30%, #D4AF37 60%, #B8860B 100%);
+  color: #140A03; border-color: transparent; box-shadow: 0 -3px 12px rgba(212,175,55,0.25);
+}
+
+.betting-rebate-page .stats-card {
+  background: linear-gradient(160deg, #1C1109 0%, #140A03 100%); margin: 14px 12px 10px; border-radius: 16px;
+  padding: 16px; border: 1px solid #2A1A08; box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,175,55,0.08);
+}
+.betting-rebate-page .stats-title { font-size: 13px; color: #C3A675; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+.betting-rebate-page .stats-title::before { content: ''; width: 3px; height: 14px; background: linear-gradient(180deg, #D4AF37, #7A581C); border-radius: 2px; display: block; flex-shrink: 0; }
+.betting-rebate-page .realtime-badge {
+  display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid #D4AF37; color: #D4AF37;
+  font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; background: rgba(212,175,55,0.06);
+}
+.betting-rebate-page .rt-dot { width: 7px; height: 7px; border-radius: 50%; background: #D4AF37; animation: br-pulse 1.5s infinite; }
+@keyframes br-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.75)} }
+.betting-rebate-page .big-amount { font-size: 32px; font-weight: 900; color: #FFF3CD; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; text-shadow: 0 2px 10px rgba(212,175,55,0.25); }
+.betting-rebate-page .vip-hint { background: #0D0704; border-radius: 8px; padding: 8px 14px; font-size: 11px; color: #8B7355; margin-bottom: 12px; border: 1px solid #2A1A08; display: flex; align-items: center; gap: 6px; }
+.betting-rebate-page .vip-hint::before { content: '👑'; font-size: 13px; }
+.betting-rebate-page .two-cols { display: flex; gap: 8px; margin-bottom: 10px; }
+.betting-rebate-page .stat-box { flex: 1; background: #0D0704; border-radius: 10px; padding: 12px; border: 1px solid #2A1A08; position: relative; overflow: hidden; }
+.betting-rebate-page .stat-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #7A581C, #D4AF37, #7A581C); }
+.betting-rebate-page .stat-box-label { font-size: 11px; color: #8B7355; margin-bottom: 5px; }
+.betting-rebate-page .stat-box-val { font-size: 18px; font-weight: 900; color: #D4AF37; }
+.betting-rebate-page .stat-note { font-size: 10px; color: #6A5030; text-align: center; padding-top: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.betting-rebate-page .stat-note::before { content: '⏰'; font-size: 11px; }
+
+.betting-rebate-page .collect-wrap { padding: 0 12px 14px; }
+.betting-rebate-page .collect-btn {
+  width: 100%; background: linear-gradient(180deg, #D4AF37 0%, #AA7C11 100%); color: #140A03; font-size: 15px; font-weight: 800;
+  border: none; border-radius: 50px; padding: 14px 0; cursor: pointer; letter-spacing: 0.4px;
+  box-shadow: 0 4px 18px rgba(212,175,55,0.4); transition: transform 0.2s, box-shadow 0.2s; font-family: inherit;
+}
+.betting-rebate-page .collect-btn:disabled { background: linear-gradient(180deg, #3A3020, #251E10); color: #6A5A35; box-shadow: none; cursor: not-allowed; transform: none; }
+
+.betting-rebate-page .history-section { padding: 0 12px 16px; }
+.betting-rebate-page .history-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; color: #FFF3CD; padding: 10px 0 12px; }
+.betting-rebate-page .history-bar { width: 4px; height: 18px; background: linear-gradient(180deg, #D4AF37, #7A581C); border-radius: 2px; }
+.betting-rebate-page .history-entry { background: #1C1109; border-radius: 14px; margin-bottom: 10px; padding: 14px; border: 1px solid #2A1A08; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+.betting-rebate-page .entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.betting-rebate-page .entry-game { font-size: 14px; font-weight: 800; color: #FFF3CD; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.betting-rebate-page .game-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: rgba(212,175,55,0.12); color: #D4AF37; border: 1px solid rgba(212,175,55,0.25); }
+.betting-rebate-page .entry-date { font-size: 10px; color: #6A5030; margin-top: 3px; }
+.betting-rebate-page .entry-status-collected { font-size: 11px; font-weight: 800; color: #D4AF37; }
+.betting-rebate-page .entry-status-pending { font-size: 11px; font-weight: 800; color: #F5A030; }
+.betting-rebate-page .entry-rows { border-left: 2px dashed #2A1A08; margin-left: 5px; padding-left: 12px; }
+.betting-rebate-page .entry-row { display: flex; justify-content: space-between; padding: 4px 0; position: relative; }
+.betting-rebate-page .entry-row-label { font-size: 12px; color: #8B7355; }
+.betting-rebate-page .entry-row-val { font-size: 12px; color: #C3A675; font-weight: 600; }
+.betting-rebate-page .entry-row-val.gold { color: #D4AF37; font-weight: 800; }
+.betting-rebate-page .no-data { text-align: center; padding: 50px 0; font-size: 13px; color: #6A5030; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.betting-rebate-page .no-data-icon { font-size: 34px; opacity: 0.35; }
+
+.betting-rebate-page .toast {
+  position: fixed; top: 66px; left: 50%; transform: translateX(-50%) translateY(-20px);
+  background: #1C1109; border: 1px solid #D4AF37; color: #FFF3CD; padding: 10px 22px; border-radius: 50px;
+  font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.3s ease; z-index: 9999; max-width: 310px;
+  text-align: center; pointer-events: none;
+}
+.betting-rebate-page .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.betting-rebate-page .toast.success { border-color: #D4AF37; color: #FFE566; }
+.betting-rebate-page .toast.error { border-color: #E52525; color: #FF8080; }
+
+.betting-rebate-page .bottom-spacer { height: 30px; }

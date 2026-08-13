@@ -1,0 +1,87 @@
+.invitation-bonus-page {
+  --ib-gold1: #7A581C; --ib-gold2: #C9971F; --ib-gold3: #D4AF37;
+  --ib-gold4: #B8860B; --ib-gold5: #F3DA95; --ib-gold-light: #FFF3CD;
+  --ib-dark1: #0D0704; --ib-dark2: #1C1109; --ib-dark3: #2A1A08; --ib-dark4: #140A03;
+  --ib-text-gold: #C3A675;
+
+  max-width: 430px; margin: 0 auto; background: var(--ib-dark1); min-height: 100vh; overflow-x: hidden;
+}
+
+.invitation-bonus-page .top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(160deg, #7A581C 0%, #C9971F 25%, #D4AF37 45%, #B8860B 70%, #7A581C 100%);
+  height: 54px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 15px rgba(212,175,55,0.4);
+}
+.invitation-bonus-page .back-btn {
+  position: absolute; left: 14px; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1.5px solid rgba(212,175,55,0.35);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.invitation-bonus-page .back-btn:hover { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.7); }
+.invitation-bonus-page .top-title { font-size: 17px; font-weight: 800; color: #140A03; letter-spacing: 0.3px; }
+
+.invitation-bonus-page .hero-banner { width: 100%; height: 200px; position: relative; overflow: hidden; background: linear-gradient(135deg, #3A1F0A 0%, #7A581C 60%, #5A3A10 100%); }
+.invitation-bonus-page .hero-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.invitation-bonus-page .hero-overlay { position: absolute; inset: 0; padding: 22px 18px; background: linear-gradient(135deg, rgba(20,10,3,0.6) 0%, rgba(20,10,3,0.1) 100%); display: flex; flex-direction: column; justify-content: center; }
+.invitation-bonus-page .hero-title { font-size: 22px; font-weight: 900; color: #FFF3CD; margin-bottom: 6px; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+.invitation-bonus-page .hero-desc { font-size: 11.5px; color: rgba(255,243,205,0.85); line-height: 1.7; white-space: pre-line; }
+.invitation-bonus-page .hero-date-label { font-size: 10.5px; color: rgba(255,243,205,0.55); margin-top: 6px; }
+.invitation-bonus-page .hero-date { font-size: 15px; font-weight: 800; color: var(--ib-gold3); margin-top: 2px; }
+
+.invitation-bonus-page .icon-btns { background: var(--ib-dark2); display: flex; justify-content: space-around; padding: 18px 20px; border-bottom: 1px solid var(--ib-dark3); border-top: 1px solid var(--ib-dark3); }
+.invitation-bonus-page .icon-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; transition: transform 0.2s; background: none; border: none; }
+.invitation-bonus-page .icon-btn:hover { transform: translateY(-3px); }
+.invitation-bonus-page .icon-btn-label { font-size: 11px; color: var(--ib-text-gold); font-weight: 600; text-align: center; }
+.invitation-bonus-page .icon-box { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+
+.invitation-bonus-page .cards-wrap { padding: 12px; }
+.invitation-bonus-page .bonus-card { background: var(--ib-dark2); border-radius: 14px; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--ib-dark3); box-shadow: 0 4px 16px rgba(0,0,0,0.4); position: relative; }
+.invitation-bonus-page .bonus-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--ib-gold3), transparent); }
+.invitation-bonus-page .bonus-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 0; }
+.invitation-bonus-page .bonus-tag { display: flex; align-items: center; }
+.invitation-bonus-page .bonus-tag-main { background: linear-gradient(90deg, var(--ib-gold1), var(--ib-gold3)); color: var(--ib-dark1); font-size: 12px; font-weight: 800; padding: 5px 8px 5px 14px; border-radius: 20px 0 0 20px; }
+.invitation-bonus-page .bonus-tag-num { background: var(--ib-gold4); color: var(--ib-dark1); font-size: 12px; font-weight: 900; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-left: -4px; border: 2px solid var(--ib-dark1); box-shadow: 0 0 6px rgba(212,175,55,0.4); }
+.invitation-bonus-page .bonus-tag-x { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; margin-left: 6px; cursor: pointer; }
+.invitation-bonus-page .bonus-tag-x svg { width: 10px; height: 10px; }
+.invitation-bonus-page .bonus-amount { font-size: 15px; font-weight: 800; color: var(--ib-gold3); }
+.invitation-bonus-page .bonus-body { padding: 10px 14px 14px; }
+.invitation-bonus-page .info-row { display: flex; justify-content: space-between; align-items: center; background: var(--ib-dark4); border-radius: 7px; padding: 8px 12px; margin-bottom: 6px; border: 1px solid var(--ib-dark3); }
+.invitation-bonus-page .info-label { font-size: 12px; color: var(--ib-text-gold); opacity: 0.8; }
+.invitation-bonus-page .info-val { font-size: 12px; color: var(--ib-gold-light); font-weight: 600; }
+.invitation-bonus-page .info-val.gold { color: var(--ib-gold3); }
+.invitation-bonus-page .divider { border: none; border-top: 1px dashed var(--ib-dark3); margin: 8px 0; }
+.invitation-bonus-page .progress-row { display: flex; margin-bottom: 10px; }
+.invitation-bonus-page .progress-cell { flex: 1; text-align: center; padding: 9px 4px; border: 1px solid var(--ib-dark3); background: var(--ib-dark4); }
+.invitation-bonus-page .progress-cell:first-child { border-right: none; border-radius: 8px 0 0 8px; }
+.invitation-bonus-page .progress-cell:last-child { border-radius: 0 8px 8px 0; }
+.invitation-bonus-page .progress-frac { font-size: 15px; font-weight: 800; color: var(--ib-gold3); }
+.invitation-bonus-page .progress-lbl { font-size: 10px; color: var(--ib-text-gold); margin-top: 2px; opacity: 0.8; }
+.invitation-bonus-page .unfinished-btn { display: block; width: 100%; background: var(--ib-dark3); color: #5a4a2a; font-size: 14px; font-weight: 700; border: none; border-radius: 50px; padding: 11px 0; text-align: center; cursor: default; letter-spacing: 0.3px; }
+
+.invitation-bonus-page .rules-info-box { margin: 12px 14px; background: rgba(180,100,0,0.12); border-radius: 10px; padding: 12px 14px; border: 1px solid rgba(212,175,55,0.2); }
+.invitation-bonus-page .rules-info-text { font-size: 12px; color: var(--ib-text-gold); line-height: 1.7; }
+.invitation-bonus-page .rules-table-wrap { padding: 0 14px 14px; }
+.invitation-bonus-page .rules-table { width: 100%; border-collapse: collapse; background: var(--ib-dark2); border-radius: 12px; overflow: hidden; border: 1px solid var(--ib-dark3); box-shadow: 0 4px 14px rgba(0,0,0,0.3); }
+.invitation-bonus-page .rules-table thead tr { background: linear-gradient(90deg, var(--ib-gold1), var(--ib-gold4)); }
+.invitation-bonus-page .rules-table thead th { padding: 11px 8px; color: var(--ib-dark1); font-size: 13px; font-weight: 800; text-align: center; }
+.invitation-bonus-page .rules-table tbody tr:nth-child(even) { background: rgba(42,26,8,0.5); }
+.invitation-bonus-page .rules-table tbody tr:nth-child(odd) { background: var(--ib-dark2); }
+.invitation-bonus-page .rules-table td { padding: 10px 8px; text-align: center; font-size: 13px; color: var(--ib-text-gold); border-bottom: 1px solid var(--ib-dark3); }
+.invitation-bonus-page .rules-table td:first-child { color: var(--ib-gold-light); font-weight: 600; }
+.invitation-bonus-page .rules-table td:last-child { color: var(--ib-gold3); font-weight: 700; }
+.invitation-bonus-page .rules-section-header { display: flex; align-items: center; justify-content: center; margin: 0 14px 12px; position: relative; }
+.invitation-bonus-page .rules-section-header::before, .invitation-bonus-page .rules-section-header::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--ib-gold1)); }
+.invitation-bonus-page .rules-section-header::after { background: linear-gradient(90deg, var(--ib-gold1), transparent); }
+.invitation-bonus-page .rules-section-title { background: linear-gradient(135deg, var(--ib-gold1), var(--ib-gold4)); color: var(--ib-dark1); font-size: 13px; font-weight: 800; padding: 6px 20px; border-radius: 20px; margin: 0 10px; letter-spacing: 0.5px; }
+.invitation-bonus-page .rules-points { padding: 0 14px 20px; }
+.invitation-bonus-page .rules-point { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: var(--ib-dark2); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--ib-dark3); }
+.invitation-bonus-page .rules-diamond { color: var(--ib-gold3); font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.invitation-bonus-page .rules-point-text { font-size: 12px; color: var(--ib-text-gold); line-height: 1.65; }
+
+.invitation-bonus-page .record-empty { display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center; }
+.invitation-bonus-page .record-empty-svg { width: 120px; height: 100px; opacity: 0.18; margin-bottom: 16px; }
+.invitation-bonus-page .record-empty-text { font-size: 14px; color: var(--ib-text-gold); opacity: 0.5; }
+
+.invitation-bonus-page .bottom-spacer { height: 30px; }

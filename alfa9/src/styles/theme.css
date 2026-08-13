@@ -1,0 +1,49 @@
+/* ===== Global theme variables (from account.html :root) ===== */
+:root {
+  --gold: #D4AF37;
+  --gold-light: #F3DA95;
+  --gold-mid: #C9971F;
+  --gold-dark: #7A581C;
+  --gold-deep: #AA7C11;
+  --bg: rgb(30, 26, 9);
+  --bg-card: #1C1109;
+  --bg-card2: #150D05;
+  --bg-input: #211608;
+  --border: rgba(212,175,55,0.18);
+  --border-soft: rgba(212,175,55,0.09);
+  --text: #F5E6C8;
+  --text-muted: #8B7355;
+  --text-dim: #5A4020;
+}
+
+/* ════════════════════════════════════════════════════════
+   GLOBAL PREMIUM SCROLLBAR
+════════════════════════════════════════════════════════ */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.3) #0a0a0a;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}

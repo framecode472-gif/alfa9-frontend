@@ -1,0 +1,176 @@
+.deposit-history-page {
+  --gold: #D4AF37;
+  --gold-light: #F3DA95;
+  --gold-mid: #C9971F;
+  --gold-dark: #7A581C;
+  --gold-deep: #AA7C11;
+  --bg: #0D0704;
+  --bg-card: #1C1109;
+  --bg-input: #211608;
+  --border: rgba(212,175,55,0.18);
+  --border-soft: rgba(212,175,55,0.09);
+  --text: #F5E6C8;
+  --text-muted: #8B7355;
+  --text-dim: #5A4020;
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  box-shadow: 0 0 60px rgba(212,175,55,0.15);
+  overflow-x: hidden;
+  padding-bottom: 60px;
+}
+.deposit-history-page * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+.deposit-history-page .page-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 18px 16px 14px;
+  background: var(--bg); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-soft);
+}
+.deposit-history-page .header-back {
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.15); border-radius: 10px;
+  cursor: pointer; text-decoration: none; transition: background 0.2s;
+}
+.deposit-history-page .header-back:hover { background: rgba(212,175,55,0.18); }
+.deposit-history-page .header-title { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: 0.5px; }
+
+.deposit-history-page .history-filter-row { display: flex; gap: 8px; padding: 14px 16px 0; overflow-x: auto; scrollbar-width: none; }
+.deposit-history-page .history-filter-row::-webkit-scrollbar { display: none; }
+.deposit-history-page .filter-chip {
+  display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg-card);
+  border: 1.5px solid var(--border-soft); border-radius: 50px; cursor: pointer;
+  font-size: 12px; font-weight: 700; color: var(--text-muted); white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+}
+.deposit-history-page .filter-chip.active { border-color: var(--gold); background: #231508; color: var(--gold-light); }
+.deposit-history-page .filter-chip img { width: 18px; height: 18px; border-radius: 4px; object-fit: contain; }
+
+.deposit-history-page .history-controls { display: flex; gap: 10px; padding: 14px 16px 0; }
+.deposit-history-page .dropdown-btn {
+  flex: 1; height: 42px; background: var(--bg-card); border: 1.5px solid var(--border-soft); border-radius: 10px;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 12px; cursor: pointer; transition: border-color 0.2s;
+}
+.deposit-history-page .dropdown-btn:hover { border-color: var(--border); }
+.deposit-history-page .dropdown-btn.active-filter { border-color: var(--gold); background: #231508; }
+.deposit-history-page .dropdown-btn-text { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.deposit-history-page .dropdown-btn.active-filter .dropdown-btn-text { color: var(--gold-light); }
+
+.deposit-history-page .date-clear-btn {
+  width: 18px; height: 18px; background: rgba(212,175,55,0.15); border: none; border-radius: 50%;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.deposit-history-page .tx-list { padding: 14px 16px 0; }
+.deposit-history-page .date-group-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 2px 8px; }
+.deposit-history-page .tx-card {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--bg-card);
+  border: 1px solid var(--border-soft); border-radius: 14px; margin-bottom: 8px; transition: all 0.2s;
+}
+.deposit-history-page .tx-card:hover { border-color: var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+.deposit-history-page .tx-icon {
+  width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden; position: relative;
+}
+.deposit-history-page .tx-icon::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 45%;
+  background: linear-gradient(180deg,rgba(255,255,255,0.18) 0%,transparent 100%); border-radius: 13px 13px 50% 50%; z-index: 1; pointer-events: none;
+}
+.deposit-history-page .tx-icon.ep { background: linear-gradient(145deg,#69F0AE,#00C853,#007A33); box-shadow: 0 4px 14px rgba(0,200,83,0.35); }
+.deposit-history-page .tx-icon.jc { background: linear-gradient(145deg,#FFD54F,#FFA000,#E65100); box-shadow: 0 4px 14px rgba(255,160,0,0.35); }
+.deposit-history-page .tx-icon img { width: 26px; height: 26px; object-fit: contain; position: relative; z-index: 2; border-radius: 6px; }
+
+.deposit-history-page .tx-info { flex: 1; min-width: 0; }
+.deposit-history-page .tx-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.deposit-history-page .tx-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.deposit-history-page .tx-order { font-size: 10px; color: var(--text-muted); opacity: 0.75; margin-top: 2px; }
+.deposit-history-page .tx-status { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-top: 4px; }
+.deposit-history-page .tx-status.success { background: rgba(0,200,83,0.12); color: #69F0AE; border: 1px solid rgba(0,200,83,0.22); }
+.deposit-history-page .tx-status.pending { background: rgba(255,160,0,0.12); color: #FFD54F; border: 1px solid rgba(255,160,0,0.22); }
+.deposit-history-page .tx-status.failed { background: rgba(229,57,53,0.12); color: #EF9A9A; border: 1px solid rgba(229,57,53,0.22); }
+
+.deposit-history-page .tx-amount {
+  font-size: 16px; font-weight: 900; background: linear-gradient(135deg,#00C853,#69F0AE);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0;
+}
+
+.deposit-history-page .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 70px 30px 40px; text-align: center; }
+.deposit-history-page .empty-icon-box {
+  width: 80px; height: 80px; border-radius: 20px; background: rgba(212,175,55,0.08); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+}
+.deposit-history-page .empty-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.deposit-history-page .empty-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 260px; margin-bottom: 28px; }
+.deposit-history-page .empty-action-btn {
+  padding: 13px 28px; border-radius: 50px; border: 1.5px solid var(--gold); background: transparent;
+  color: var(--gold); font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.2s;
+}
+.deposit-history-page .empty-action-btn:hover { background: rgba(212,175,55,0.08); }
+
+.deposit-history-page .sheet-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: flex-end; justify-content: center;
+}
+.deposit-history-page .sheet-overlay.show { display: flex; }
+.deposit-history-page .bottom-sheet {
+  background: #150d04; border: 1px solid var(--border); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px;
+  padding: 0 0 40px; animation: depSlideUp 0.28s ease;
+}
+@keyframes depSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.deposit-history-page .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 14px auto 0; }
+.deposit-history-page .sheet-topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 0; }
+.deposit-history-page .sheet-cancel-btn { font-size: 14px; font-weight: 600; color: var(--text-muted); background: none; border: none; cursor: pointer; font-family: inherit; }
+.deposit-history-page .sheet-title-text { font-size: 15px; font-weight: 800; color: var(--text); }
+.deposit-history-page .sheet-confirm-btn { font-size: 14px; font-weight: 700; color: var(--gold); background: none; border: none; cursor: pointer; font-family: inherit; }
+.deposit-history-page .sheet-options { padding: 20px 0 0; }
+.deposit-history-page .sheet-option {
+  display: block; width: 100%; padding: 18px 20px; background: none; border: none; font-size: 15px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; font-family: inherit; text-align: center; border-bottom: 1px solid var(--border-soft); transition: color 0.2s, background 0.2s;
+}
+.deposit-history-page .sheet-option:last-child { border-bottom: none; }
+.deposit-history-page .sheet-option:hover { background: rgba(212,175,55,0.05); color: var(--text); }
+.deposit-history-page .sheet-option.selected { color: var(--gold); font-weight: 800; }
+.deposit-history-page .sheet-option.selected::after { content: ' ✓'; }
+
+.deposit-history-page .cal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 300; align-items: center; justify-content: center; padding: 20px;
+}
+.deposit-history-page .cal-overlay.show { display: flex; }
+.deposit-history-page .cal-modal {
+  background: #150d04; border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 390px;
+  padding: 0 0 16px; animation: depFadeScale 0.25s ease;
+}
+@keyframes depFadeScale { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.deposit-history-page .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border-soft); }
+.deposit-history-page .cal-title { font-size: 16px; font-weight: 800; color: var(--text); }
+.deposit-history-page .cal-close-btn {
+  width: 30px; height: 30px; background: rgba(212,175,55,0.08); border: 1px solid var(--border-soft); border-radius: 8px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.deposit-history-page .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 8px; }
+.deposit-history-page .cal-nav-btn {
+  width: 32px; height: 32px; background: rgba(212,175,55,0.08); border: 1px solid var(--border-soft); border-radius: 8px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+}
+.deposit-history-page .cal-nav-btn:hover { background: rgba(212,175,55,0.16); }
+.deposit-history-page .cal-month-label { font-size: 14px; font-weight: 800; color: var(--text); }
+.deposit-history-page .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; margin-bottom: 4px; }
+.deposit-history-page .cal-weekday { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 6px 0; }
+.deposit-history-page .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; gap: 2px; }
+.deposit-history-page .cal-day {
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text); transition: background 0.15s; position: relative;
+}
+.deposit-history-page .cal-day:hover:not(.empty):not(.disabled) { background: rgba(212,175,55,0.1); }
+.deposit-history-page .cal-day.disabled { color: var(--text-dim); cursor: not-allowed; }
+.deposit-history-page .cal-day.empty { cursor: default; }
+.deposit-history-page .cal-day.start, .deposit-history-page .cal-day.end { background: var(--gold) !important; color: #140A03 !important; font-weight: 900; }
+.deposit-history-page .cal-day.in-range { background: rgba(212,175,55,0.15); }
+.deposit-history-page .cal-day.today { border: 1px solid rgba(212,175,55,0.35); }
+.deposit-history-page .cal-day-label { font-size: 8px; font-weight: 700; color: rgba(20,10,3,0.8); line-height: 1; margin-top: 1px; }
+.deposit-history-page .cal-confirm-btn {
+  display: block; margin: 14px 16px 0; width: calc(100% - 32px); height: 48px; border-radius: 12px; border: none;
+  background: linear-gradient(180deg, #F3DA95 0%, #D4AF37 40%, #AA7C11 100%); color: #140A03; font-size: 14px; font-weight: 900;
+  letter-spacing: 0.5px; cursor: pointer; font-family: inherit; box-shadow: 0 3px 14px rgba(212,175,55,0.35); transition: opacity 0.2s;
+}
+.deposit-history-page .cal-confirm-btn:active { opacity: 0.88; }

@@ -1,0 +1,496 @@
+.activity-page {
+  max-width: 430px;
+  margin: 0 auto;
+  background: #0D0704;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== BONUS TOP SECTION ===== */
+.activity-page .bonus-top {
+  background: linear-gradient(160deg, #7A581C 0%, #C9971F 25%, #D4AF37 45%, #B8860B 70%, #7A581C 100%);
+  padding: 16px 20px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.activity-page .bonus-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.activity-page .bonus-logo img {
+  height: 50px;
+  object-fit: contain;
+}
+
+.activity-page .bonus-top::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255, 243, 205, 0.08);
+}
+
+.activity-page .bonus-top::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 243, 205, 0.06);
+}
+
+.activity-page .bonus-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 25px;
+  margin-top: 25px;
+}
+
+.activity-page .bonus-cell {
+  flex: 1;
+  text-align: center;
+}
+
+.activity-page .bonus-divider {
+  width: 1px;
+  height: 44px;
+  background: rgba(20, 10, 3, 0.35);
+}
+
+.activity-page .bonus-label {
+  font-size: 13px;
+  color: rgba(20, 10, 3, 0.7);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.activity-page .bonus-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #140A03;
+  letter-spacing: 0.5px;
+}
+
+.activity-page .bonus-btn {
+  display: block;
+  width: 150px;
+  margin: 0 auto;
+  background: #fff;
+  color: #B8860B;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 0;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.activity-page .bonus-btn:hover { transform: scale(1.04); }
+
+/* ===== ICON GRID ===== */
+.activity-page .icon-section {
+  background: #1C1109;
+  padding: 18px 10px 14px;
+  border-bottom: 1px solid #2A1A08;
+}
+
+.activity-page .icon-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 14px;
+}
+
+.activity-page .icon-row:last-child { margin-bottom: 0; }
+
+.activity-page .icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  flex: 1;
+  text-decoration: none;
+}
+
+.activity-page .icon-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #2A1508;
+}
+
+.activity-page .icon-label {
+  font-size: 11px;
+  color: #C3A675;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.activity-page .icon-row-single {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 0;
+}
+
+.activity-page .icon-row-single .icon-item {
+  flex: 0 0 25%;
+}
+
+/* ===== PROMO CARDS ===== */
+.activity-page .promo-section {
+  padding: 14px 20px;
+  background: #140A03;
+}
+
+.activity-page .promo-card {
+  background: #1C1109;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #2A1A08;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: block;
+  text-decoration: none;
+}
+
+.activity-page .promo-card:hover { transform: translateY(-2px); }
+
+/* Full image shown — no cropping. Height follows the image's own
+   aspect ratio instead of a fixed crop box. */
+.activity-page .promo-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  background: #2A1508;
+}
+
+/* Premium heading style — bigger, gold gradient, letter-spacing, glow */
+.activity-page .promo-title {
+  padding: 14px 16px 14px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  background: linear-gradient(135deg, #FFF3CD 0%, #F3DA95 30%, #D4AF37 60%, #B8860B 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #FFF3CD;
+  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.25);
+  position: relative;
+}
+
+.activity-page .promo-desc {
+  padding: 0 16px 14px;
+  font-size: 12px;
+  color: #8B7355;
+  line-height: 1.5;
+}
+
+.activity-page .promo-row-2 {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.activity-page .promo-row-2 .promo-card {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.activity-page .promo-row-2 .promo-img {
+  height: 120px;
+  object-fit: cover;
+}
+
+.activity-page .promo-row-2 .promo-title {
+  font-size: 15px;
+}
+
+.activity-page .bottom-spacer { height: 120px; }
+
+.activity-page {
+  max-width: 430px;
+  margin: 0 auto;
+  background: #0D0704;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== BONUS TOP SECTION ===== */
+.activity-page .bonus-top {
+  background: linear-gradient(160deg, #7A581C 0%, #C9971F 25%, #D4AF37 45%, #B8860B 70%, #7A581C 100%);
+  padding: 16px 20px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.activity-page .bonus-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.activity-page .bonus-logo img {
+  height: 50px;
+  object-fit: contain;
+}
+
+.activity-page .bonus-top::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255, 243, 205, 0.08);
+}
+
+.activity-page .bonus-top::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 243, 205, 0.06);
+}
+
+.activity-page .bonus-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 25px;
+  margin-top: 25px;
+}
+
+.activity-page .bonus-cell {
+  flex: 1;
+  text-align: center;
+}
+
+.activity-page .bonus-divider {
+  width: 1px;
+  height: 44px;
+  background: rgba(20, 10, 3, 0.35);
+}
+
+.activity-page .bonus-label {
+  font-size: 13px;
+  color: rgba(20, 10, 3, 0.7);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.activity-page .bonus-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #140A03;
+  letter-spacing: 0.5px;
+}
+
+.activity-page .bonus-btn {
+  display: block;
+  width: 150px;
+  margin: 0 auto;
+  background: #fff;
+  color: #B8860B;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 0;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.activity-page .bonus-btn:hover { transform: scale(1.04); }
+
+/* ===== ICON GRID ===== */
+.activity-page .icon-section {
+  background: #1C1109;
+  padding: 18px 10px 14px;
+  border-bottom: 1px solid #2A1A08;
+}
+
+.activity-page .icon-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 14px;
+}
+
+.activity-page .icon-row:last-child { margin-bottom: 0; }
+
+.activity-page .icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  flex: 1;
+  text-decoration: none;
+}
+
+.activity-page .icon-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #2A1508;
+}
+
+.activity-page .icon-label {
+  font-size: 11px;
+  color: #C3A675;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.activity-page .icon-row-single {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 0;
+}
+
+.activity-page .icon-row-single .icon-item {
+  flex: 0 0 25%;
+}
+
+/* ===== PROMO CARDS ===== */
+.activity-page .promo-section {
+  padding: 14px 20px;
+  background: #140A03;
+}
+
+.activity-page .promo-card {
+  background: #1C1109;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #2A1A08;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: block;
+  text-decoration: none;
+}
+
+.activity-page .promo-card:hover { transform: translateY(-2px); }
+
+/* Full image shown — no cropping. Height follows the image's own
+   aspect ratio instead of a fixed crop box. */
+.activity-page .promo-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  background: #2A1508;
+}
+
+/* Premium heading style — bigger, gold gradient, letter-spacing, glow */
+.activity-page .promo-title {
+  padding: 14px 16px 14px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  background: linear-gradient(135deg, #FFF3CD 0%, #F3DA95 30%, #D4AF37 60%, #B8860B 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #FFF3CD;
+  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.25);
+  position: relative;
+}
+
+.activity-page .promo-desc {
+  padding: 0 16px 14px;
+  font-size: 12px;
+  color: #8B7355;
+  line-height: 1.5;
+}
+
+.activity-page .promo-row-2 {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.activity-page .promo-row-2 .promo-card {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.activity-page .promo-row-2 .promo-img {
+  height: 120px;
+  object-fit: cover;
+}
+
+.activity-page .promo-row-2 .promo-title {
+  font-size: 15px;
+}
+
+.activity-page .bottom-spacer { height: 120px; }
+
+/* ================================================================
+   MOBILE RESPONSIVE (does not alter desktop styles above)
+   ================================================================ */
+@media (max-width: 480px) {
+  .activity-page .bonus-top { padding: 13px 16px 20px; }
+  .activity-page .bonus-logo { margin-bottom: 12px; }
+  .activity-page .bonus-logo img { height: 42px; }
+
+  .activity-page .bonus-row { margin-bottom: 20px; margin-top: 20px; }
+  .activity-page .bonus-label { font-size: 11.5px; }
+  .activity-page .bonus-amount { font-size: 19px; }
+  .activity-page .bonus-divider { height: 38px; }
+
+  .activity-page .bonus-btn { width: 130px; font-size: 13.5px; padding: 12px 0; }
+
+  .activity-page .icon-section { padding: 14px 6px 10px; }
+  .activity-page .icon-row { margin-bottom: 10px; }
+  .activity-page .icon-img { width: 42px; height: 42px; border-radius: 12px; }
+  .activity-page .icon-label { font-size: 10px; }
+
+  .activity-page .promo-section { padding: 12px 14px; }
+  .activity-page .promo-row-2 { gap: 8px; margin-bottom: 10px; }
+  .activity-page .promo-row-2 .promo-img { height: 95px; }
+  .activity-page .promo-row-2 .promo-title { font-size: 13px; padding: 10px 12px 10px; }
+  .activity-page .promo-desc { font-size: 11px; padding: 0 12px 10px; }
+
+  .activity-page .promo-title { font-size: 15px; padding: 12px 13px 12px; }
+
+  .activity-page .bottom-spacer { height: 100px; }
+}
+
+@media (max-width: 360px) {
+  .activity-page .bonus-logo img { height: 38px; }
+  .activity-page .bonus-amount { font-size: 17px; }
+  .activity-page .bonus-label { font-size: 10.5px; }
+  .activity-page .bonus-btn { width: 118px; font-size: 12.5px; }
+
+  .activity-page .icon-img { width: 38px; height: 38px; }
+  .activity-page .icon-label { font-size: 9.5px; }
+
+  .activity-page .promo-row-2 .promo-img { height: 84px; }
+  .activity-page .promo-title { font-size: 13.5px; }
+  .activity-page .promo-row-2 .promo-title { font-size: 12px; }
+}

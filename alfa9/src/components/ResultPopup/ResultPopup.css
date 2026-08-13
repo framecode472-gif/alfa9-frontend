@@ -1,0 +1,227 @@
+.rp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(4, 2, 1, 0.75);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  perspective: 1200px;
+  animation: rpFadeIn 0.25s ease;
+}
+
+@keyframes rpFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rp-wrapper {
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}
+
+.rp-card {
+  width: 350px;
+  height: 495px;
+  max-width: 92vw;
+  position: relative;
+  background: url('/image/alfa-9-popup-bg.png') no-repeat center center;
+  background-size: contain;
+  filter: drop-shadow(0 20px 45px rgba(212, 175, 55, 0.45));
+  transform: scale(1);
+  opacity: 1;
+  transition: opacity 0.35s cubic-bezier(0.25, 1, 0.5, 1), transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.rp-card.rp-closing {
+  opacity: 0;
+  transform: scale(0.8) translateY(25px);
+}
+
+/* Loss uses the same gold card art but tinted red so it still reads as "not a win" */
+.rp-card.rp-loss {
+  filter: drop-shadow(0 20px 45px rgba(212, 175, 55, 0.45)) saturate(0.6) hue-rotate(150deg);
+}
+
+.rp-dust {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* close button */
+.rp-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ffd700;
+  background: radial-gradient(circle, rgba(40, 25, 10, 0.95), rgba(15, 8, 2, 0.98));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.85), inset 0 0 6px rgba(255, 215, 0, 0.45), 0 0 12px rgba(255, 215, 0, 0.3);
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.rp-close span { color: #ffd700; font-size: 11px; font-weight: 900; line-height: 1; }
+.rp-close:hover {
+  border-color: #fff;
+  transform: scale(1.15) rotate(90deg);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.8);
+}
+.rp-close:hover span { color: #fff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.9); }
+
+/* header */
+.rp-top {
+  position: absolute;
+  top: 170px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 300px;
+  max-width: 82%;
+  text-align: center;
+}
+.rp-headline {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  margin-bottom: 10px;
+  font-family: 'Arial Black', Impact, sans-serif;
+  background: linear-gradient(180deg, #ffffff 0%, #ffe082 30%, #ffb300 70%, #ff6f00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+.rp-loss .rp-headline {
+  background: linear-gradient(180deg, #ffffff 0%, #ffb3b3 35%, #ff5c5c 75%, #a11d1d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.rp-results-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.rp-results-label {
+  font-size: 11.5px;
+  color: #f3e5f5;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+.rp-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.rp-badge-green { background: linear-gradient(180deg, #17d97a, #0d7a45); }
+.rp-badge-red { background: linear-gradient(180deg, #ff5876, #921b30); }
+.rp-badge-violet { background: linear-gradient(180deg, #c084fc, #5f2ea3); }
+.rp-badge-number { background: linear-gradient(180deg, #0d9488, #115e59); }
+.rp-badge-size { background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
+.rp-badge-generic { background: linear-gradient(180deg, #d4af37, #8a6a17); font-family: 'DM Mono', 'Courier New', monospace; letter-spacing: 0.3px; }
+
+/* slip */
+.rp-slip {
+  position: absolute;
+  top: 295px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 250px;
+  max-width: 78%;
+  padding: 10px 10px 0;
+  text-align: center;
+  animation: rpSlipReveal 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: top center;
+}
+@keyframes rpSlipReveal {
+  from { transform: translateX(-50%) scaleY(0); opacity: 0; }
+  to { transform: translateX(-50%) scaleY(1); opacity: 1; }
+}
+.rp-slip-label {
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #17d97a;
+  text-shadow: 0 0 5px rgba(23, 217, 122, 0.5), 0 0 15px rgba(23, 217, 122, 0.3), 0 1px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 3px;
+}
+.rp-loss .rp-slip-label { color: #b3261e; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2); }
+.rp-slip-amount {
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+  color: #0d7a45;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.95)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
+}
+.rp-loss .rp-slip-amount { color: #7a1414; }
+.rp-slip-period {
+  font-size: 10.5px;
+  color: #201103;
+  font-weight: 800;
+  line-height: 1.4;
+  opacity: 0.95;
+  letter-spacing: 0.3px;
+}
+
+/* bottom bar */
+.rp-bottom {
+  position: absolute;
+  bottom: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rp-check {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.1);
+  line-height: 1;
+}
+.rp-autoclose-text {
+  font-size: 12px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+@media (max-width: 380px) {
+  .rp-card { width: 300px; height: 424px; }
+  .rp-top { top: 146px; }
+  .rp-slip { top: 253px; }
+  .rp-bottom { bottom: 29px; }
+  .rp-headline { font-size: 19px; }
+  .rp-slip-amount { font-size: 21px; }
+}

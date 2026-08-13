@@ -1,0 +1,12 @@
+<svg width="680" height="420" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Image placeholder</title>
+  <desc>A gold-and-dark themed placeholder showing a person silhouette icon, used when an image fails to load</desc>
+
+  <rect x="0" y="0" width="680" height="420" rx="14" fill="#1C1109"/>
+  <rect x="0.5" y="0.5" width="679" height="419" rx="14" fill="none" stroke="rgba(212,175,55,0.18)" stroke-width="1"/>
+
+  <circle cx="340" cy="210" r="70" fill="#150D05"/>
+  <circle cx="340" cy="210" r="70" fill="none" stroke="#D4AF37" stroke-width="1.5"/>
+  <circle cx="340" cy="188" r="26" fill="#5A4020"/>
+  <path d="M 292 258 a 48 38 0 0 1 96 0 z" fill="#5A4020"/>
+</svg>

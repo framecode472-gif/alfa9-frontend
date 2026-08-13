@@ -1,0 +1,603 @@
+/* ===== Global theme variables (from account.html :root) ===== */
+:root {
+  --gold: #D4AF37;
+  --gold-light: #F3DA95;
+  --gold-mid: #C9971F;
+  --gold-dark: #7A581C;
+  --gold-deep: #AA7C11;
+  --bg: rgb(30, 26, 9);
+  --bg-card: #1C1109;
+  --bg-card2: #150D05;
+  --bg-input: #211608;
+  --border: rgba(212,175,55,0.18);
+  --border-soft: rgba(212,175,55,0.09);
+  --text: #F5E6C8;
+  --text-muted: #8B7355;
+  --text-dim: #5A4020;
+}
+
+html, body, #root {
+  background: rgb(145, 149, 163);
+}
+
+
+
+
+
+
+
+
+/* ===== Home page container (mobile-app frame) ===== */
+.home-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: rgb(30, 26, 9);
+    color: #f5e6d3;
+    min-height: 100vh;
+    overflow-x: hidden;
+    max-width: 430px;
+    margin: 0 auto;
+    box-shadow: 0 0 60px rgba(212, 175, 55, 0.15);
+    position: relative;
+}
+
+.home-page ::-webkit-scrollbar { width: 6px; }
+.home-page ::-webkit-scrollbar-track { background: #0a0a0a; }
+.home-page ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
+.home-page ::-webkit-scrollbar-thumb:hover { background: #d4af37; }
+
+
+
+
+
+.home-page .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(180deg, #111111 0%, #0a0a0a 100%);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(212,175,55,0.1);
+    border-bottom: 1px solid rgba(212,175,55,0.1);
+}
+.home-page .logo img {
+    height: 42px; width: auto; max-width: 130px; object-fit: contain;
+    filter: drop-shadow(0 0 15px rgba(212,175,55,0.4));
+}
+.home-page .msg-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #1a1a1a, #111111);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.home-page .msg-icon:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(212,175,55,0.3); }
+
+.home-page .slider-container {
+    position: relative; margin: 12px; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 30px rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.15);
+}
+.home-page .slider { position: relative; width: 100%; aspect-ratio: 2/1; }
+.home-page .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease-in-out; }
+.home-page .slide.active { opacity: 1; }
+.home-page .slide img { width: 100%; height: 100%; object-fit: cover; }
+.home-page .slider-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+.home-page .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(212,175,55,0.3); cursor: pointer; transition: all 0.3s;
+}
+.home-page .dot.active {
+    background: linear-gradient(135deg, #e30505, #efad06);
+    width: 24px; border-radius: 4px; box-shadow: 0 0 15px rgba(212,175,55,0.6);
+}
+
+.home-page .announcement {
+    display: flex; align-items: center; gap: 12px;
+    margin: 12px; padding: 12px 16px;
+    background: linear-gradient(135deg, #1a1a1a, #111111);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.home-page .announce-text-wrapper { flex: 1; overflow: hidden; height: 20px; }
+.home-page .announce-text {
+    white-space: nowrap;
+    animation: marqueeScroll 18s linear infinite;
+}
+.home-page .announce-text span { display: block; font-size: 13px; color: #c9a227; white-space: nowrap; }
+@keyframes marqueeScroll {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+.home-page .detail-btn {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    color: #0a0a0a; border: none; padding: 8px 20px;
+    border-radius: 50px; font-weight: 600; font-size: 13px; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap; flex-shrink: 0;
+}
+.home-page .detail-btn:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(212,175,55,0.5); }
+
+.home-page .category-grid { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+.home-page .category-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.home-page .category-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.home-page .category-card {
+    position: relative; border-radius: 14px; overflow: hidden;
+    background-position: center; background-repeat: no-repeat;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+    transition: transform 0.18s ease, filter 0.18s ease;
+    user-select: none;
+}
+.home-page .category-card:active { transform: scale(0.94); filter: brightness(1.12); }
+.home-page .cat-large { height: 90px; }
+.home-page .cat-medium { height: 80px; }
+.home-page .category-icon {
+    position: absolute; top: 50%; left: 0; transform: translateY(-50%);
+    height: 90%; width: auto; max-width: 70%; object-fit: contain;
+    object-position: left center; z-index: 1; pointer-events: none;
+}
+.home-page .cat-large .category-label {
+    position: absolute; top: 50%; right: 14px; transform: translateY(-50%);
+    z-index: 2; font-size: 20px; font-weight: 700; color: #fff;
+    white-space: nowrap; text-shadow: 0 1px 6px rgba(0,0,0,0.65);
+}
+.home-page .cat-medium .category-label {
+    position: absolute; bottom: 10px; right: 10px; z-index: 2;
+    font-size: 15px; font-weight: 700; color: #fff;
+    white-space: nowrap; text-shadow: 0 1px 5px rgba(0,0,0,0.65);
+}
+
+.home-page .section { padding: 16px 12px; }
+.home-page .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.home-page .section-title { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #f5e6d3; }
+.home-page .title-bar {
+    width: 4px; height: 20px;
+    background: linear-gradient(180deg, #d4af37, #c41e3a);
+    border-radius: 2px; box-shadow: 0 0 10px rgba(212,175,55,0.5); flex-shrink: 0;
+}
+.home-page .all-btn {
+    background: transparent; border: 1px solid rgba(212,175,55,0.3);
+    color: #d4af37; padding: 6px 16px; border-radius: 50px; font-size: 13px;
+    cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.3s;
+}
+.home-page .all-btn:hover { background: rgba(212,175,55,0.1); border-color: #d4af37; }
+.home-page .arrow { font-size: 16px; }
+
+.home-page .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(196,30,58,0.15); border: 1px solid rgba(196,30,58,0.4);
+    color: #ff4466; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    padding: 4px 10px; border-radius: 50px;
+}
+.home-page .live-dot {
+    width: 7px; height: 7px; background: #ff4466; border-radius: 50%;
+    animation: livePulse 1.2s ease-in-out infinite;
+}
+@keyframes livePulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+.home-page .games-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.home-page .game-card {
+    position: relative;
+    background: #111111; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4); transition: transform 0.3s; cursor: pointer;
+}
+.home-page .game-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(212,175,55,0.2); }
+.home-page .game-img { width: 100%; display: block; }
+.home-page .rtp-bar {
+    display: flex; justify-content: space-between; padding: 6px 10px;
+    background: linear-gradient(90deg, #d4af37, #b8860b);
+    font-size: 11px; font-weight: 600; color: #0a0a0a;
+}
+
+.home-page .providers-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.home-page .provider-card {
+    position: relative; border-radius: 12px; overflow: hidden; cursor: pointer;
+    background: linear-gradient(135deg, #0f0a00 0%, #2b1a00 20%, #5f3b00 45%, #b8860b 75%, #ffd700 100%);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4); transition: all 0.3s ease;
+}
+.home-page .provider-card:hover { transform: translateY(-4px); }
+.home-page .provider-img { width: 100%; object-fit: cover; position: relative; z-index: 2; display: block; }
+
+.home-page .lottery-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.home-page .lottery-card {
+    position: relative; overflow: hidden; border-radius: 16px; padding: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    aspect-ratio: 0.8/1; cursor: pointer; transition: transform 0.3s;
+    background: linear-gradient(145deg, #1a1200 0%, #3a2400 35%, #d4a017 100%);
+    box-shadow: 0 12px 35px rgba(0,0,0,.25);
+}
+.home-page .lottery-card:hover { transform: translateY(-4px); }
+.home-page .lottery-name { position: relative; z-index: 2; font-size: 18px; font-weight: 700; color: #fff7dc; text-shadow: 0 0 10px rgba(255,215,0,.35); }
+.home-page .lottery-img { position: relative; z-index: 2; width: 100%; height: 110px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(255,215,0,.35)); }
+
+.home-page .sports-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.home-page .sports-card {
+    position: relative; border-radius: 16px; overflow: hidden; cursor: pointer;
+    transition: transform 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border: 1px solid rgba(212,175,55,0.1); aspect-ratio: 12/16; line-height: 0;
+}
+.home-page .sports-card:hover { transform: translateY(-4px); border-color: rgba(212,175,55,0.3); }
+.home-page .sports-img { width: 100%; height: 100%; object-fit: cover; display: block; vertical-align: bottom; }
+
+/* ===== "Coming Soon" — premium in-card badge (replaces alert()) =====
+   Sits on the card itself, but hidden (opacity:0) by default. It only
+   fades in for ~1.8s when the card is tapped (see Home.jsx showComingSoon),
+   via the .is-active modifier — it must NOT be visible just from scrolling
+   into view. Applied via the .is-locked modifier on game-card / provider-card /
+   sports-card wherever the title isn't live yet. */
+.home-page .is-locked { cursor: pointer; }
+.home-page .is-locked:active { animation: lockedNudge 0.4s ease; }
+@keyframes lockedNudge {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px) rotate(-0.5deg); }
+    55% { transform: translateX(2px) rotate(0.5deg); }
+    80% { transform: translateX(-1px); }
+}
+
+.home-page .coming-soon-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(8,6,2,0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 3;
+    padding: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.home-page .coming-soon-overlay.is-active {
+    opacity: 1;
+}
+.home-page .coming-soon-overlay.is-active .coming-soon-pill {
+    animation: comingSoonPop 0.4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes comingSoonPop {
+    0%   { transform: scale(0.6); opacity: 0; }
+    60%  { transform: scale(1.07); opacity: 1; }
+    100% { transform: scale(1); }
+}
+.home-page .coming-soon-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #1c1109 0%, #2a1b08 100%);
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(212,175,55,0.55);
+    box-shadow: 0 0 0 1px rgba(212,175,55,0.12) inset, 0 4px 18px rgba(0,0,0,0.55), 0 0 18px rgba(212,175,55,0.3);
+    white-space: nowrap;
+}
+.home-page .coming-soon-pill svg {
+    flex-shrink: 0;
+    color: #d4af37;
+    filter: drop-shadow(0 0 4px rgba(212,175,55,0.6));
+}
+.home-page .coming-soon-pill .csp-text {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #f3da95, #d4af37 50%, #f3da95);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+/* Sports/game tiles are narrower — let the pill wrap to two lines there
+   instead of overflowing the card. */
+.home-page .sports-card .coming-soon-pill,
+.home-page .provider-card .coming-soon-pill {
+    white-space: normal;
+    text-align: center;
+    flex-direction: column;
+    gap: 3px;
+    padding: 9px 10px;
+}
+
+.home-page .winning-list { display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.home-page .winning-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    background: #111111; border: 1px solid rgba(212,175,55,0.1);
+    border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.home-page .winning-item.slide-in { animation: winSlideIn  0.5s ease forwards; }
+.home-page .winning-item.slide-out { animation: winSlideOut 0.4s ease forwards; }
+@keyframes winSlideIn  { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes winSlideOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
+.home-page .winning-avatar { width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid #d4af37; box-shadow:0 0 10px rgba(212,175,55,0.3); flex-shrink:0; }
+.home-page .winning-name { flex:1; font-size:13px; color:#c9a227; font-weight:600; }
+.home-page .winning-game { width:55px; height:45px; border-radius:8px; object-fit:cover; border:1px solid rgba(212,175,55,0.2); flex-shrink:0; }
+.home-page .winning-amount { text-align:right; flex-shrink:0; }
+.home-page .winning-amount .amount { display:block; font-size:14px; font-weight:700; color:#d4af37; }
+.home-page .winning-amount .label { font-size:11px; color:#8b7355; }
+
+.home-page .podium-container {
+    display: flex; justify-content: center; align-items: flex-end;
+    gap: 6px; margin: 20px 0 80px; padding: 0 8px;
+}
+.home-page .podium-col { display:flex; flex-direction:column; align-items:center; flex:1; position:relative; }
+.home-page .podium-badge-img { width:44px; height:auto; object-fit:contain; margin-bottom:-6px; position:relative; z-index:3; }
+.home-page .crown-img { width:52px; }
+.home-page .podium-face { border-radius:50%; object-fit:cover; border:2px solid #d4af37; position:relative; z-index:2; box-shadow:0 0 14px rgba(212,175,55,0.5); }
+.home-page .second-face { width:58px; height:58px; }
+.home-page .first-face { width:72px; height:72px; border-color:#ffd700; box-shadow:0 0 24px rgba(255,215,0,0.6); }
+.home-page .podium-box-wrap { position:relative; width:100%; margin-top:6px; }
+.home-page .podium-box-img { width:100%; height:auto; display:block; border-radius:8px 8px 0 0; object-fit:cover; }
+.home-page .podium-box-overlay { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:8px 4px 6px; }
+.home-page .rank-badge-img { width:44px; height:auto; object-fit:contain; }
+.home-page .rank-badge-text { font-size:11px; font-weight:700; color:#fff; background:rgba(0,0,0,0.45); padding:2px 8px; padding-top:50px; border-radius:8px; }
+.home-page .podium-name { font-size:11px; color:#f5e6d3; text-align:center; font-weight:600; text-shadow:0 1px 4px rgba(0,0,0,0.8); word-break:break-all; }
+.home-page .podium-amount { font-size:10px; color:#d4af37; font-weight:700; text-align:center; text-shadow:0 1px 4px rgba(0,0,0,0.8); word-break:break-all; }
+.home-page .gold-text { color:#ffd700 !important; text-shadow:0 0 8px rgba(255,215,0,0.5),0 1px 4px rgba(0,0,0,0.8) !important; }
+
+.home-page .leaderboard { display:flex; flex-direction:column; gap:8px; }
+.home-page .leader-item { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#111111; border:1px solid rgba(212,175,55,0.1); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
+.home-page .leader-rank { font-size:18px; font-weight:700; color:#8b7355; width:30px; text-align:center; flex-shrink:0; }
+.home-page .leader-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid rgba(212,175,55,0.3); flex-shrink:0; }
+.home-page .leader-name { flex:1; font-size:13px; color:#c9a227; }
+.home-page .leader-amount { font-size:13px; font-weight:600; color:#0a0a0a; background:linear-gradient(90deg,#d4af37,#b8860b); padding:6px 14px; border-radius:50px; box-shadow:0 2px 10px rgba(212,175,55,0.3); flex-shrink:0; }
+
+.home-page .info-section { background:linear-gradient(180deg,#0f0a00 0%,#1a1200 100%); border-radius:20px; margin:0 12px 16px; padding:24px 20px; border:1px solid rgba(212,175,55,0.2); }
+.home-page .info-providers-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+.home-page .info-provider-card { background:rgba(255,255,255,0.05); border:1px solid rgba(212,175,55,0.2); border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; min-height:60px; padding:8px; }
+.home-page .info-provider-img { width:100%; height:60px; object-fit:contain; display:block; }
+.home-page .info-provider-placeholder { font-size:11px; color:#8b7355; text-align:center; display:none; align-items:center; justify-content:center; width:100%; min-height:44px; }
+.home-page .info-points { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+.home-page .info-point { display:flex; gap:10px; align-items:flex-start; }
+.home-page .info-diamond { color:#d4af37; font-size:14px; flex-shrink:0; margin-top:2px; }
+.home-page .info-point span:last-child { font-size:13px; color:#c9a8a8; line-height:1.5; }
+.home-page .info-warning { border-top:1px solid rgba(212,175,55,0.1); padding-top:14px; text-align:center; }
+.home-page .info-warning p { font-size:12px; color:#c41e3a; line-height:1.6; }
+
+.home-page .page-menu { margin:0 12px 16px; margin-bottom:150px; background:linear-gradient(180deg,#111111 0%,#0d0b00 100%); border:1px solid rgba(212,175,55,0.15); border-radius:16px; overflow:hidden; }
+.home-page .menu-item { display:flex; align-items:center; gap:14px; padding:16px 18px; cursor:pointer; border-bottom:1px solid rgba(212,175,55,0.08); transition:background 0.2s; }
+.home-page .menu-item:last-child { border-bottom:none; }
+.home-page .menu-item:hover { background:rgba(212,175,55,0.05); }
+.home-page .menu-icon-wrap { width:38px; height:38px; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.2); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.home-page .menu-label { flex:1; font-size:15px; font-weight:500; color:#f0ddb0; }
+.home-page .menu-arrow { flex-shrink:0; }
+.home-page .bottom-spacer { height: 20px; }
+
+/* ================================================================
+   PREMIUM ENTRANCE ANIMATION SYSTEM
+   Two layers:
+   1. "Hero" elements (header, slider, announcement, categories) —
+      always visible on load, so they animate in once, staggered,
+      right after first paint.
+   2. Everything below the fold — wrapped in <Reveal> in Home.jsx,
+      which adds/removes `.is-visible` on a `.reveal-parent` every
+      time it crosses into/out of the viewport (via IntersectionObserver),
+      so the animation replays both scrolling down AND scrolling back
+      up past a section.
+   ================================================================ */
+
+/* ---- 1. Hero mount-in ---- */
+.home-page .header {
+    opacity: 0;
+    transform: translateY(-14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.home-page .header.is-in { opacity: 1; transform: translateY(0); }
+
+.home-page .slider-container {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+}
+.home-page .slider-container.is-in { opacity: 1; transform: translateY(0); }
+
+.home-page .announcement {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+}
+.home-page .announcement.is-in { opacity: 1; transform: translateY(0); }
+
+.home-page .category-grid {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+}
+.home-page .category-grid.is-in { opacity: 1; transform: translateY(0); }
+
+.home-page .category-grid.is-in .category-card {
+    animation: catPop 0.5s cubic-bezier(.34,1.56,.64,1) backwards;
+    animation-delay: calc(0.36s + var(--i, 0) * 60ms);
+}
+@keyframes catPop {
+    from { opacity: 0; transform: scale(0.85) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ---- 2. Scroll reveal (below the fold) ---- */
+.home-page .reveal-parent .section-header {
+    opacity: 0;
+    transform: translateX(-18px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.home-page .reveal-parent.is-visible .section-header {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.home-page .reveal-parent .game-card,
+.home-page .reveal-parent .lottery-card,
+.home-page .reveal-parent .provider-card,
+.home-page .reveal-parent .sports-card,
+.home-page .reveal-parent .leader-item,
+.home-page .reveal-parent .menu-item,
+.home-page .reveal-parent .podium-col,
+.home-page .reveal-parent .info-provider-card {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+    transition: opacity 0.55s cubic-bezier(.19,1,.22,1), transform 0.55s cubic-bezier(.19,1,.22,1);
+    transition-delay: calc(var(--i, 0) * 70ms);
+}
+.home-page .reveal-parent.is-visible .game-card,
+.home-page .reveal-parent.is-visible .lottery-card,
+.home-page .reveal-parent.is-visible .provider-card,
+.home-page .reveal-parent.is-visible .sports-card,
+.home-page .reveal-parent.is-visible .leader-item,
+.home-page .reveal-parent.is-visible .menu-item,
+.home-page .reveal-parent.is-visible .podium-col,
+.home-page .reveal-parent.is-visible .info-provider-card {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Winning-info list and info-section/page-menu blocks don't have a
+   per-card stagger target above — fade the whole block gently. */
+.home-page .reveal-parent .winning-list {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.home-page .reveal-parent.is-visible .winning-list {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.home-page .reveal-parent.info-section {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(.19,1,.22,1), transform 0.6s cubic-bezier(.19,1,.22,1);
+}
+.home-page .reveal-parent.info-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.home-page .reveal-parent.page-menu {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(.19,1,.22,1), transform 0.6s cubic-bezier(.19,1,.22,1);
+}
+.home-page .reveal-parent.page-menu.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ---- Respect reduced-motion users: skip straight to the end state ---- */
+@media (prefers-reduced-motion: reduce) {
+    .home-page .header,
+    .home-page .slider-container,
+    .home-page .announcement,
+    .home-page .category-grid,
+    .home-page .category-grid .category-card,
+    .home-page .reveal-parent,
+    .home-page .reveal-parent * {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* ================================================================
+   NEW — MOBILE RESPONSIVE FIXES (nothing above was removed/changed)
+   Original file had zero media queries, so every padding/gap/font-size
+   was fixed px. That's fine on desktop (.home-page is capped 430px
+   anyway) but on real small phones (<=380px, e.g. iPhone SE, small
+   Android) things like category icon+label, lottery card padding,
+   coming-soon pill text, and podium avatars got visually tight.
+   These two breakpoints scale everything down proportionally.
+   ================================================================ */
+* { box-sizing: border-box; }
+.home-page { overflow-x: hidden; }
+
+@media (max-width: 380px) {
+  .home-page .header { padding: 10px 12px; }
+  .home-page .logo img { height: 36px; }
+  .home-page .msg-icon { width: 38px; height: 38px; }
+
+  .home-page .slider-container { margin: 10px; }
+
+  .home-page .announcement { margin: 10px; padding: 10px 12px; gap: 8px; }
+  .home-page .announce-text span { font-size: 12px; }
+  .home-page .detail-btn { padding: 7px 14px; font-size: 12px; }
+
+  .home-page .category-grid { padding: 10px; gap: 6px; }
+  .home-page .category-row-2,
+  .home-page .category-row-3 { gap: 6px; }
+  .home-page .cat-large { height: 78px; }
+  .home-page .cat-medium { height: 68px; }
+  .home-page .cat-large .category-label { font-size: 15px; right: 10px; }
+  .home-page .cat-medium .category-label { font-size: 12.5px; bottom: 8px; right: 8px; }
+
+  .home-page .section { padding: 14px 10px; }
+  .home-page .section-title { font-size: 16px; }
+  .home-page .all-btn { padding: 5px 12px; font-size: 12px; }
+
+  .home-page .games-grid,
+  .home-page .providers-grid,
+  .home-page .lottery-grid,
+  .home-page .sports-grid { gap: 8px; }
+
+  .home-page .lottery-card { padding: 10px; }
+  .home-page .lottery-name { font-size: 15px; }
+  .home-page .lottery-img { height: 85px; }
+
+  .home-page .coming-soon-pill { padding: 6px 10px; }
+  .home-page .coming-soon-pill .csp-text { font-size: 9px; }
+
+  .home-page .winning-item { padding: 10px 12px; gap: 8px; }
+  .home-page .winning-avatar { width: 38px; height: 38px; }
+  .home-page .winning-name { font-size: 12px; }
+  .home-page .winning-game { width: 46px; height: 38px; }
+  .home-page .winning-amount .amount { font-size: 12.5px; }
+  .home-page .winning-amount .label { font-size: 10px; }
+
+  .home-page .podium-container { gap: 4px; padding: 0 4px; margin: 20px 0 70px; }
+  .home-page .second-face { width: 48px; height: 48px; }
+  .home-page .first-face { width: 60px; height: 60px; }
+  .home-page .podium-badge-img { width: 36px; }
+  .home-page .crown-img { width: 44px; }
+  .home-page .podium-name { font-size: 10px; }
+  .home-page .podium-amount { font-size: 9px; }
+
+  .home-page .leader-item { padding: 10px 12px; gap: 8px; }
+  .home-page .leader-rank { font-size: 15px; width: 24px; }
+  .home-page .leader-avatar { width: 34px; height: 34px; }
+  .home-page .leader-name { font-size: 12px; }
+  .home-page .leader-amount { font-size: 12px; padding: 5px 10px; }
+
+  .home-page .info-section { padding: 18px 14px; margin: 0 10px 14px; }
+  .home-page .info-provider-img { height: 50px; }
+  .home-page .info-point span:last-child { font-size: 12px; }
+  .home-page .info-warning p { font-size: 11px; }
+
+  .home-page .page-menu { margin: 0 10px 16px; margin-bottom: 150px; }
+  .home-page .menu-item { padding: 14px 14px; gap: 12px; }
+  .home-page .menu-icon-wrap { width: 34px; height: 34px; }
+  .home-page .menu-label { font-size: 14px; }
+}
+
+@media (max-width: 340px) {
+  .home-page .games-grid,
+  .home-page .providers-grid,
+  .home-page .lottery-grid,
+  .home-page .sports-grid { gap: 6px; }
+  .home-page .cat-large { height: 70px; }
+  .home-page .cat-medium { height: 60px; }
+  .home-page .cat-large .category-label { font-size: 13px; }
+  .home-page .cat-medium .category-label { font-size: 11px; }
+  .home-page .lottery-card { padding: 8px; }
+  .home-page .lottery-img { height: 70px; }
+  .home-page .lottery-name { font-size: 13px; }
+  .home-page .winning-avatar { width: 34px; height: 34px; }
+  .home-page .winning-game { width: 40px; height: 34px; }
+}

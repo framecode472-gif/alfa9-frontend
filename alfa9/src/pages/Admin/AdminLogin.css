@@ -1,0 +1,53 @@
+.admin-login-page {
+  --gold: #D4AF37;
+  --gold-light: #F3DA95;
+  --gold-dark: #7A581C;
+  --bg-card: #1C1109;
+  --bg-input: #211608;
+  --border: rgba(212,175,55,0.2);
+  --text: #F5E6C8;
+  --text-muted: #8B7355;
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(700px 400px at 50% 0%, rgba(212,175,55,0.08), transparent 60%),
+    #0D0704;
+  padding: 20px;
+}
+
+.admin-login-page .admin-login-card {
+  width: 100%;
+  max-width: 340px;
+  background: linear-gradient(150deg, var(--bg-card), #150D05);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 26px;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+}
+
+.admin-login-page .admin-login-logo { height: 40px; margin-bottom: 18px; }
+.admin-login-page .admin-login-title { font-size: 18px; font-weight: 800; color: var(--gold-light); margin-bottom: 4px; }
+.admin-login-page .admin-login-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 22px; }
+
+.admin-login-page .admin-login-form { display: flex; flex-direction: column; gap: 12px; }
+.admin-login-page .admin-login-form input {
+  background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; color: var(--text); font-size: 14px; outline: none; text-align: center;
+  letter-spacing: 1px; transition: border-color 0.2s;
+}
+.admin-login-page .admin-login-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.1); }
+
+.admin-login-page .admin-login-error { font-size: 12px; color: #E24B4A; }
+
+.admin-login-page .admin-login-btn {
+  padding: 13px; border: none; border-radius: 50px; cursor: pointer; font-family: inherit;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+  color: #140A03; font-size: 14px; font-weight: 800; transition: filter 0.2s;
+}
+.admin-login-page .admin-login-btn:hover { filter: brightness(1.08); }
+.admin-login-page .admin-login-btn:active { transform: scale(0.98); }

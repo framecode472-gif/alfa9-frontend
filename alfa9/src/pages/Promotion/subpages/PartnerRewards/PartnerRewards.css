@@ -1,0 +1,108 @@
+.partner-rewards-page.page-wrapper {
+  width: 100%;
+  max-width: 430px;
+  background: #0D0704;
+  min-height: 100vh;
+  overflow-x: hidden;
+  margin: 0 auto;
+}
+
+.partner-rewards-page .top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(160deg, #7A581C 0%, #C9971F 25%, #D4AF37 45%, #B8860B 70%, #7A581C 100%);
+  height: 52px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 15px rgba(212,175,55,0.4);
+}
+.partner-rewards-page .top-title { font-size: 17px; font-weight: 800; color: #140A03; }
+.partner-rewards-page .back-btn { position: absolute; left: 14px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #140A03; text-decoration: none; }
+
+.partner-rewards-page .reward-hero {
+  position: relative; margin: 0; padding: 22px 16px; min-height: 140px;
+  background: linear-gradient(135deg, #E8A33D, #D4882A 60%, #B8690F);
+  background-image: url('/image/reward-bg.png');
+  background-size: cover; background-position: center;
+  display: flex; align-items: center; overflow: hidden;
+}
+.partner-rewards-page .reward-hero::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(13,7,4,0.15) 0%, rgba(13,7,4,0.05) 60%);
+}
+.partner-rewards-page .reward-hero-text { position: relative; z-index: 1; margin-left: auto; text-align: right; max-width: 55%; }
+.partner-rewards-page .reward-hero-title { font-size: 15px; font-weight: 800; color: #140A03; line-height: 1.3; margin-bottom: 10px; }
+.partner-rewards-page .reward-hero-amount {
+  display: inline-block; background: linear-gradient(180deg,#3A2510,#140A03);
+  border: 1px solid #D4AF37; color: #FFF3CD; font-size: 16px; font-weight: 800;
+  padding: 5px 15px; border-radius: 50px;
+}
+
+.partner-rewards-page .info-stack { padding: 16px 14px 0; display: flex; flex-direction: column; gap: 10px; }
+.partner-rewards-page .info-row {
+  background: #1C1109; border: 1px solid #2A1A08; border-radius: 12px;
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+}
+.partner-rewards-page .info-label { font-size: 14px; color: #8B7355; font-weight: 600; }
+.partner-rewards-page .info-value { font-size: 16px; font-weight: 800; color: #FFF3CD; }
+.partner-rewards-page .info-value.green { color: #7BD88F; }
+.partner-rewards-page .info-value.red { color: #FF6B5E; }
+
+.partner-rewards-page .invite-record-link {
+  text-align: center; margin: 16px 0 4px; font-size: 13px; font-weight: 700; color: #D4AF37; cursor: pointer;
+}
+
+.partner-rewards-page .link-section { margin: 14px 14px 0; }
+.partner-rewards-page .link-section-title { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.partner-rewards-page .link-bar { width: 4px; height: 18px; background: linear-gradient(180deg,#D4AF37,#7A581C); border-radius: 2px; }
+.partner-rewards-page .link-title { font-size: 15px; font-weight: 800; color: #FFF3CD; }
+.partner-rewards-page .link-box {
+  display: flex; align-items: stretch; background: #1C1109; border: 1px solid #2A1A08;
+  border-radius: 50px; overflow: hidden; box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+}
+.partner-rewards-page .link-text {
+  flex: 1; padding: 13px 16px; font-size: 13px; color: #C3A675;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.partner-rewards-page .link-copy-btn {
+  width: 54px; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #D4AF37 0%, #AA7C11 100%); cursor: pointer; flex-shrink: 0;
+}
+
+.partner-rewards-page .rules-card {
+  margin: 18px 14px 30px; background: #1C1109; border: 1px solid #2A1A08; border-radius: 14px;
+  padding: 16px; box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+}
+.partner-rewards-page .rules-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.partner-rewards-page .rules-header-icon { width: 22px; height: 22px; }
+.partner-rewards-page .rules-header-text { font-size: 15px; font-weight: 800; color: #FFF3CD; }
+.partner-rewards-page .rules-sub { font-size: 13px; color: #C3A675; margin-bottom: 14px; }
+.partner-rewards-page .rules-sub b { color: #FF6B5E; font-weight: 800; }
+
+.partner-rewards-page .reward-table { width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+.partner-rewards-page .reward-table thead th {
+  background: linear-gradient(135deg,#7A581C,#D4AF37 50%,#B8860B);
+  color: #140A03; font-size: 12px; font-weight: 800; padding: 10px 6px; text-align: center;
+}
+.partner-rewards-page .reward-table td {
+  font-size: 11.5px; color: #C3A675; text-align: center; padding: 12px 6px;
+  border-bottom: 1px solid #2A1A08; vertical-align: middle; line-height: 1.4;
+}
+.partner-rewards-page .reward-table tr:nth-child(odd) td { background: #140A03; }
+.partner-rewards-page .reward-table tr:nth-child(even) td { background: #1C1109; }
+.partner-rewards-page .deposit-cell { font-weight: 800; color: #D4AF37; }
+.partner-rewards-page .bonus-cell { color: #FF6B5E; font-weight: 800; }
+
+.partner-rewards-page .note-text { font-size: 12.5px; color: #FF6B5E; font-weight: 700; margin: 14px 0 10px; }
+.partner-rewards-page .eg-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 6px; }
+.partner-rewards-page .eg-item { display: flex; gap: 8px; font-size: 12.5px; color: #C3A675; line-height: 1.5; }
+.partner-rewards-page .eg-dot { width: 7px; height: 7px; border-radius: 50%; background: #D4AF37; margin-top: 6px; flex-shrink: 0; }
+.partner-rewards-page .eg-item b.hl { color: #FF6B5E; font-weight: 800; }
+
+.partner-rewards-page .toast {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-20px);
+  background: #1C1109; border: 1px solid #D4AF37; color: #FFF3CD; padding: 10px 22px;
+  border-radius: 50px; font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.3s;
+  z-index: 99999; pointer-events: none;
+  max-width: calc(100vw - 40px); width: max-content; box-sizing: border-box;
+  white-space: normal; text-align: center; word-break: break-word;
+}
+.partner-rewards-page .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }

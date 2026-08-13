@@ -1,0 +1,245 @@
+/* ── OUTER SHELL: fills the browser window, grey backdrop on desktop ── */
+.splash-outer {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #8c8f9c; /* same grey as the rest of the app shell */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* ── INNER FRAME: the actual 430px "phone" panel ── */
+.splash-screen {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  max-height: 920px;
+  background: radial-gradient(circle at 50% 50%, #2e1805 0%, #150a02 70%, #000000 100%);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 16px;
+  animation: splashFadeIn 0.4s ease forwards;
+}
+
+.splash-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255, 215, 0, 0.015) 1.2px, transparent 0);
+  background-size: 20px 20px;
+  opacity: 0.8;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.splash-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.splash-hero-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.splash-hero-section {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: splashHeroFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.splash-hero-section::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 183, 77, 0.25) 0%, rgba(255, 183, 77, 0) 70%);
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(40px);
+  animation: splashPulseGlow 4s ease-in-out infinite alternate;
+}
+
+.splash-hero-image {
+  width: 430px;
+  max-width: 430px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.95));
+}
+
+.splash-text-section {
+  text-align: center;
+  width: 100%;
+  padding: 12px 10px 0 10px;
+  animation: splashTextFadeIn 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.splash-headline {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  display: block;
+  background: linear-gradient(180deg, #ffffff 60%, #ffeaa7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(255, 215, 0, 0.15));
+  word-wrap: break-word;
+  font-family: 'Montserrat', -apple-system, sans-serif;
+}
+
+.splash-logo-section {
+  width: 100%;
+  max-width: 170px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  animation: splashLogoFadeIn 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.splash-logo-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.4));
+  transition: transform 0.3s ease;
+}
+
+/* ── exit animation: whole page zooms + fades out before Home appears ── */
+.splash-outer.splash-exit {
+  animation: splashExitOut 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ── on real phones (<=430px viewport) go true full-screen, no frame ── */
+@media (max-width: 430px) {
+  .splash-outer {
+    background-color: #000000;
+  }
+  .splash-screen {
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 25px 12px 40px 12px;
+  }
+  .splash-headline {
+    font-size: 11px;
+    letter-spacing: 1.2px;
+  }
+  .splash-hero-image {
+    width: 100%;
+  }
+  .splash-logo-section {
+    margin-bottom: 22px;
+  }
+}
+
+@keyframes splashFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes splashHeroFadeIn {
+  0% { opacity: 0; transform: translateY(15px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes splashTextFadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splashLogoFadeIn {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes splashPulseGlow {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  100% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes splashExitOut {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+
+
+/* ================================================================
+   EXTRA MOBILE RESPONSIVE — logo visibility fix
+   (does not alter desktop styles or the existing 430px block above)
+   ================================================================ */
+@media (max-width: 480px) {
+  .splash-hero-container { flex-grow: 0.85; }
+
+  .splash-logo-section {
+    max-width: 150px;
+    height: 46px;
+    margin-top: 12px;
+    margin-bottom: 26px;
+  }
+  .splash-logo-image {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.55)) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.9));
+  }
+}
+
+/* Short-height phones (common Android sizes, small iPhones) — logo was
+   getting pushed off-screen or squeezed to the very bottom edge */
+@media (max-height: 700px) {
+  .splash-screen { padding-top: 20px; padding-bottom: 30px; }
+  .splash-hero-image { max-width: 78%; }
+  .splash-text-section { padding-top: 8px; }
+  .splash-headline { font-size: 12px; }
+  .splash-logo-section {
+    margin-top: 10px;
+    margin-bottom: 18px;
+    height: 42px;
+  }
+}
+
+@media (max-height: 600px) {
+  .splash-hero-image { max-width: 62%; }
+  .splash-headline { font-size: 10.5px; letter-spacing: 1px; }
+  .splash-logo-section {
+    max-width: 130px;
+    height: 36px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Extra-narrow phones */
+@media (max-width: 360px) {
+  .splash-logo-section { max-width: 128px; height: 38px; margin-bottom: 20px; }
+  .splash-headline { font-size: 10px; }
+}

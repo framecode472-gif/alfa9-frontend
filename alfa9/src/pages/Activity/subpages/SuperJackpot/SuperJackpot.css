@@ -1,0 +1,182 @@
+.super-jackpot-page {
+  --sj-gold1: #7A581C; --sj-gold2: #C9971F; --sj-gold3: #D4AF37; --sj-gold4: #B8860B;
+  --sj-gold5: #F3DA95; --sj-gold-light: #FFF3CD; --sj-dark1: #0D0704; --sj-dark2: #1C1109;
+  --sj-dark3: #2A1A08; --sj-dark4: #140A03; --sj-text-gold: #C3A675; --sj-red: #ef4444;
+
+  max-width: 430px; margin: 0 auto; background: var(--sj-dark1); min-height: 100vh;
+  position: relative; overflow-x: hidden; padding-bottom: 20px;
+}
+
+.super-jackpot-page .top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(180deg, #1C120C 0%, var(--sj-dark4) 100%);
+  height: 56px; display: flex; align-items: center; justify-content: center;
+  border-bottom: 2px solid;
+  border-image: linear-gradient(to right, var(--sj-gold1), var(--sj-gold3), var(--sj-gold4), var(--sj-gold3), var(--sj-gold1)) 1;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.55);
+}
+.super-jackpot-page .back-btn {
+  position: absolute; left: 14px; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1.5px solid rgba(212,175,55,0.35);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.super-jackpot-page .back-btn:hover { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.7); }
+.super-jackpot-page .top-title {
+  font-size: 17px; font-weight: 800;
+  background: linear-gradient(180deg, var(--sj-gold5) 0%, var(--sj-gold3) 50%, var(--sj-gold1) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px;
+}
+
+.super-jackpot-page .hero-banner {
+  width: 100%; position: relative; overflow: hidden;
+  background: radial-gradient(circle at 50% 20%, rgba(255,215,110,0.35), transparent 60%),
+    linear-gradient(150deg, #2B1400 0%, #5A2800 40%, #8A4500 70%, #3D1F00 100%);
+}
+.super-jackpot-page .hero-bg-layer { position: absolute; inset: 0; z-index: 0; }
+.super-jackpot-page .hero-bg-layer img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.super-jackpot-page .hero-rays {
+  position: absolute; top: 50%; left: 50%; width: 420px; height: 420px; transform: translate(-50%,-50%);
+  background: repeating-conic-gradient(rgba(255,225,130,0.10) 0deg 6deg, transparent 6deg 18deg);
+  animation: sj-rayspin 26s linear infinite; pointer-events: none; z-index: 1;
+}
+@keyframes sj-rayspin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+.super-jackpot-page .hero-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(8,4,0,0.32) 0%, rgba(8,4,0,0.42) 35%, rgba(8,4,0,0.70) 72%, rgba(8,4,0,0.90) 100%);
+  pointer-events: none; z-index: 2;
+}
+.super-jackpot-page .hero-content { position: relative; z-index: 3; padding: 22px 20px 22px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.super-jackpot-page .hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--sj-gold5), var(--sj-gold3) 55%, var(--sj-gold1));
+  color: var(--sj-dark1); font-size: 10.5px; font-weight: 900; padding: 5px 14px 5px 10px; border-radius: 20px;
+  letter-spacing: 1.2px; text-transform: uppercase; width: fit-content; box-shadow: 0 4px 14px rgba(212,175,55,0.5);
+}
+.super-jackpot-page .hero-coin-wrap { filter: drop-shadow(0 8px 18px rgba(0,0,0,0.55)); }
+.super-jackpot-page .hero-coin-wrap svg { animation: sj-coinPulse 2.6s ease-in-out infinite; display: block; }
+@keyframes sj-coinPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+.super-jackpot-page .hero-title {
+  font-size: 24px; font-weight: 900; letter-spacing: 0.4px;
+  background: linear-gradient(180deg, var(--sj-gold-light) 0%, var(--sj-gold5) 40%, var(--sj-gold3) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.super-jackpot-page .hero-desc-wrap { background: rgba(8,4,0,0.45); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 10px 14px; }
+.super-jackpot-page .hero-desc { font-size: 12px; color: #FFF3CD; line-height: 1.7; max-width: 300px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+.super-jackpot-page .receive-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; margin: 16px 14px 0;
+  background: linear-gradient(150deg, var(--sj-dark3), var(--sj-dark2)); color: #7a6640; font-size: 15px; font-weight: 700;
+  border: 1px solid rgba(122,88,28,0.5); border-radius: 50px; padding: 13px 0; cursor: default; width: calc(100% - 28px);
+}
+
+.super-jackpot-page .action-btns { display: flex; gap: 10px; padding: 14px 14px 6px; }
+.super-jackpot-page .action-btn {
+  flex: 1; background: linear-gradient(180deg, #241408 0%, #1C1109 100%); border: 1px solid rgba(122,88,28,0.5);
+  border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 6px;
+  cursor: pointer; color: var(--sj-text-gold); font-size: 13px; font-weight: 700; transition: all 0.25s;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+}
+.super-jackpot-page .action-btn.active-tab {
+  background: linear-gradient(135deg, var(--sj-gold2), var(--sj-gold4)); border-color: var(--sj-gold3); color: var(--sj-dark1);
+  box-shadow: 0 4px 16px rgba(212,175,55,0.45), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.super-jackpot-page .action-btn-icon {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 8px;
+  background: linear-gradient(150deg, rgba(212,175,55,0.22), rgba(212,175,55,0.04)); box-shadow: inset 0 0 0 1px rgba(212,175,55,0.25);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+/* FIX: icons now use currentColor so they can flip contrast depending on
+   tab state — soft gold with a glow when the tab is inactive (dark card
+   background), and dark solid when the tab is active (solid gold pill
+   background) so the icon never blends into the button. */
+.super-jackpot-page .action-btn-icon svg {
+  color: var(--sj-gold3);
+  filter: drop-shadow(0 0 3px rgba(212,175,55,0.4));
+  transition: color 0.25s ease, filter 0.25s ease;
+}
+.super-jackpot-page .action-btn.active-tab .action-btn-icon {
+  background: rgba(13,7,4,0.16);
+  box-shadow: inset 0 0 0 1px rgba(13,7,4,0.22);
+}
+.super-jackpot-page .action-btn.active-tab .action-btn-icon svg {
+  color: var(--sj-dark1);
+  filter: none;
+}
+
+.super-jackpot-page .gold-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--sj-gold1), var(--sj-gold3), var(--sj-gold1), transparent); margin: 4px 14px 0; opacity: 0.6; }
+
+.super-jackpot-page .empty-card {
+  background: linear-gradient(160deg, var(--sj-dark2), var(--sj-dark3)); margin: 8px 14px 16px; border-radius: 18px;
+  padding: 38px 20px 32px; text-align: center; border: 1px solid rgba(122,88,28,0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45); position: relative; overflow: hidden;
+}
+.super-jackpot-page .empty-svg { width: 140px; height: 108px; margin-bottom: 16px; position: relative; z-index: 1; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.4)); }
+.super-jackpot-page .empty-text { font-size: 14px; color: var(--sj-text-gold); opacity: 0.85; position: relative; z-index: 1; }
+.super-jackpot-page .go-bet-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 28px); margin: 0 14px 20px;
+  background: linear-gradient(135deg, var(--sj-gold5), var(--sj-gold3) 45%, var(--sj-gold4)); color: var(--sj-dark1);
+  font-size: 16px; font-weight: 800; border: none; border-radius: 50px; padding: 15px 0; cursor: pointer;
+  box-shadow: 0 6px 22px rgba(212,175,55,0.45); letter-spacing: 0.5px;
+}
+
+.super-jackpot-page .warning-box {
+  margin: 14px 14px; background: linear-gradient(135deg, rgba(232,160,32,0.14), rgba(232,160,32,0.04)); border-radius: 12px;
+  padding: 13px 14px; display: flex; gap: 10px; align-items: flex-start; border: 1px solid rgba(212,175,55,0.3);
+}
+.super-jackpot-page .warning-icon-wrap {
+  width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; background: linear-gradient(135deg, var(--sj-gold3), var(--sj-gold1));
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(212,175,55,0.3);
+}
+.super-jackpot-page .warning-text { font-size: 12px; color: #e6c97a; line-height: 1.6; padding-top: 3px; }
+
+.super-jackpot-page .bonus-section { padding: 4px 14px 14px; }
+.super-jackpot-page .bonus-section-title { display: flex; align-items: center; gap: 9px; font-size: 16px; font-weight: 800; padding: 10px 0 12px; color: var(--sj-gold-light); }
+.super-jackpot-page .bonus-section-icon {
+  width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(145deg, var(--sj-gold5), var(--sj-gold3) 60%, var(--sj-gold1));
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(212,175,55,0.4); flex-shrink: 0;
+}
+.super-jackpot-page .bonus-table-wrap { border-radius: 16px; overflow: hidden; border: 1px solid rgba(122,88,28,0.5); box-shadow: 0 8px 22px rgba(0,0,0,0.4); }
+.super-jackpot-page .bonus-table { width: 100%; border-collapse: collapse; background: var(--sj-dark2); }
+.super-jackpot-page .bonus-table thead tr { background: linear-gradient(135deg, var(--sj-gold2), var(--sj-gold4)); }
+.super-jackpot-page .bonus-table thead th { padding: 12px 8px; color: var(--sj-dark1); font-size: 11.5px; font-weight: 800; text-align: center; }
+.super-jackpot-page .bonus-table tbody tr:nth-child(even) { background: rgba(42,26,8,0.55); }
+.super-jackpot-page .bonus-table tbody tr:nth-child(odd) { background: var(--sj-dark2); }
+.super-jackpot-page .bonus-table td { padding: 10px 8px; text-align: center; font-size: 12px; color: var(--sj-text-gold); border-bottom: 1px solid rgba(122,88,28,0.25); }
+.super-jackpot-page .bonus-table td:first-child { color: var(--sj-gold5); font-weight: 800; }
+.super-jackpot-page .bonus-table td:last-child { color: var(--sj-red); font-weight: 800; }
+
+.super-jackpot-page .footer-note {
+  margin: 16px 14px 14px; background: linear-gradient(160deg, var(--sj-dark2), var(--sj-dark3)); border-radius: 12px; padding: 13px 14px;
+  display: flex; gap: 9px; align-items: flex-start; border: 1px solid rgba(122,88,28,0.4);
+}
+.super-jackpot-page .note-text { font-size: 12px; color: var(--sj-text-gold); line-height: 1.6; }
+.super-jackpot-page .contact-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 28px); margin: 0 14px 20px;
+  background: linear-gradient(135deg, var(--sj-gold5), var(--sj-gold3) 45%, var(--sj-gold4)); color: var(--sj-dark1);
+  font-size: 15px; font-weight: 800; border: none; border-radius: 50px; padding: 14px 0; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+}
+
+.super-jackpot-page .star-lead-note { margin: 14px 14px 4px; text-align: center; font-size: 11px; color: var(--sj-text-gold); opacity: 0.7; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; }
+.super-jackpot-page .cards-wrap { padding: 10px 14px; }
+.super-jackpot-page .winner-card { background: linear-gradient(155deg, var(--sj-dark2), var(--sj-dark3)); border-radius: 16px; margin-bottom: 12px; padding: 15px; border: 1px solid rgba(122,88,28,0.4); box-shadow: 0 6px 18px rgba(0,0,0,0.4); overflow: hidden; position: relative; }
+.super-jackpot-page .winner-card.rank-1 { border-color: rgba(212,175,55,0.65); box-shadow: 0 8px 24px rgba(212,175,55,0.18), 0 6px 18px rgba(0,0,0,0.4); }
+.super-jackpot-page .winner-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.super-jackpot-page .medal { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: var(--sj-dark1); flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,0,0,0.4); }
+.super-jackpot-page .medal.gold { background: linear-gradient(145deg, var(--sj-gold5), var(--sj-gold3) 60%, var(--sj-gold1)); }
+.super-jackpot-page .medal.silver { background: linear-gradient(145deg, #ECECEC, #B8B8B8 60%, #8A8A8A); }
+.super-jackpot-page .medal.bronze { background: linear-gradient(145deg, #E8A868, #C97A3D 60%, #8A4E24); }
+.super-jackpot-page .medal.plain { background: linear-gradient(145deg, #4a3a20, #2a1e0c); color: var(--sj-text-gold); }
+.super-jackpot-page .winner-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--sj-gold1); }
+.super-jackpot-page .winner-name-wrap { flex: 1; }
+.super-jackpot-page .winner-name { font-size: 15px; font-weight: 700; background: linear-gradient(90deg, var(--sj-gold5), var(--sj-gold3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: block; }
+.super-jackpot-page .winner-multiplier-badge { font-size: 10px; font-weight: 800; color: var(--sj-dark1); background: linear-gradient(135deg, var(--sj-gold5), var(--sj-gold3)); padding: 2px 9px; border-radius: 10px; display: inline-block; margin-top: 3px; }
+.super-jackpot-page .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 11px; border-radius: 8px; margin-bottom: 4px; background: rgba(42,26,8,0.5); }
+.super-jackpot-page .info-row:nth-child(even) { background: rgba(28,17,9,0.8); }
+.super-jackpot-page .info-label { font-size: 12px; color: var(--sj-text-gold); opacity: 0.75; }
+.super-jackpot-page .info-val { font-size: 12px; color: var(--sj-text-gold); font-weight: 700; }
+.super-jackpot-page .info-val.orange { color: var(--sj-gold5); }
+.super-jackpot-page .info-val.red { color: var(--sj-red); }
+
+.super-jackpot-page .bottom-spacer { height: 24px; }

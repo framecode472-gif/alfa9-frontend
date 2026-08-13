@@ -1,0 +1,205 @@
+/* ===== About Us page (scoped under .about-us-page) ===== */
+
+.about-us-page {
+  --gold: #D4AF37;
+  --gold-light: #F3DA95;
+  --gold-mid: #C9971F;
+  --gold-dark: #7A581C;
+  --bg: #120E06;
+  --bg-card: #1B1309;
+  --bg-card2: #150F06;
+  --glass: rgba(28, 20, 10, 0.55);
+  --border: rgba(212, 175, 55, 0.20);
+  --border-soft: rgba(212, 175, 55, 0.10);
+  --text: #F5E6C8;
+  --text-muted: #9A8567;
+  --text-dim: #5A4020;
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:
+    radial-gradient(700px 400px at 15% 0%, rgba(212, 175, 55, 0.07), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  padding-bottom: 40px;
+}
+
+.about-us-page ::-webkit-scrollbar { width: 5px; }
+.about-us-page ::-webkit-scrollbar-track { background: #0a0a0a; }
+.about-us-page ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); border-radius: 3px; }
+
+/* ── PAGES ── */
+.about-us-page .page { animation: aboutPageIn 0.35s ease; }
+@keyframes aboutPageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HEADER ── */
+.about-us-page .header {
+  position: relative;
+  background:
+    radial-gradient(120% 140% at 85% -10%, rgba(212, 175, 55, 0.20), transparent 55%),
+    linear-gradient(160deg, #140D02 0%, #241705 35%, #382305 55%, #241705 75%, #140D02 100%);
+  padding: 48px 20px 30px; text-align: center;
+  border-bottom-left-radius: 26px; border-bottom-right-radius: 26px;
+  overflow: hidden; margin-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.about-us-page .header::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(-55deg, transparent, transparent 40px, rgba(212, 175, 55, 0.04) 40px, rgba(212, 175, 55, 0.04) 41px);
+}
+.about-us-page .back-btn {
+  position: absolute; top: 14px; left: 14px; width: 38px; height: 38px;
+  background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10;
+  text-decoration: none; backdrop-filter: blur(8px);
+}
+.about-us-page .header-title {
+  font-size: 20px; font-weight: 900;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  position: relative; z-index: 1; margin-bottom: 7px; letter-spacing: 0.3px;
+}
+.about-us-page .header-sub { font-size: 12px; color: var(--text-muted); position: relative; z-index: 1; }
+
+/* ── HERO BANNER (main about page) ── */
+.about-us-page .about-hero {
+  margin: 0 14px 20px;
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgba(212, 175, 55, 0.10), transparent 55%),
+    linear-gradient(135deg, #211608, #2a1a08, #1a1003);
+  border: 1px solid var(--border); border-radius: 22px; padding: 28px 20px 24px;
+  text-align: center; position: relative; overflow: hidden;
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.55);
+}
+.about-us-page .about-hero::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(-45deg, transparent, transparent 22px, rgba(255, 255, 255, 0.02) 22px, rgba(255, 255, 255, 0.02) 23px);
+  pointer-events: none;
+}
+.about-us-page .about-logo-wrap { display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; position: relative; z-index: 1; }
+.about-us-page .about-logo-wrap img { width: 150px; height: 70px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+.about-us-page .about-app-name {
+  font-size: 26px; font-weight: 900;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold) 45%, var(--gold-light) 70%, var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  position: relative; z-index: 1; margin-bottom: 6px;
+}
+.about-us-page .about-version {
+  display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold-mid);
+  background: rgba(212, 175, 55, 0.13); border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 20px; padding: 4px 12px; letter-spacing: 0.4px; position: relative; z-index: 1; margin-bottom: 16px;
+}
+.about-us-page .about-tagline { font-size: 13px; color: var(--text-muted); line-height: 1.65; position: relative; z-index: 1; }
+
+/* ── STATS ROW ── */
+.about-us-page .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 14px 20px; }
+.about-us-page .stat-card {
+  background: linear-gradient(150deg, var(--bg-card), var(--bg-card2)); border: 1px solid var(--border-soft);
+  border-radius: 16px; padding: 16px 10px; text-align: center; transition: transform 0.2s, border-color 0.2s;
+}
+.about-us-page .stat-card:active { transform: scale(0.96); }
+.about-us-page .stat-num {
+  font-size: 19px; font-weight: 900;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 5px;
+}
+.about-us-page .stat-label { font-size: 10px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; }
+
+/* ── MENU LIST ── */
+.about-us-page .menu-list {
+  margin: 0 14px; background: linear-gradient(150deg, var(--bg-card), var(--bg-card2));
+  border: 1px solid var(--border-soft); border-radius: 18px; overflow: hidden;
+}
+.about-us-page .menu-item {
+  display: flex; align-items: center; gap: 14px; padding: 18px 16px; cursor: pointer;
+  border-bottom: 1px solid var(--border-soft); transition: background 0.2s; position: relative;
+}
+.about-us-page .menu-item:last-child { border-bottom: none; }
+.about-us-page .menu-item:hover { background: rgba(212, 175, 55, 0.05); }
+.about-us-page .menu-item:active { background: rgba(212, 175, 55, 0.09); }
+.about-us-page .menu-icon {
+  width: 46px; height: 46px; border-radius: 15px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.about-us-page .menu-icon img { width: 46px; height: 46px; object-fit: contain; border-radius: 15px; }
+.about-us-page .menu-text { flex: 1; }
+.about-us-page .menu-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.about-us-page .menu-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.about-us-page .menu-arrow { color: var(--text-dim); flex-shrink: 0; transition: transform 0.2s; }
+.about-us-page .menu-item:hover .menu-arrow { transform: translateX(2px); color: var(--gold-mid); }
+
+/* ── SECTION LABEL ── */
+.about-us-page .section-label {
+  font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 1.8px; text-transform: uppercase;
+  padding: 0 18px 10px; display: flex; align-items: center; gap: 8px;
+}
+.about-us-page .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-soft), transparent); }
+
+/* ══════════════ INNER PAGE (Agreement) ══════════════ */
+.about-us-page .inner-header {
+  position: relative;
+  background:
+    radial-gradient(120% 140% at 15% -10%, rgba(212, 175, 55, 0.20), transparent 55%),
+    linear-gradient(160deg, #140D02 0%, #241705 35%, #382305 55%, #241705 75%, #140D02 100%);
+  padding: 48px 20px 26px; text-align: center;
+  border-bottom-left-radius: 26px; border-bottom-right-radius: 26px;
+  overflow: hidden; margin-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.about-us-page .inner-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(-55deg, transparent, transparent 40px, rgba(212, 175, 55, 0.04) 40px, rgba(212, 175, 55, 0.04) 41px);
+}
+.about-us-page .inner-back-btn {
+  position: absolute; top: 14px; left: 14px; width: 38px; height: 38px;
+  background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; backdrop-filter: blur(8px);
+}
+.about-us-page .inner-title {
+  font-size: 18px; font-weight: 800;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  position: relative; z-index: 1; margin-bottom: 5px;
+}
+.about-us-page .inner-date { font-size: 11px; color: var(--text-muted); position: relative; z-index: 1; }
+
+/* ── AGREEMENT CONTENT ── */
+.about-us-page .agreement-wrap { padding: 0 14px 20px; }
+.about-us-page .agreement-section { margin-bottom: 20px; }
+.about-us-page .agreement-section-title { font-size: 14px; font-weight: 800; color: var(--gold-mid); margin-bottom: 10px; display: flex; align-items: center; gap: 9px; }
+.about-us-page .agreement-section-num {
+  width: 25px; height: 25px; background: linear-gradient(135deg, var(--gold-dark), var(--gold-mid)); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #140A03;
+  flex-shrink: 0; box-shadow: 0 3px 8px rgba(212, 175, 55, 0.3);
+}
+.about-us-page .agreement-text {
+  font-size: 12px; color: var(--text-muted); line-height: 1.7;
+  background: linear-gradient(150deg, var(--bg-card), var(--bg-card2)); border: 1px solid var(--border-soft);
+  border-radius: 14px; padding: 15px;
+}
+.about-us-page .agreement-text p { margin-bottom: 8px; }
+.about-us-page .agreement-text p:last-child { margin-bottom: 0; }
+.about-us-page .agreement-text strong { color: var(--gold-light); font-weight: 700; }
+.about-us-page .agreement-text ul { padding-left: 16px; margin-top: 6px; }
+.about-us-page .agreement-text ul li { margin-bottom: 5px; }
+
+.about-us-page .agree-badge {
+  margin: 0 14px 10px; background: linear-gradient(135deg, rgba(212, 175, 55, 0.10), rgba(212, 175, 55, 0.02));
+  border: 1px solid var(--border); border-radius: 16px; padding: 15px 16px; display: flex; align-items: center; gap: 11px;
+  position: relative; overflow: hidden;
+}
+.about-us-page .agree-badge::before {
+  content: ''; position: absolute; top: -30%; right: -15%; width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.14), transparent 70%); pointer-events: none;
+}
+.about-us-page .agree-badge-icon {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 12px; background: rgba(212, 175, 55, 0.13);
+  border: 1px solid rgba(212, 175, 55, 0.3); display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.about-us-page .agree-badge-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; position: relative; z-index: 1; }
+.about-us-page .agree-badge-text strong { color: var(--gold-mid); }

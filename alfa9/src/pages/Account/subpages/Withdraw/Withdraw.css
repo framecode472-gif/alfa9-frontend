@@ -1,0 +1,402 @@
+.withdraw-page {
+  --gold: #D4AF37;
+  --gold-light: #F3DA95;
+  --gold-mid: #C9971F;
+  --gold-dark: #7A581C;
+  --gold-deep: #AA7C11;
+  --bg: #0D0704;
+  --bg-card: #1C1109;
+  --bg-card2: #150D06;
+  --bg-input: #211608;
+  --border: rgba(212,175,55,0.18);
+  --border-soft: rgba(212,175,55,0.09);
+  --text: #F5E6C8;
+  --text-muted: #8B7355;
+  --text-dim: #5A4020;
+  --red: #ef4444;
+
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  box-shadow: 0 0 60px rgba(212,175,55,0.15);
+  overflow-x: hidden;
+  padding-bottom: 60px;
+  position: relative;
+}
+.withdraw-page * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+.withdraw-page ::-webkit-scrollbar { width: 5px; }
+.withdraw-page ::-webkit-scrollbar-track { background: #0a0a0a; }
+.withdraw-page ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
+
+.withdraw-page .view-panel { display: none; }
+.withdraw-page .view-panel.active { display: block; animation: withdrawFadeIn 0.3s ease; }
+@keyframes withdrawFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.withdraw-page .page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 16px 14px; background: var(--bg);
+  position: sticky; top: 0; z-index: 100;
+  border-bottom: 1px solid var(--border-soft);
+  backdrop-filter: blur(6px);
+}
+.withdraw-page .header-back {
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.18);
+  border-radius: 11px; cursor: pointer; text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.withdraw-page .header-back:hover { background: rgba(212,175,55,0.18); border-color: rgba(212,175,55,0.35); }
+.withdraw-page .header-title { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: 0.3px; }
+.withdraw-page .header-right-btn {
+  display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700;
+  color: var(--gold-mid); cursor: pointer; background: rgba(212,175,55,0.08);
+  border: 1px solid rgba(212,175,55,0.2); border-radius: 20px;
+  font-family: inherit; padding: 7px 13px; transition: all 0.2s;
+}
+.withdraw-page .header-right-btn:hover { background: rgba(212,175,55,0.16); color: var(--gold-light); }
+
+.withdraw-page .balance-hero {
+  margin: 16px 16px 0; border-radius: 22px; padding: 24px 22px 22px;
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #7A4F0D 0%, #B8860B 25%, #D4AF37 50%, #C9971F 70%, #8B6914 100%);
+  box-shadow: 0 10px 34px rgba(212,175,55,0.4), 0 2px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.withdraw-page .balance-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 1px, transparent 1px, transparent 28px);
+  pointer-events: none;
+}
+.withdraw-page .balance-glow {
+  position: absolute; top: -30px; right: -30px; width: 170px; height: 170px;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 65%);
+  pointer-events: none;
+}
+.withdraw-page .balance-label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; position: relative; z-index: 1; }
+.withdraw-page .balance-icon-box {
+  width: 24px; height: 24px; background: rgba(255,255,255,0.25); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.withdraw-page .balance-label-text { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.88); letter-spacing: 0.6px; text-transform: uppercase; }
+.withdraw-page .balance-amount-row { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
+.withdraw-page .balance-amount { font-size: 31px; font-weight: 900; color: #fff; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+.withdraw-page .balance-refresh {
+  width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+}
+.withdraw-page .balance-refresh:hover { background: rgba(255,255,255,0.32); }
+
+.withdraw-page .section-title {
+  font-size: 11px; font-weight: 700; color: var(--gold-mid); letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 22px 16px 10px; display: flex; align-items: center; gap: 8px;
+}
+.withdraw-page .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+.withdraw-page .gateway-tabs { display: flex; gap: 10px; padding: 0 16px; }
+.withdraw-page .gateway-tab {
+  flex: 1; background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+  border: 1.5px solid var(--border-soft); border-radius: 15px; padding: 15px 8px 13px;
+  cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: all 0.22s; position: relative; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+}
+.withdraw-page .gateway-tab.active {
+  border-color: var(--gold); background: linear-gradient(160deg, #2a1a08, #1e1206);
+  box-shadow: 0 6px 20px rgba(212,175,55,0.22);
+}
+.withdraw-page .gateway-tab:hover:not(.active) { border-color: var(--border); transform: translateY(-1px); }
+.withdraw-page .gateway-tab-logo { width: 42px; height: 42px; object-fit: contain; border-radius: 11px; background: rgba(255,255,255,0.05); }
+.withdraw-page .gateway-tab-name { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; }
+.withdraw-page .gateway-tab.active .gateway-tab-name { color: var(--gold-light); }
+.withdraw-page .gateway-tab.active::after {
+  content: ''; position: absolute; bottom: -1.5px; left: 20%; right: 20%; height: 2.5px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.withdraw-page .saved-account-card {
+  margin: 14px 16px 0; background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+  border: 1px solid var(--border); border-radius: 16px; padding: 15px 16px;
+  display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+}
+.withdraw-page .saved-account-left { display: flex; align-items: center; gap: 12px; }
+.withdraw-page .saved-account-icon {
+  width: 40px; height: 40px; background: linear-gradient(145deg, rgba(212,175,55,0.2), rgba(212,175,55,0.06));
+  border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center;
+}
+.withdraw-page .saved-account-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.withdraw-page .saved-account-number { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.withdraw-page .locked-badge {
+  background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25); border-radius: 9px;
+  padding: 5px 10px; font-size: 11px; font-weight: 700; color: var(--gold-mid);
+  display: flex; align-items: center; gap: 4px;
+}
+
+.withdraw-page .add-account-card {
+  margin: 14px 16px 0; background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+  border: 1.5px dashed var(--border); border-radius: 16px; padding: 22px;
+  display: flex; flex-direction: column; align-items: center; gap: 9px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.withdraw-page .add-account-card:hover { border-color: var(--gold); background: linear-gradient(160deg, #241608, #1a1006); }
+.withdraw-page .add-account-plus {
+  width: 46px; height: 46px; background: linear-gradient(145deg, rgba(212,175,55,0.14), rgba(212,175,55,0.03));
+  border: 2px dashed var(--border); border-radius: 13px; display: flex; align-items: center; justify-content: center;
+}
+.withdraw-page .add-account-text { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+.withdraw-page .amount-input-section { padding: 0 16px; margin-top: 4px; }
+.withdraw-page .amount-input-wrap {
+  background: var(--bg-input); border: 1.5px solid var(--border); border-radius: 14px;
+  display: flex; align-items: center; padding: 0 16px; height: 56px; position: relative;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.withdraw-page .amount-input-wrap:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.12); }
+.withdraw-page .currency-label { font-size: 14px; font-weight: 800; color: var(--gold); margin-right: 10px; white-space: nowrap; }
+.withdraw-page .amount-input-wrap input {
+  background: transparent; border: none; color: var(--text); font-size: 16px; font-weight: 700;
+  width: 100%; outline: none; font-family: inherit;
+}
+.withdraw-page .amount-input-wrap input::placeholder { color: var(--text-dim); }
+.withdraw-page .all-btn {
+  background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.08));
+  border: 1px solid rgba(212,175,55,0.3); border-radius: 9px; padding: 6px 13px;
+  font-size: 12px; font-weight: 800; color: var(--gold); cursor: pointer;
+  font-family: inherit; white-space: nowrap; transition: background 0.2s;
+}
+.withdraw-page .all-btn:hover { background: rgba(212,175,55,0.28); }
+
+.withdraw-page .withdrawable-info { margin: 10px 16px 0; display: flex; align-items: center; justify-content: space-between; }
+.withdraw-page .withdrawable-left { font-size: 12px; color: var(--text-muted); }
+.withdraw-page .withdrawable-left span { color: var(--gold); font-weight: 700; }
+.withdraw-page .withdrawable-right { font-size: 12px; color: var(--text-muted); }
+.withdraw-page .withdrawable-right span { color: var(--text); font-weight: 700; }
+
+.withdraw-page .withdraw-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 20px 16px 0; width: calc(100% - 32px); height: 56px;
+  border-radius: 16px; border: none;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold) 45%, var(--gold-deep));
+  background-size: 200% 100%; color: #140A03; font-size: 16px; font-weight: 900;
+  letter-spacing: 1px; cursor: pointer; font-family: inherit;
+  box-shadow: 0 8px 26px rgba(212,175,55,0.42), inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: transform 0.2s, box-shadow 0.2s, background-position 0.3s;
+}
+.withdraw-page .withdraw-btn:hover { transform: scale(1.01); box-shadow: 0 10px 30px rgba(212,175,55,0.55); background-position: 100% 0; }
+.withdraw-page .withdraw-btn:active { transform: scale(0.98); }
+
+.withdraw-page .rules-card {
+  margin: 20px 16px 0; background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+  border: 1px solid var(--border-soft); border-radius: 18px; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+.withdraw-page .rules-title {
+  font-size: 12px; font-weight: 800; color: var(--gold-mid); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 13px; display: flex; align-items: center; gap: 7px;
+}
+.withdraw-page .rule-item { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 10px; }
+.withdraw-page .rule-item:last-child { margin-bottom: 0; }
+.withdraw-page .rule-dot {
+  width: 6px; height: 6px; background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+}
+.withdraw-page .rule-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+.withdraw-page .rule-text strong { color: var(--gold); font-weight: 700; }
+
+.withdraw-page .history-section-heading {
+  display: flex; align-items: center; gap: 8px; padding: 22px 16px 12px;
+}
+.withdraw-page .history-section-icon {
+  width: 22px; height: 22px; background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 8px rgba(212,175,55,0.35);
+}
+.withdraw-page .history-section-heading span { font-size: 14px; font-weight: 800; color: var(--text); }
+
+.withdraw-page .mini-history-card {
+  margin: 0 16px; background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+  border: 1px solid var(--border-soft); border-radius: 18px; padding: 32px 20px; text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+.withdraw-page .mini-history-text { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
+
+.withdraw-page .modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 200;
+  align-items: flex-end; justify-content: center;
+}
+.withdraw-page .modal-overlay.show { display: flex; }
+.withdraw-page .modal-sheet {
+  background: linear-gradient(170deg, var(--bg-card), var(--bg-card2));
+  border: 1px solid var(--border); border-top: 1px solid rgba(212,175,55,0.35);
+  border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; padding: 0 0 40px;
+  animation: withdrawSlideUp 0.3s ease; box-shadow: 0 -10px 30px rgba(0,0,0,0.4);
+}
+@keyframes withdrawSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.withdraw-page .modal-handle { width: 40px; height: 4px; background: rgba(212,175,55,0.3); border-radius: 2px; margin: 14px auto 0; }
+.withdraw-page .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 0; }
+.withdraw-page .modal-title { font-size: 16px; font-weight: 800; color: var(--gold-light); display: flex; align-items: center; gap: 8px; }
+.withdraw-page .modal-close {
+  width: 32px; height: 32px; background: rgba(212,175,55,0.08); border: 1px solid var(--border-soft);
+  border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.withdraw-page .modal-method-selector { display: flex; gap: 10px; padding: 16px 20px 0; }
+.withdraw-page .method-pill {
+  flex: 1; padding: 11px 8px; background: var(--bg-card); border: 1.5px solid var(--border-soft);
+  border-radius: 11px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+}
+.withdraw-page .method-pill.active { border-color: var(--gold); background: linear-gradient(160deg, #2a1a08, #1e1206); }
+.withdraw-page .method-pill img { width: 24px; height: 24px; border-radius: 6px; object-fit: contain; }
+.withdraw-page .method-pill-name { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.withdraw-page .method-pill.active .method-pill-name { color: var(--gold-light); }
+.withdraw-page .method-pill.disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6); }
+.withdraw-page .method-pill-lock { margin-left: 4px; font-size: 11px; }
+
+.withdraw-page .modal-field { padding: 14px 20px 0; }
+.withdraw-page .modal-field label {
+  display: block; font-size: 11px; font-weight: 700; color: var(--gold-mid);
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+}
+.withdraw-page .modal-input {
+  width: 100%; height: 52px; background: var(--bg-input); border: 1.5px solid var(--border);
+  border-radius: 13px; padding: 0 16px; color: var(--text); font-size: 15px; font-weight: 600;
+  outline: none; font-family: inherit; transition: border-color 0.2s;
+}
+.withdraw-page .modal-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.12); }
+.withdraw-page .modal-input::placeholder { color: var(--text-dim); }
+
+.withdraw-page .modal-save-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 20px 20px 0; width: calc(100% - 40px); height: 54px; border-radius: 15px; border: none;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold) 45%, var(--gold-deep));
+  color: #140A03; font-size: 15px; font-weight: 900; letter-spacing: 1px; cursor: pointer;
+  font-family: inherit; box-shadow: 0 6px 20px rgba(212,175,55,0.38); transition: transform 0.15s;
+}
+.withdraw-page .modal-save-btn:active { transform: scale(0.98); }
+
+.withdraw-page .history-filter-row { display: flex; gap: 8px; padding: 14px 16px 0; overflow-x: auto; scrollbar-width: none; }
+.withdraw-page .history-filter-row::-webkit-scrollbar { display: none; }
+.withdraw-page .filter-chip {
+  display: flex; align-items: center; gap: 6px; padding: 9px 15px;
+  background: linear-gradient(160deg, var(--bg-card), var(--bg-card2)); border: 1.5px solid var(--border-soft);
+  border-radius: 50px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-muted);
+  white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+}
+.withdraw-page .filter-chip.active { border-color: var(--gold); background: linear-gradient(160deg, #2a1a08, #1e1206); color: var(--gold-light); }
+.withdraw-page .filter-chip img { width: 18px; height: 18px; border-radius: 4px; object-fit: contain; }
+
+.withdraw-page .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 30px 40px; text-align: center; }
+.withdraw-page .empty-icon-box {
+  width: 86px; height: 86px; border-radius: 24px; background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  margin-bottom: 22px; box-shadow: 0 10px 26px rgba(0,0,0,0.35); position: relative;
+}
+.withdraw-page .empty-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.withdraw-page .empty-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 260px; margin-bottom: 28px; }
+.withdraw-page .empty-action-btn {
+  display: flex; align-items: center; gap: 7px; padding: 13px 26px; border-radius: 50px;
+  border: 1.5px solid var(--gold); background: rgba(212,175,55,0.06); color: var(--gold);
+  font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.2s;
+}
+.withdraw-page .empty-action-btn:hover { background: rgba(212,175,55,0.14); }
+
+.withdraw-page .all-history-btn {
+  display: inline-flex; align-items: center; gap: 7px; padding: 12px 34px; border-radius: 50px;
+  border: 1.5px solid var(--gold); background: rgba(212,175,55,0.06); color: var(--gold);
+  font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.2s;
+}
+.withdraw-page .all-history-btn:hover { background: rgba(212,175,55,0.14); }
+
+.withdraw-page .history-controls { display: flex; gap: 10px; padding: 14px 16px 0; }
+.withdraw-page .dropdown-btn {
+  flex: 1; height: 44px; background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+  border: 1.5px solid var(--border-soft); border-radius: 11px;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 13px;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.withdraw-page .dropdown-btn:hover { border-color: var(--border); }
+.withdraw-page .dropdown-btn.active-filter { border-color: var(--gold); background: linear-gradient(160deg, #2a1a08, #1e1206); }
+.withdraw-page .dropdown-btn-text { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.withdraw-page .dropdown-btn.active-filter .dropdown-btn-text { color: var(--gold-light); }
+
+.withdraw-page .status-sheet-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 300;
+  align-items: flex-end; justify-content: center;
+}
+.withdraw-page .status-sheet-overlay.show { display: flex; }
+.withdraw-page .status-sheet {
+  background: linear-gradient(170deg, var(--bg-card), var(--bg-card2)); border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; padding: 0 0 40px;
+  animation: withdrawSlideUp 0.28s ease; box-shadow: 0 -10px 30px rgba(0,0,0,0.4);
+}
+.withdraw-page .status-sheet-topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 0; }
+.withdraw-page .status-cancel-btn { font-size: 14px; font-weight: 600; color: var(--text-muted); background: none; border: none; cursor: pointer; font-family: inherit; }
+.withdraw-page .status-confirm-btn { font-size: 14px; font-weight: 700; color: var(--gold); background: none; border: none; cursor: pointer; font-family: inherit; }
+.withdraw-page .status-options { padding: 20px 0 0; }
+.withdraw-page .status-option {
+  display: block; width: 100%; padding: 18px 20px; background: none; border: none;
+  font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; font-family: inherit;
+  text-align: center; border-bottom: 1px solid var(--border-soft); transition: color 0.2s, background 0.2s;
+}
+.withdraw-page .status-option:last-child { border-bottom: none; }
+.withdraw-page .status-option:hover { background: rgba(212,175,55,0.05); color: var(--text); }
+.withdraw-page .status-option.selected { color: var(--gold); font-weight: 800; }
+.withdraw-page .status-option.selected::after { content: ' ✓'; }
+
+.withdraw-page .cal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 300;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.withdraw-page .cal-overlay.show { display: flex; }
+.withdraw-page .cal-modal {
+  background: linear-gradient(170deg, var(--bg-card), var(--bg-card2)); border: 1px solid var(--border);
+  border-radius: 22px; width: 100%; max-width: 390px; padding: 0 0 16px;
+  animation: withdrawFadeScale 0.25s ease; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+@keyframes withdrawFadeScale { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.withdraw-page .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 14px; border-bottom: 1px solid var(--border-soft); }
+.withdraw-page .cal-title { font-size: 16px; font-weight: 800; color: var(--gold-light); }
+.withdraw-page .cal-close-btn {
+  width: 30px; height: 30px; background: rgba(212,175,55,0.08); border: 1px solid var(--border-soft);
+  border-radius: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.withdraw-page .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 8px; }
+.withdraw-page .cal-nav-btn {
+  width: 32px; height: 32px; background: rgba(212,175,55,0.08); border: 1px solid var(--border-soft);
+  border-radius: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+}
+.withdraw-page .cal-nav-btn:hover { background: rgba(212,175,55,0.16); }
+.withdraw-page .cal-month-label { font-size: 14px; font-weight: 800; color: var(--text); }
+.withdraw-page .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; margin-bottom: 4px; }
+.withdraw-page .cal-weekday { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 6px 0; }
+.withdraw-page .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; gap: 2px; }
+.withdraw-page .cal-day {
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text);
+  transition: background 0.15s; position: relative;
+}
+.withdraw-page .cal-day:hover:not(.empty):not(.disabled) { background: rgba(212,175,55,0.1); }
+.withdraw-page .cal-day.disabled { color: var(--text-dim); cursor: not-allowed; }
+.withdraw-page .cal-day.empty { cursor: default; }
+.withdraw-page .cal-day.start, .withdraw-page .cal-day.end {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold)) !important;
+  color: #140A03 !important; font-weight: 900;
+}
+.withdraw-page .cal-day.in-range { background: rgba(212,175,55,0.15); }
+.withdraw-page .cal-day.today { border: 1px solid rgba(212,175,55,0.35); }
+.withdraw-page .cal-day-label { font-size: 8px; font-weight: 700; color: rgba(20,10,3,0.8); line-height: 1; margin-top: 1px; }
+.withdraw-page .cal-confirm-btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px; margin: 14px 16px 0;
+  width: calc(100% - 32px); height: 48px; border-radius: 13px; border: none;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold) 45%, var(--gold-deep));
+  color: #140A03; font-size: 14px; font-weight: 900; letter-spacing: 0.5px; cursor: pointer;
+  font-family: inherit; box-shadow: 0 5px 16px rgba(212,175,55,0.38);
+}
+
+.withdraw-page .toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+  background: linear-gradient(160deg, var(--bg-card), var(--bg-card2)); border: 1px solid var(--gold);
+  color: var(--gold-light); padding: 11px 22px; border-radius: 50px; font-size: 13px; font-weight: 600;
+  opacity: 0; transition: all 0.3s ease; z-index: 9999; max-width: 320px; text-align: center; pointer-events: none;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.45);
+}
+.withdraw-page .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.withdraw-page .toast.error { border-color: var(--red); color: #FF8080; }
