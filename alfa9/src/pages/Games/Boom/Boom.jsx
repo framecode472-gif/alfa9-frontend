@@ -98,7 +98,6 @@ function Boom() {
   const rootRef = useRef(null);
   const gridFrameRef = useRef(null);
   const [gridSize, setGridSize] = useState(null); // measured square px size, forced via ResizeObserver
-  const [frameWidth, setFrameWidth] = useState(null); // gridSize + frame's own horizontal padding — makes the frame hug the grid instead of stretching full-width
 
   // Sizes the grid to fit EVERYTHING on screen with zero scrolling —
   // header, Game ID/Next row, the grid itself, Random/Auto/Mines row,
@@ -109,13 +108,6 @@ function Boom() {
   // height minus every other row's actual height (topbar, the two
   // control rows, bet bar, all gaps/padding) — independent of the
   // grid's own current size, so it can't feed back into itself.
-  //
-  // The grid-FRAME itself is then also sized to gridSize + its own
-  // horizontal padding (frameWidth, below) and centered with margin
-  // auto, instead of stretching to the full row width — that stretch
-  // is exactly what left the big empty dark bands on the frame's left
-  // and right whenever the frame's own square came out narrower than
-  // the wrap (e.g. height-limited on short/wide screens).
   useEffect(() => {
     const frame = gridFrameRef.current;
     if (!frame) return;
@@ -137,7 +129,6 @@ function Boom() {
       const frameCs = getComputedStyle(frame);
       const framePadX = parseFloat(frameCs.paddingLeft) + parseFloat(frameCs.paddingRight);
       const framePadY = parseFloat(frameCs.paddingTop) + parseFloat(frameCs.paddingBottom);
-      const frameBorderX = parseFloat(frameCs.borderLeftWidth) + parseFloat(frameCs.borderRightWidth);
 
       // Everything the grid ISN'T — measured from elements whose size
       // never depends on the grid's own size, so this can't loop.
@@ -146,12 +137,9 @@ function Boom() {
         + wrapPadY + wrapGap * 2 + framePadY;
 
       const availH = screen.clientHeight - chromeHeight;
-      const availW = wrap.clientWidth - framePadX - frameBorderX;
+      const availW = frame.clientWidth - framePadX;
       const size = Math.max(0, Math.floor(Math.min(availW, availH)));
-      if (size > 0) {
-        setGridSize(size);
-        setFrameWidth(size + framePadX + frameBorderX);
-      }
+      if (size > 0) setGridSize(size);
     };
 
     measure();
@@ -636,14 +624,7 @@ function Boom() {
                   <svg className="bm-menu-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 </div>
                 <div className="bm-menu-item" onClick={() => { playClick(); setLangChoice(lang); setLanguageOpen(true); setMenuOpen(false); }}>
-                  <span className="bm-menu-icon">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.5" />
-                      <ellipse cx="12" cy="12" rx="8.5" ry="3.6" stroke="currentColor" strokeWidth="1.2" />
-                      <path d="M12 3.5V20.5" stroke="currentColor" strokeWidth="1.2" />
-                      <path d="M3.5 12H20.5" stroke="currentColor" strokeWidth="1.2" />
-                    </svg>
-                  </span>
+                  <span className="bm-menu-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.5" /><path d="M3.5 12H20.5" stroke="currentColor" strokeWidth="1.3" /></svg></span>
                   <span>{t.language}</span>
                   <svg className="bm-menu-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 </div>
@@ -664,7 +645,7 @@ function Boom() {
             <div className="bm-next-badge"><span>{t.next}</span> <span>{nextMultiplier.toFixed(2)}x</span></div>
           </div>
 
-          <div className="bm-grid-frame" ref={gridFrameRef} style={frameWidth ? { width: frameWidth, margin: '0 auto' } : undefined}>
+          <div className="bm-grid-frame" ref={gridFrameRef}>
             <div className="bm-grid" style={gridSize ? { width: gridSize, height: gridSize } : undefined}>
               {tiles.map((tl, i) => (
                 <div key={i} className={`bm-tile${tl.state !== 'hidden' ? ` revealed ${tl.state}${tl.dim ? ' dim' : ''}` : ''}`} onClick={() => onTileClick(i)}>
