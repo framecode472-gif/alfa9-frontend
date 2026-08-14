@@ -100,21 +100,19 @@ function Boom() {
   const [gridSize, setGridSize] = useState(null); // measured square px size, forced via ResizeObserver
 
   // Forces the grid to be a perfect square with real measured pixels
-  // instead of relying on CSS aspect-ratio (which, depending on the
-  // browser/layout context, wasn't reliably squaring the grid inside
-  // its flex frame — this measures the frame's actual available box on
-  // every resize and sets the grid to min(width, height) so it's
-  // guaranteed square no matter what).
+  // instead of relying on CSS aspect-ratio. Sized purely off the frame's
+  // available WIDTH (not min(width, height)) — using height too was what
+  // left big empty dark bars around the grid whenever the frame's height
+  // and width didn't match (sides on desktop, top/bottom on mobile). The
+  // frame itself is flex:0 0 auto now, so it just hugs this square.
   useEffect(() => {
     const frame = gridFrameRef.current;
     if (!frame) return;
     const measure = () => {
       const cs = getComputedStyle(frame);
       const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
-      const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
       const availW = frame.clientWidth - padX;
-      const availH = frame.clientHeight - padY;
-      const size = Math.max(0, Math.floor(Math.min(availW, availH)));
+      const size = Math.max(0, Math.floor(availW));
       if (size > 0) setGridSize(size);
     };
     measure();
