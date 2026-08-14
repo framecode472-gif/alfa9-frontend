@@ -9,7 +9,15 @@
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: #050302;
+  /* Premium layered ambient background (soft off-corner glows + a deep
+     radial vignette), same look as the "moody backlit arena" backdrops
+     you see behind slot/mines games in Unity — done purely with CSS
+     gradients on the existing gold palette, no new image asset needed. */
+  background:
+    radial-gradient(900px 620px at 12% -8%, rgba(255,170,60,0.14), transparent 60%),
+    radial-gradient(760px 560px at 108% 12%, rgba(255,110,0,0.10), transparent 58%),
+    radial-gradient(1100px 820px at 50% 118%, rgba(130,66,12,0.22), transparent 62%),
+    radial-gradient(ellipse at 50% 42%, #1a0d05 0%, #0c0603 45%, #050302 82%);
   color: #fff;
   font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
   overflow: hidden;
@@ -232,7 +240,14 @@
 }
 .bm-grid {
   display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr);
-  gap: clamp(8px, 2.6vw, 10px); aspect-ratio: 1 / 1; height: 100%; width: 100%; max-width: 100%; max-height: 100%; margin: 0 auto;
+  /* No explicit height here — aspect-ratio only works when height is auto.
+     Previously height:100% fought with aspect-ratio:1/1 (both width+height
+     were definite, so the browser ignored aspect-ratio entirely and just
+     stretched the grid to whatever height .bm-grid-frame's flex-grow gave
+     it — very tall on desktop, squashing every tile into a narrow strip
+     instead of a proper square). Width-driven aspect-ratio + max-height as
+     a ceiling keeps it a true square on any screen. */
+  gap: clamp(8px, 2.6vw, 10px); aspect-ratio: 1 / 1; width: 100%; max-width: 100%; max-height: 100%; margin: 0 auto;
 }
 
 /* ── PREMIUM TILE ──
@@ -332,13 +347,18 @@
     inset 0 3px 4px rgba(255,140,90,0.25);
   animation: bmShakeBomb 0.35s ease;
 }
-@keyframes bmShakeBomb {
-  0%, 100% { transform: translate(0, 0); }
+@keyframes bmShakeBomb {  0%, 100% { transform: translate(0, 0); }
   20% { transform: translate(-3px, 2px); }
   40% { transform: translate(3px, -2px); }
   60% { transform: translate(-2px, -2px); }
   80% { transform: translate(2px, 2px); }
 }
+
+/* End-of-round full-board reveal — tiles the player DIDN'T click get
+   this on top of .gem/.bomb, so they read as "here's what was there"
+   rather than "what you picked": no shake, softer glow, slightly faded. */
+.bm-tile.dim { opacity: 0.6; animation: none; }
+.bm-tile.dim .bm-star-glow, .bm-tile.dim .bm-mine-glow { opacity: 0.5; }
 
 .bm-controls-row { display: flex; gap: clamp(6px, 2vw, 10px); flex-wrap: wrap; flex: 0 0 auto; }
 .bm-btn-pill {

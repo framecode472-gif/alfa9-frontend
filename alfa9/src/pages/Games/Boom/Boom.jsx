@@ -206,6 +206,7 @@ function Boom() {
   const [roundId, setRoundId] = useState(null);
   const [busy, setBusy] = useState(false); // guards against double-taps while a request is in flight
   const busyRef = useRef(false);
+  const resetTimerRef = useRef(null); // schedules the auto-reset after a round ends
 
   // Same curve as the backend's calcMultiplier — used only to show a live
   // estimate before the server confirms each reveal.
@@ -263,10 +264,15 @@ function Boom() {
     })();
   }, [loadHistory]);
 
+  // Clear any pending auto-reset timer if the player navigates away
+  // mid-countdown, so it can't fire a setState after unmount.
+  useEffect(() => () => { if (resetTimerRef.current) clearTimeout(resetTimerRef.current); }, []);
+
   const startRound = async () => {
     if (busyRef.current) return;
     const betVal = Math.max(MIN_BET, betAmount || MIN_BET);
     if (betVal > balance) return;
+    if (resetTimerRef.current) { clearTimeout(resetTimerRef.current); resetTimerRef.current = null; }
     busyRef.current = true; setBusy(true);
     try {
       const res = await apiFetch('/boom/start', { method: 'POST', body: { betAmount: betVal, minesCount: mines } });
@@ -296,18 +302,29 @@ function Boom() {
   };
 
   // Finishes the round on the CLIENT side once the server has already
-  // confirmed the outcome — never decides win/loss itself. `bombTile`
-  // (if any) is the single tile the server told us was a bomb; every
-  // other still-hidden tile just stays hidden, since the server never
-  // reveals bomb positions the player didn't actually hit.
-  const finishRound = (won, mult, betVal, bombTile) => {
+  // confirmed the outcome — never decides win/loss itself. `fullReveal`
+  // is a 25-slot 'mine'/'safe' array the server sends once a round ends,
+  // so every tile the player DIDN'T click also gets shown (like the real
+  // Mines game reveals the whole board on bust/cashout) — those get a
+  // `dim` flag so they read as "informational" rather than "what you
+  // picked", since tiles the player actually revealed keep full color.
+  const finishRound = (won, mult, betVal, fullReveal) => {
     setBetActive(false);
     setRoundId(null);
-    if (bombTile !== undefined && bombTile !== null) {
-      setTiles((prev) => prev.map((tl, idx) => (idx === bombTile ? { state: 'bomb' } : tl)));
+    if (fullReveal) {
+      setTiles((prev) => prev.map((tl, idx) => {
+        if (tl.state !== 'hidden') return tl; // already revealed by the player — leave as-is
+        return { state: fullReveal[idx] === 'mine' ? 'bomb' : 'gem', dim: true };
+      }));
     }
     logHistory(won, mult, betVal);
     if (won) playCashout();
+
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => {
+      setTiles(Array.from({ length: GRID_SIZE }, () => ({ state: 'hidden' })));
+      resetTimerRef.current = null;
+    }, 2000);
   };
 
   const onTileClick = async (i) => {
@@ -319,7 +336,7 @@ function Boom() {
         setTiles((prev) => prev.map((tl, idx) => (idx === i ? { state: 'bomb' } : tl)));
         playBoom();
         setBalance(res.balance);
-        finishRound(false, 0, currentBet);
+        finishRound(false, 0, currentBet, res.fullReveal);
       } else {
         setTiles((prev) => prev.map((tl, idx) => (idx === i ? { state: 'gem' } : tl)));
         playGem();
@@ -328,7 +345,7 @@ function Boom() {
         setNextMultiplier(res.multiplier);
         if (res.autoWin) {
           setBalance(res.balance);
-          finishRound(true, res.multiplier, currentBet);
+          finishRound(true, res.multiplier, currentBet, res.fullReveal);
         }
       }
     } catch (err) {
@@ -344,7 +361,7 @@ function Boom() {
     try {
       const res = await apiFetch(`/boom/${roundId}/cashout`, { method: 'POST' });
       setBalance(res.balance);
-      finishRound(true, res.multiplier ?? nextMultiplier, currentBet);
+      finishRound(true, res.multiplier ?? nextMultiplier, currentBet, res.fullReveal);
     } catch (err) {
       console.error('Boom cashout failed:', err.message);
     } finally {
@@ -365,17 +382,28 @@ function Boom() {
 
   const handleReset = async () => {
     playClick();
+    if (resetTimerRef.current) { clearTimeout(resetTimerRef.current); resetTimerRef.current = null; }
     if (betActive && roundId) {
       if (revealedSafe > 0) {
         // Already has a safe tile revealed — reset button cashes out at the
         // current multiplier rather than throwing the stake away.
+        // cashOutNow() calls finishRound(), which shows the full-board
+        // reveal and schedules its own 2s auto-clear.
         await cashOutNow();
       } else {
-        try { await apiFetch(`/boom/${roundId}/giveup`, { method: 'POST' }); } catch { /* best-effort */ }
-        finishRound(false, 0, currentBet);
+        try {
+          const res = await apiFetch(`/boom/${roundId}/giveup`, { method: 'POST' });
+          finishRound(false, 0, currentBet, res.fullReveal);
+        } catch {
+          // best-effort — still clear the board locally even if the
+          // network call failed, so the player isn't stuck.
+          finishRound(false, 0, currentBet, null);
+        }
       }
+    } else {
+      // No active round to give up — just make sure the board is clear.
+      setTiles(Array.from({ length: GRID_SIZE }, () => ({ state: 'hidden' })));
     }
-    setTiles(Array.from({ length: GRID_SIZE }, () => ({ state: 'hidden' })));
   };
 
   /* ---------- UI popups ---------- */
@@ -562,7 +590,7 @@ function Boom() {
           <div className="bm-grid-frame">
             <div className="bm-grid">
               {tiles.map((tl, i) => (
-                <div key={i} className={`bm-tile${tl.state !== 'hidden' ? ` revealed ${tl.state}` : ''}`} onClick={() => onTileClick(i)}>
+                <div key={i} className={`bm-tile${tl.state !== 'hidden' ? ` revealed ${tl.state}${tl.dim ? ' dim' : ''}` : ''}`} onClick={() => onTileClick(i)}>
                   {tl.state === 'hidden' && <div className="bm-tile-dot" />}
                   {tl.state === 'gem' && (
                     <div className="bm-tile-icon-wrap" key={`gem-${i}`}>
