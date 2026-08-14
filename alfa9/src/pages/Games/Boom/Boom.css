@@ -240,14 +240,12 @@
 }
 .bm-grid {
   display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr);
-  /* No explicit height here — aspect-ratio only works when height is auto.
-     Previously height:100% fought with aspect-ratio:1/1 (both width+height
-     were definite, so the browser ignored aspect-ratio entirely and just
-     stretched the grid to whatever height .bm-grid-frame's flex-grow gave
-     it — very tall on desktop, squashing every tile into a narrow strip
-     instead of a proper square). Width-driven aspect-ratio + max-height as
-     a ceiling keeps it a true square on any screen. */
-  gap: clamp(8px, 2.6vw, 10px); aspect-ratio: 1 / 1; width: 100%; max-width: 100%; max-height: 100%; margin: 0 auto;
+  /* Square is derived purely from width here — never give this element
+     an explicit height (that's what broke it before: height:100% made
+     both width AND height definite, so aspect-ratio was skipped and the
+     grid just stretched to whatever height the flex parent handed it —
+     very tall on desktop, squashing every tile into a narrow strip). */
+  gap: clamp(8px, 2.6vw, 10px); aspect-ratio: 1 / 1; width: 100%; max-width: 100%; max-height: 100%; margin: 0 auto; flex-shrink: 0;
 }
 
 /* ── PREMIUM TILE ──

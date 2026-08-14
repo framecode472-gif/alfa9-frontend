@@ -96,6 +96,33 @@ function randomHex(len) {
 function Boom() {
   const navigate = useNavigate();
   const rootRef = useRef(null);
+  const gridFrameRef = useRef(null);
+  const [gridSize, setGridSize] = useState(null); // measured square px size, forced via ResizeObserver
+
+  // Forces the grid to be a perfect square with real measured pixels
+  // instead of relying on CSS aspect-ratio (which, depending on the
+  // browser/layout context, wasn't reliably squaring the grid inside
+  // its flex frame — this measures the frame's actual available box on
+  // every resize and sets the grid to min(width, height) so it's
+  // guaranteed square no matter what).
+  useEffect(() => {
+    const frame = gridFrameRef.current;
+    if (!frame) return;
+    const measure = () => {
+      const cs = getComputedStyle(frame);
+      const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      const availW = frame.clientWidth - padX;
+      const availH = frame.clientHeight - padY;
+      const size = Math.max(0, Math.floor(Math.min(availW, availH)));
+      if (size > 0) setGridSize(size);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(frame);
+    window.addEventListener('orientationchange', measure);
+    return () => { ro.disconnect(); window.removeEventListener('orientationchange', measure); };
+  }, []);
 
   /* loader */
   const [loading, setLoading] = useState(true);
@@ -587,8 +614,8 @@ function Boom() {
             <div className="bm-next-badge"><span>{t.next}</span> <span>{nextMultiplier.toFixed(2)}x</span></div>
           </div>
 
-          <div className="bm-grid-frame">
-            <div className="bm-grid">
+          <div className="bm-grid-frame" ref={gridFrameRef}>
+            <div className="bm-grid" style={gridSize ? { width: gridSize, height: gridSize } : undefined}>
               {tiles.map((tl, i) => (
                 <div key={i} className={`bm-tile${tl.state !== 'hidden' ? ` revealed ${tl.state}${tl.dim ? ' dim' : ''}` : ''}`} onClick={() => onTileClick(i)}>
                   {tl.state === 'hidden' && <div className="bm-tile-dot" />}
