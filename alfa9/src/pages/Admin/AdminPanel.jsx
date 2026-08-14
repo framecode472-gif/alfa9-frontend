@@ -1585,6 +1585,32 @@ function GiftsView({ codes, codeForm, setCodeForm, generateCode, copyCode, toggl
   );
 }
 
+// Boom Mines' source image (Booms.png) has its own solid blue background,
+// so inside the dark card it looked like a flat box instead of a floating
+// icon like the other three games' transparent PNGs. This inline SVG
+// mirrors their transparent, floating-icon style instead.
+function BoomThumbIcon() {
+  return (
+    <svg viewBox="0 0 120 120" width="72" height="72">
+      <defs>
+        <radialGradient id="boomThumbGlow" cx="50%" cy="45%" r="60%">
+          <stop offset="0%" stopColor="#5b5b5b" />
+          <stop offset="100%" stopColor="#161616" />
+        </radialGradient>
+        <linearGradient id="boomThumbStar" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ffe9a8" />
+          <stop offset="100%" stopColor="#e0a112" />
+        </linearGradient>
+      </defs>
+      <circle cx="72" cy="70" r="30" fill="url(#boomThumbGlow)" />
+      <rect x="69" y="26" width="6" height="12" rx="3" fill="#8a8a8a" transform="rotate(28 72 32)" />
+      <circle cx="86" cy="24" r="5" fill="#ffcf5c" />
+      <path d="M38 44 l4 11 11 4 -11 4 -4 11 -4 -11 -11 -4 11 -4 z" fill="url(#boomThumbStar)" />
+      <path d="M22 30 l2.4 6.4 6.4 2.4 -6.4 2.4 -2.4 6.4 -2.4 -6.4 -6.4 -2.4 6.4 -2.4 z" fill="url(#boomThumbStar)" opacity="0.85" />
+    </svg>
+  );
+}
+
 /* ============================================================ GAMES */
 function GamesView({ games, updateGame, saveGame }) {
   return (
@@ -1592,7 +1618,9 @@ function GamesView({ games, updateGame, saveGame }) {
       {games.map((g) => (
         <div className="item-card" key={g.key}>
           <div className="game-thumb">
-            <img src={g.img} alt={g.name} onError={(e) => { e.target.style.display = 'none'; }} />
+            {g.key === 'boom'
+              ? <BoomThumbIcon />
+              : <img src={g.img} alt={g.name} onError={(e) => { e.target.style.display = 'none'; }} />}
             <span className={`game-status-pill ${g.enabled ? 'on' : 'off'}`}>{g.enabled ? 'Live' : 'Disabled'}</span>
           </div>
           <div className="item-card-top">

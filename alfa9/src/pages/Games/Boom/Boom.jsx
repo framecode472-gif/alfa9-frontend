@@ -206,7 +206,6 @@ function Boom() {
   const [roundId, setRoundId] = useState(null);
   const [busy, setBusy] = useState(false); // guards against double-taps while a request is in flight
   const busyRef = useRef(false);
-  const [pendingTile, setPendingTile] = useState(null); // tile index waiting on the server's reveal response
 
   // Same curve as the backend's calcMultiplier — used only to show a live
   // estimate before the server confirms each reveal.
@@ -313,7 +312,7 @@ function Boom() {
 
   const onTileClick = async (i) => {
     if (!betActive || !roundId || tiles[i].state !== 'hidden' || busyRef.current) return;
-    busyRef.current = true; setBusy(true); setPendingTile(i);
+    busyRef.current = true; setBusy(true);
     try {
       const res = await apiFetch(`/boom/${roundId}/reveal`, { method: 'POST', body: { tileIndex: i } });
       if (res.busted) {
@@ -335,7 +334,7 @@ function Boom() {
     } catch (err) {
       console.error('Boom reveal failed:', err.message);
     } finally {
-      busyRef.current = false; setBusy(false); setPendingTile(null);
+      busyRef.current = false; setBusy(false);
     }
   };
 
@@ -561,11 +560,10 @@ function Boom() {
           </div>
 
           <div className="bm-grid-frame">
-            <div className={`bm-grid${busy ? ' bm-grid-busy' : ''}`}>
+            <div className="bm-grid">
               {tiles.map((tl, i) => (
-                <div key={i} className={`bm-tile${tl.state !== 'hidden' ? ` revealed ${tl.state}` : ''}${pendingTile === i ? ' pending' : ''}`} onClick={() => onTileClick(i)}>
-                  {tl.state === 'hidden' && pendingTile !== i && <div className="bm-tile-dot" />}
-                  {pendingTile === i && <div className="bm-tile-spinner" />}
+                <div key={i} className={`bm-tile${tl.state !== 'hidden' ? ` revealed ${tl.state}` : ''}`} onClick={() => onTileClick(i)}>
+                  {tl.state === 'hidden' && <div className="bm-tile-dot" />}
                   {tl.state === 'gem' && (
                     <div className="bm-tile-icon-wrap" key={`gem-${i}`}>
                       <div className="bm-star-glow" />
@@ -619,14 +617,8 @@ function Boom() {
             </button>
             <button className="bm-round-btn" disabled={betActive} onClick={() => { playClick(); setBetAmount((a) => a + 1); }}>&#43;</button>
             <button className="bm-refresh-btn" onClick={handleReset}>&#8635;</button>
-            <button className={`bm-bet-btn${busy ? ' bm-bet-btn-busy' : ''}`} disabled={busy || (!betActive && !canBet)} onClick={handleMainBtn}>
-              {busy ? (
-                <span className="bm-btn-spinner" />
-              ) : betActive ? (
-                `\u2713 ${t.cashOut}${revealedSafe > 0 ? `  Rs${potentialPayout.toFixed(2)}` : ''}`
-              ) : (
-                `\u25B6 ${t.bet2}`
-              )}
+            <button className="bm-bet-btn" disabled={busy || (!betActive && !canBet)} onClick={handleMainBtn}>
+              {betActive ? `\u2713 ${t.cashOut}${revealedSafe > 0 ? `  Rs${potentialPayout.toFixed(2)}` : ''}` : `\u25B6 ${t.bet2}`}
             </button>
           </div>
         </div>

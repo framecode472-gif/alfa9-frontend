@@ -291,24 +291,6 @@
 }
 .bm-tile:not(.revealed):hover .bm-tile-dot { transform: scale(1.1); }
 
-/* Spinner shown on the exact tile the user just clicked, while we wait
-   for the server to confirm gem/bomb — replaces the "did my tap even
-   register?" feeling with clear, immediate feedback. */
-.bm-tile.pending { cursor: wait; }
-.bm-tile-spinner {
-  position: relative; z-index: 1;
-  width: 32%; height: 32%; border-radius: 50%;
-  border: 3px solid rgba(255, 214, 120, 0.25);
-  border-top-color: #ffcf5c;
-  animation: bmSpin 0.7s linear infinite;
-}
-@keyframes bmSpin { to { transform: rotate(360deg); } }
-
-/* Dim the rest of the board slightly while a reveal request is in
-   flight, and block taps on other tiles so a double-tap can't fire a
-   second request before the first one resolves. */
-.bm-grid-busy .bm-tile:not(.pending) { opacity: 0.55; pointer-events: none; }
-
 .bm-tile-icon-wrap {
   position: relative; z-index: 2;
   width: 78%; height: 78%;
@@ -449,14 +431,6 @@
 }
 .bm-bet-btn:active { transform: translateY(1px); }
 .bm-bet-btn:disabled { opacity: 0.5; }
-.bm-bet-btn.bm-bet-btn-busy:disabled { opacity: 0.85; } /* keep the spinner clearly visible, not washed out */
-
-.bm-btn-spinner {
-  width: 20px; height: 20px; border-radius: 50%;
-  border: 3px solid rgba(42, 18, 6, 0.25);
-  border-top-color: #2a1206;
-  animation: bmSpin 0.7s linear infinite;
-}
 
 /* ===== HAMBURGER MENU ===== */
 .bm-menu-dropdown {
