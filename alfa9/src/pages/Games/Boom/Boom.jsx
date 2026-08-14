@@ -99,27 +99,60 @@ function Boom() {
   const gridFrameRef = useRef(null);
   const [gridSize, setGridSize] = useState(null); // measured square px size, forced via ResizeObserver
 
-  // Forces the grid to be a perfect square with real measured pixels
-  // instead of relying on CSS aspect-ratio. Sized purely off the frame's
-  // available WIDTH (not min(width, height)) — using height too was what
-  // left big empty dark bars around the grid whenever the frame's height
-  // and width didn't match (sides on desktop, top/bottom on mobile). The
-  // frame itself is flex:0 0 auto now, so it just hugs this square.
+  // Sizes the grid to fit EVERYTHING on screen with zero scrolling —
+  // header, Game ID/Next row, the grid itself, Random/Auto/Mines row,
+  // and the bet bar all visible together, matching the reference. Width
+  // alone (previous version) made the grid huge and pushed the bet bar
+  // off-screen; height alone (the version before that) left empty bars
+  // on the sides. This measures the REAL leftover space: total screen
+  // height minus every other row's actual height (topbar, the two
+  // control rows, bet bar, all gaps/padding) — independent of the
+  // grid's own current size, so it can't feed back into itself.
   useEffect(() => {
     const frame = gridFrameRef.current;
     if (!frame) return;
+    const wrap = frame.parentElement; // .bm-game-wrap
+    const screen = frame.closest('.bm-game-screen');
+    if (!wrap || !screen) return;
+
     const measure = () => {
-      const cs = getComputedStyle(frame);
-      const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
-      const availW = frame.clientWidth - padX;
-      const size = Math.max(0, Math.floor(availW));
+      const topRow = wrap.querySelector('.bm-controls-row-top');
+      const botRow = wrap.querySelector('.bm-controls-row');
+      const topbar = screen.querySelector('.bm-topbar');
+      const betBar = screen.querySelector('.bm-bet-bar');
+      if (!topRow || !botRow || !topbar || !betBar) return;
+
+      const wrapCs = getComputedStyle(wrap);
+      const wrapPadY = parseFloat(wrapCs.paddingTop) + parseFloat(wrapCs.paddingBottom);
+      const wrapGap = parseFloat(wrapCs.rowGap || wrapCs.gap) || 0;
+
+      const frameCs = getComputedStyle(frame);
+      const framePadX = parseFloat(frameCs.paddingLeft) + parseFloat(frameCs.paddingRight);
+      const framePadY = parseFloat(frameCs.paddingTop) + parseFloat(frameCs.paddingBottom);
+
+      // Everything the grid ISN'T — measured from elements whose size
+      // never depends on the grid's own size, so this can't loop.
+      const chromeHeight = topbar.offsetHeight + betBar.offsetHeight
+        + topRow.offsetHeight + botRow.offsetHeight
+        + wrapPadY + wrapGap * 2 + framePadY;
+
+      const availH = screen.clientHeight - chromeHeight;
+      const availW = frame.clientWidth - framePadX;
+      const size = Math.max(0, Math.floor(Math.min(availW, availH)));
       if (size > 0) setGridSize(size);
     };
+
     measure();
+    requestAnimationFrame(measure); // re-check once fonts/layout settle
     const ro = new ResizeObserver(measure);
-    ro.observe(frame);
+    ro.observe(screen);
     window.addEventListener('orientationchange', measure);
-    return () => { ro.disconnect(); window.removeEventListener('orientationchange', measure); };
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('orientationchange', measure);
+      window.removeEventListener('resize', measure);
+    };
   }, []);
 
   /* loader */
