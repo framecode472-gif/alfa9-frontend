@@ -603,8 +603,14 @@
   .chats-view--chat-open .chats-view-detail { display: flex; }
   .chats-view--chat-open .chats-view-back-btn { display: flex; }
 }
-/* ===== MODAL (Reset Password result, Referrals list) ===== */
-.modal-overlay {
+/* ===== MODAL (Reset Password result, Referrals list) =====
+   Scoped under .admin-page — plain unscoped ".modal-overlay" collided with
+   the SAME class name used on the login/Auth page and several other pages
+   (Auth.css, Wallet.css, Safe.css, etc, each with their own show/hide
+   logic). Vite bundles all page CSS into one global stylesheet, so an
+   unscoped rule here was leaking onto every other page and force-showing
+   their modals permanently. Scoping fixes it without touching those pages. */
+.admin-page .modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.65);
@@ -614,7 +620,7 @@
   z-index: 1000;
   padding: 20px;
 }
-.modal-card {
+.admin-page .modal-card {
   background: var(--panel, #141414);
   border: 1px solid var(--border, #2a2a2a);
   border-radius: 14px;
