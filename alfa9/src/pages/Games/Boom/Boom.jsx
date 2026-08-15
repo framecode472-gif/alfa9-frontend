@@ -96,76 +96,6 @@ function randomHex(len) {
 function Boom() {
   const navigate = useNavigate();
   const rootRef = useRef(null);
-  const gridFrameRef = useRef(null);
-  const [gridSize, setGridSize] = useState(null); // measured square px size, forced via ResizeObserver
-  const [frameWidth, setFrameWidth] = useState(null); // gridSize + frame's own horizontal padding — makes the frame hug the grid instead of stretching full-width
-
-  // Sizes the grid to fit EVERYTHING on screen with zero scrolling —
-  // header, Game ID/Next row, the grid itself, Random/Auto/Mines row,
-  // and the bet bar all visible together, matching the reference. Width
-  // alone (previous version) made the grid huge and pushed the bet bar
-  // off-screen; height alone (the version before that) left empty bars
-  // on the sides. This measures the REAL leftover space: total screen
-  // height minus every other row's actual height (topbar, the two
-  // control rows, bet bar, all gaps/padding) — independent of the
-  // grid's own current size, so it can't feed back into itself.
-  //
-  // The grid-FRAME itself is then also sized to gridSize + its own
-  // horizontal padding (frameWidth, below) and centered with margin
-  // auto, instead of stretching to the full row width — that stretch
-  // is exactly what left the big empty dark bands on the frame's left
-  // and right whenever the frame's own square came out narrower than
-  // the wrap (e.g. height-limited on short/wide screens).
-  useEffect(() => {
-    const frame = gridFrameRef.current;
-    if (!frame) return;
-    const wrap = frame.parentElement; // .bm-game-wrap
-    const screen = frame.closest('.bm-game-screen');
-    if (!wrap || !screen) return;
-
-    const measure = () => {
-      const topRow = wrap.querySelector('.bm-controls-row-top');
-      const botRow = wrap.querySelector('.bm-controls-row');
-      const topbar = screen.querySelector('.bm-topbar');
-      const betBar = screen.querySelector('.bm-bet-bar');
-      if (!topRow || !botRow || !topbar || !betBar) return;
-
-      const wrapCs = getComputedStyle(wrap);
-      const wrapPadY = parseFloat(wrapCs.paddingTop) + parseFloat(wrapCs.paddingBottom);
-      const wrapGap = parseFloat(wrapCs.rowGap || wrapCs.gap) || 0;
-
-      const frameCs = getComputedStyle(frame);
-      const framePadX = parseFloat(frameCs.paddingLeft) + parseFloat(frameCs.paddingRight);
-      const framePadY = parseFloat(frameCs.paddingTop) + parseFloat(frameCs.paddingBottom);
-      const frameBorderX = parseFloat(frameCs.borderLeftWidth) + parseFloat(frameCs.borderRightWidth);
-
-      // Everything the grid ISN'T — measured from elements whose size
-      // never depends on the grid's own size, so this can't loop.
-      const chromeHeight = topbar.offsetHeight + betBar.offsetHeight
-        + topRow.offsetHeight + botRow.offsetHeight
-        + wrapPadY + wrapGap * 2 + framePadY;
-
-      const availH = screen.clientHeight - chromeHeight;
-      const availW = wrap.clientWidth - framePadX - frameBorderX;
-      const size = Math.max(0, Math.floor(Math.min(availW, availH)));
-      if (size > 0) {
-        setGridSize(size);
-        setFrameWidth(size + framePadX + frameBorderX);
-      }
-    };
-
-    measure();
-    requestAnimationFrame(measure); // re-check once fonts/layout settle
-    const ro = new ResizeObserver(measure);
-    ro.observe(screen);
-    window.addEventListener('orientationchange', measure);
-    window.addEventListener('resize', measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('orientationchange', measure);
-      window.removeEventListener('resize', measure);
-    };
-  }, []);
 
   /* loader */
   const [loading, setLoading] = useState(true);
@@ -664,8 +594,8 @@ function Boom() {
             <div className="bm-next-badge"><span>{t.next}</span> <span>{nextMultiplier.toFixed(2)}x</span></div>
           </div>
 
-          <div className="bm-grid-frame" ref={gridFrameRef} style={frameWidth ? { width: frameWidth, margin: '0 auto' } : undefined}>
-            <div className="bm-grid" style={gridSize ? { width: gridSize, height: gridSize } : undefined}>
+          <div className="bm-grid-frame">
+            <div className="bm-grid">
               {tiles.map((tl, i) => (
                 <div key={i} className={`bm-tile${tl.state !== 'hidden' ? ` revealed ${tl.state}${tl.dim ? ' dim' : ''}` : ''}`} onClick={() => onTileClick(i)}>
                   {tl.state === 'hidden' && <div className="bm-tile-dot" />}
