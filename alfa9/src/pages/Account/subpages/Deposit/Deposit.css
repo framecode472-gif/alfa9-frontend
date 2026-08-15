@@ -76,6 +76,8 @@
     box-shadow: 0 6px 20px rgba(212,175,55,0.22), inset 0 0 0 1px rgba(212,175,55,0.15);
 }
 .deposit-page .gateway-card:hover:not(.active) { border-color: var(--dp-border); transform: translateY(-1px); }
+.deposit-page .gateway-card.disabled { opacity: 0.55; cursor: not-allowed; }
+.deposit-page .gateway-card.disabled:hover { transform: none; }
 .deposit-page .gateway-info { display: flex; align-items: center; gap: 10px; }
 .deposit-page .gateway-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 9px; background: rgba(255,255,255,0.05); }
 .deposit-page .gateway-name { font-size: 14px; font-weight: 700; color: var(--dp-text); }

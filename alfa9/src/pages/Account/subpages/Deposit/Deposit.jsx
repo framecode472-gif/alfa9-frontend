@@ -5,6 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
 import './Deposit.css';
 
+// Toggle this to re-enable JazzCash later — just flip it back to false.
+// While true, tapping the JazzCash card shows a toast telling the user to
+// use Easypaisa instead, and does not select JazzCash as the gateway.
+const JAZZCASH_UNDER_MAINTENANCE = true;
+
 const AMOUNTS = [
   { val: 300, bonus: '+Rs 10' },
   { val: 500, bonus: '+Rs 20', popular: true },
@@ -23,7 +28,7 @@ function Deposit() {
   // Updated version
   const navigate = useNavigate();
   const [view, setView] = useState('main'); // 'main' | 'process' | 'history'
-  const [gateway, setGateway] = useState('JazzCash');
+  const [gateway, setGateway] = useState(JAZZCASH_UNDER_MAINTENANCE ? 'Easypaisa' : 'JazzCash');
   const [amount, setAmount] = useState(300);
   const [balance, setBalance] = useState(() => parseFloat(localStorage.getItem('alfa9_balance') || '0'));
   const [screenshot, setScreenshot] = useState(null);   // preview data URL, for <img>
@@ -135,12 +140,25 @@ function Deposit() {
 
           <div className="section-title">1. Choose Gateway</div>
           <div className="gateway-grid">
-            <div className={`gateway-card ${gateway === 'JazzCash' ? 'active' : ''}`} onClick={() => setGateway('JazzCash')}>
+            <div
+              className={`gateway-card ${gateway === 'JazzCash' ? 'active' : ''} ${JAZZCASH_UNDER_MAINTENANCE ? 'disabled' : ''}`}
+              onClick={() => {
+                if (JAZZCASH_UNDER_MAINTENANCE) {
+                  showToast('JazzCash abhi available nahi hai. Easypaisa best hai, us se deposit karein.', 'error');
+                  return;
+                }
+                setGateway('JazzCash');
+              }}
+            >
               <div className="gateway-info">
                 <img src="/image/Jazzcash.png" className="gateway-logo" alt="JazzCash" onError={(e) => { e.target.style.display = 'none'; }} />
-                <div><div className="gateway-name">JazzCash</div><div className="gateway-type">Manual Pay</div></div>
+                <div><div className="gateway-name">JazzCash</div><div className="gateway-type">{JAZZCASH_UNDER_MAINTENANCE ? 'Unavailable' : 'Manual Pay'}</div></div>
               </div>
-              <span className="bonus-tag">+2% Bonus</span>
+              {JAZZCASH_UNDER_MAINTENANCE ? (
+                <span className="bonus-tag" style={{ background: '#3a3a3a', color: '#bbb' }}>Maintenance</span>
+              ) : (
+                <span className="bonus-tag">+2% Bonus</span>
+              )}
               <div className="active-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg></div>
             </div>
             <div className={`gateway-card ${gateway === 'Easypaisa' ? 'active' : ''}`} onClick={() => setGateway('Easypaisa')}>

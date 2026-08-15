@@ -249,7 +249,12 @@ export default function AdminPanel() {
         method: d.method,
         status: d.status,
         time: new Date(d.createdAt).toLocaleString(),
-        screenshot: d.screenshot ? `${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${d.screenshot}` : null,
+        // New deposits store the screenshot as a base64 data URI (works forever,
+        // survives Railway redeploys). Old deposits made before this fix still
+        // have a disk path like "/uploads/screenshots/xxx.jpg" — those will 404
+        // since the old files no longer exist, but we keep the fallback so we
+        // don't crash on old records.
+        screenshot: d.screenshot ? (d.screenshot.startsWith('data:') ? d.screenshot : `${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${d.screenshot}`) : null,
         flagged: !!d.flagged,
         flagReason: d.flagReason || null,
       }));
