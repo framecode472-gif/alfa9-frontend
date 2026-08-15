@@ -31,6 +31,17 @@ export async function apiFetch(endpoint, options = {}) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
+    // ===== SINGLE-DEVICE SESSION KICK =====
+    // Backend sends this specific code when the account was logged into on
+    // another device — this session is now stale. Force this browser back
+    // to the login screen instead of just showing an error toast.
+    if (data.code === 'SESSION_INVALIDATED') {
+      localStorage.removeItem('alfa9_token');
+      localStorage.removeItem('alfa9_user');
+      if (!window.location.pathname.startsWith('/auth')) {
+        window.location.href = '/auth';
+      }
+    }
     throw new Error(data.message || data.error || 'Something went wrong');
   }
   return data;

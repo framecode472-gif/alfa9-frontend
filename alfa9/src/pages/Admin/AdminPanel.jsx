@@ -313,6 +313,18 @@ export default function AdminPanel() {
     }
   };
 
+  // Generates a brand-new password for a locked-out user (never displays
+  // their real one — see resetUserPassword in adminController for why).
+  const resetUserPassword = async (userId) => {
+    try {
+      const data = await apiFetch(`/users/${userId}/reset-password`, { method: 'POST' });
+      return data.tempPassword;
+    } catch (err) {
+      showToast(err.message || 'Failed to reset password');
+      return null;
+    }
+  };
+
   // ===== AUTO FETCH ON TAB CHANGE =====
   useEffect(() => {
     if (activeNav === 'dashboard') fetchDashboard();
@@ -850,6 +862,7 @@ export default function AdminPanel() {
               users={users.filter((u) => matchesSearch(searchQuery, u.uid, u._id, u.name, u.email, u.phone))}
               showToast={showToast}
               onSetWagering={updateUserWagering}
+              onResetPassword={resetUserPassword}
             />
           )}
 
@@ -935,7 +948,7 @@ function EmptyState({ icon = 'empty', title, sub }) {
 }
 
 /* ============================================================ DASHBOARD */
-function UsersView({ users, showToast, onSetWagering }) {
+function UsersView({ users, showToast, onSetWagering, onResetPassword }) {
   const copyUid = (uid) => {
     navigator.clipboard?.writeText(uid).then(
       () => showToast('UID copied — paste it in Gift codes / Give Points'),
@@ -962,6 +975,50 @@ function UsersView({ users, showToast, onSetWagering }) {
   // Quick unlock: mark requirement as fully met right now, no betting needed.
   const unlockNow = (userId) => onSetWagering(userId, { required: 0, completed: 0 });
 
+  // ===== RESET PASSWORD =====
+  // Shows the generated temp password ONCE in a modal so the admin can
+  // relay it to the user — see resetUserPassword in adminController for
+  // why we never show/store the user's real password.
+  const [resetResult, setResetResult] = useState(null); // { name, password } | null
+  const [resettingFor, setResettingFor] = useState(null); // userId currently resetting (loading state)
+
+  const handleResetPassword = async (u) => {
+    if (!window.confirm(`Reset ${u.name}'s password? Their old password will stop working immediately.`)) return;
+    setResettingFor(u._id);
+    const tempPassword = await onResetPassword(u._id);
+    setResettingFor(null);
+    if (tempPassword) setResetResult({ name: u.name, password: tempPassword });
+  };
+
+  const copyResetPassword = () => {
+    if (!resetResult) return;
+    navigator.clipboard?.writeText(resetResult.password).then(
+      () => showToast('Password copied'),
+      () => showToast('Could not copy')
+    );
+  };
+
+  // ===== REFERRALS =====
+  const [referralsFor, setReferralsFor] = useState(null); // user object whose modal is open
+  const [referralsData, setReferralsData] = useState(null);
+  const [referralsLoading, setReferralsLoading] = useState(false);
+
+  const openReferrals = async (u) => {
+    setReferralsFor(u);
+    setReferralsData(null);
+    setReferralsLoading(true);
+    try {
+      const data = await apiFetch(`/users/${u._id}/referrals`);
+      setReferralsData(data.referrals || []);
+    } catch (err) {
+      showToast(err.message || 'Failed to load referrals');
+      setReferralsData([]);
+    } finally {
+      setReferralsLoading(false);
+    }
+  };
+  const closeReferrals = () => { setReferralsFor(null); setReferralsData(null); };
+
   return (
     <div className="panel">
       <div className="panel-header">
@@ -974,7 +1031,7 @@ function UsersView({ users, showToast, onSetWagering }) {
           <div className="table-scroll">
             <table>
               <thead>
-                <tr><th>UID</th><th>Name</th><th>Email / Phone</th><th>Balance</th><th>Status</th><th>Wagering (bet / required)</th><th></th></tr>
+                <tr><th>UID</th><th>Name</th><th>Email / Phone</th><th>Balance</th><th>Status</th><th>Referrals</th><th>Wagering (bet / required)</th><th></th></tr>
               </thead>
               <tbody>
                 {users.map((u) => {
@@ -989,6 +1046,15 @@ function UsersView({ users, showToast, onSetWagering }) {
                       <td className="cell-muted">{u.email || u.phone || 'N/A'}</td>
                       <td className="cell-strong">{fmt(u.balance || 0)}</td>
                       <td><StatusBadge status={u.status} /></td>
+                      <td>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => openReferrals(u)}
+                          title="See everyone this user referred, and how much each one deposited/withdrew"
+                        >
+                          {u.referralCount || 0} referred
+                        </button>
+                      </td>
                       <td>
                         {wagerOpenFor === u._id ? (
                           <div className="btn-row" style={{ alignItems: 'center', gap: 6 }}>
@@ -1026,6 +1092,14 @@ function UsersView({ users, showToast, onSetWagering }) {
                               )}
                             </>
                           )}
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => handleResetPassword(u)}
+                            disabled={resettingFor === u._id}
+                            title="Generate a new password for this user if they're locked out"
+                          >
+                            {resettingFor === u._id ? 'Resetting…' : 'Reset Password'}
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -1036,6 +1110,74 @@ function UsersView({ users, showToast, onSetWagering }) {
           </div>
         )}
       </div>
+
+      {/* ===== RESET PASSWORD RESULT MODAL ===== */}
+      {resetResult && (
+        <div className="modal-overlay" onClick={() => setResetResult(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginTop: 0 }}>New password for {resetResult.name}</h3>
+            <p className="cell-muted" style={{ fontSize: 13 }}>
+              Share this with the user now — it will not be shown again. They should change it after logging in.
+            </p>
+            <div
+              style={{
+                background: 'var(--bg-3, #1a1a1a)',
+                border: '1px solid var(--border, #333)',
+                borderRadius: 8,
+                padding: '12px 16px',
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: 1,
+                textAlign: 'center',
+                margin: '14px 0'
+              }}
+            >
+              {resetResult.password}
+            </div>
+            <div className="btn-row" style={{ justifyContent: 'flex-end' }}>
+              <button className="btn btn-ghost btn-sm" onClick={copyResetPassword}>Copy</button>
+              <button className="btn btn-success btn-sm" onClick={() => setResetResult(null)}>Done</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== REFERRALS MODAL ===== */}
+      {referralsFor && (
+        <div className="modal-overlay" onClick={closeReferrals}>
+          <div className="modal-card" style={{ maxWidth: 640 }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginTop: 0 }}>{referralsFor.name}'s referrals</h3>
+            {referralsLoading ? (
+              <p className="cell-muted">Loading…</p>
+            ) : !referralsData || referralsData.length === 0 ? (
+              <EmptyState icon="empty" title="No referrals yet" sub="Nobody has signed up with this user's invite code yet." />
+            ) : (
+              <div className="table-scroll" style={{ maxHeight: 420 }}>
+                <table>
+                  <thead>
+                    <tr><th>Name</th><th>UID</th><th>Joined</th><th>Deposited</th><th>Withdrawn</th><th>Status</th></tr>
+                  </thead>
+                  <tbody>
+                    {referralsData.map((r) => (
+                      <tr key={r._id}>
+                        <td>{r.invitedUser?.name || '—'}</td>
+                        <td className="cell-strong">{r.invitedUser?.uid || '—'}</td>
+                        <td className="cell-muted">{r.invitedUser?.joinedAt ? new Date(r.invitedUser.joinedAt).toLocaleDateString() : '—'}</td>
+                        <td className="cell-strong">{fmt(r.invitedUser?.totalDeposited || 0)}</td>
+                        <td className="cell-strong">{fmt(r.invitedUser?.totalWithdrawn || 0)}</td>
+                        <td>{r.invitedUser ? <StatusBadge status={r.invitedUser.status} /> : <span className="cell-muted">Deleted</span>}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <div className="btn-row" style={{ justifyContent: 'flex-end', marginTop: 12 }}>
+              <button className="btn btn-ghost btn-sm" onClick={closeReferrals}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
