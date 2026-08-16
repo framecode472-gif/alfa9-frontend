@@ -264,12 +264,14 @@ export default function AdminPanel() {
         method: d.method,
         status: d.status,
         time: new Date(d.createdAt).toLocaleString(),
-        // New deposits store the screenshot as a base64 data URI (works forever,
-        // survives Railway redeploys). Old deposits made before this fix still
-        // have a disk path like "/uploads/screenshots/xxx.jpg" — those will 404
-        // since the old files no longer exist, but we keep the fallback so we
-        // don't crash on old records.
-        screenshot: d.screenshot ? (d.screenshot.startsWith('data:') ? d.screenshot : `${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${d.screenshot}`) : null,
+        // ===== LAZY-LOADED SCREENSHOT =====
+        // The list endpoint no longer sends the actual image (that alone
+        // was why switching Pending/Approved/Rejected took 7-8 seconds —
+        // see getAllDeposits in adminController). We only know a receipt
+        // EXISTS from screenshotHash; the real image bytes are fetched on
+        // demand only when the admin clicks to view it (see openReceipt in
+        // DepositsView below).
+        hasScreenshot: !!d.screenshotHash,
         flagged: !!d.flagged,
         flagReason: d.flagReason || null,
       }));
@@ -1385,7 +1387,35 @@ function DepositsView({ dTab, setDTab, dCounts, rows, onAccept, onReject, onBulk
     setSelected([]);
   };
 
+  // ===== RECEIPT LIGHTBOX (lazy-loaded) =====
+  // Screenshots are fetched on demand, one at a time, only when the admin
+  // actually clicks to view one — the list itself no longer carries the
+  // image bytes (see fetchDeposits + getAllDeposits for why).
+  // Shown in an in-app modal, NOT a new browser tab: Chrome (and mobile
+  // browsers) block top-level navigation to large data: URIs — that's
+  // exactly what caused the blank/broken "bank page" on desktop and the
+  // tab auto-closing on mobile. Rendering the same data URI inside an
+  // <img> tag on this page works fine; only navigating TO one as a URL doesn't.
+  const [lightboxUrl, setLightboxUrl] = useState(null);
+  const [loadingReceiptId, setLoadingReceiptId] = useState(null);
+
+  const openReceipt = async (depositId) => {
+    setLoadingReceiptId(depositId);
+    try {
+      const data = await apiFetch(`/deposits/${depositId}/screenshot`);
+      setLightboxUrl(data.screenshot);
+    } catch (err) {
+      // Most likely an old deposit from before screenshots were stored
+      // permanently in the database — that file no longer exists.
+      console.error(err);
+    } finally {
+      setLoadingReceiptId(null);
+    }
+  };
+  const closeLightbox = () => setLightboxUrl(null);
+
   return (
+    <>
     <div className="panel">
       <div className="tab-row">
         {tabs.map((t) => (
@@ -1435,10 +1465,25 @@ function DepositsView({ dTab, setDTab, dCounts, rows, onAccept, onReject, onBulk
                     <td className="cell-strong">{fmt(d.amount)}</td>
                     <td className="cell-muted">{d.method}</td>
                     <td>
-                      {d.screenshot ? (
-                        <a href={d.screenshot} target="_blank" rel="noopener noreferrer">
-                          <img src={d.screenshot} alt="Receipt" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: d.flagged ? '2px solid #e05252' : '1px solid var(--border)' }} />
-                        </a>
+                      {d.hasScreenshot ? (
+                        <button
+                          type="button"
+                          className="receipt-thumb-btn"
+                          onClick={() => openReceipt(d.id)}
+                          disabled={loadingReceiptId === d.id}
+                          style={{
+                            width: 44, height: 44, borderRadius: 6, cursor: 'pointer',
+                            border: d.flagged ? '2px solid #e05252' : '1px solid var(--border)',
+                            background: 'var(--bg-3, #1a1a1a)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0
+                          }}
+                          title="View receipt"
+                        >
+                          {loadingReceiptId === d.id ? (
+                            <span style={{ fontSize: 10, color: 'var(--text-muted, #999)' }}>…</span>
+                          ) : (
+                            <Icon name="download" />
+                          )}
+                        </button>
                       ) : (
                         <span className="cell-muted">No receipt</span>
                       )}
@@ -1462,6 +1507,16 @@ function DepositsView({ dTab, setDTab, dCounts, rows, onAccept, onReject, onBulk
         )}
       </div>
     </div>
+
+    {lightboxUrl && (
+      <div className="modal-overlay" onClick={closeLightbox}>
+        <div className="modal-card" style={{ maxWidth: 480, textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+          <img src={lightboxUrl} alt="Receipt" style={{ width: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: 8, marginBottom: 16 }} />
+          <button className="btn btn-ghost btn-sm" onClick={closeLightbox}>Close</button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 
