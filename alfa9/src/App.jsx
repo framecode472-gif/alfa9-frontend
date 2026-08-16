@@ -6,6 +6,7 @@ import './styles/theme.css';
 import ChatWidget from './components/ChatWidget/ChatWidget.jsx';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop.jsx';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
+import Loader from './components/Loader/Loader.jsx';
 import Landing from './pages/Landing/Landing.jsx';
 import Auth from './pages/Auth/Auth.jsx';
 import Home from './pages/Home/Home.jsx';
@@ -82,6 +83,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Loader />
       <ScrollToTop />
       <Routes>
         {/* Public routes - accessible without login */}
