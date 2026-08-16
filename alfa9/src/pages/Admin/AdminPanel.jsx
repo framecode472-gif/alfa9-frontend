@@ -115,6 +115,7 @@ function Icon({ name }) {
     case 'plus': return <svg {...common}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>;
     case 'trash': return <svg {...common}><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /></svg>;
     case 'check': return <svg {...common}><polyline points="20 6 9 17 4 12" /></svg>;
+    case 'chevronDown': return <svg {...common} width="14" height="14"><polyline points="6 9 12 15 18 9" /></svg>;
     case 'chevron-up': return <svg {...common}><polyline points="18 15 12 9 6 15" /></svg>;
     case 'logout': return <svg {...common}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>;
     case 'menu': return <svg {...common}><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>;
@@ -983,6 +984,51 @@ export default function AdminPanel() {
 }
 
 /* ============================================================ SHARED EMPTY STATE */
+/* ===== CUSTOM DROPDOWN =====
+   A plain <select>'s CLOSED box can be styled with CSS (we did that with
+   the gold chevron), but the OPEN options list is always rendered by the
+   browser/OS itself — no CSS can touch it, which is why it still looks
+   like a stock white/blue system dropdown. This component fakes a select
+   using a button + an absolutely-positioned div list we fully control, so
+   the whole thing — closed AND open — matches the app's gold/black theme. */
+function CustomSelect({ value, onChange, options }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const onClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, []);
+
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <div className="custom-select" ref={ref}>
+      <button type="button" className={`custom-select-trigger${open ? ' open' : ''}`} onClick={() => setOpen((v) => !v)}>
+        <span>{selected ? selected.label : 'Select…'}</span>
+        <Icon name="chevronDown" />
+      </button>
+      {open && (
+        <div className="custom-select-list">
+          {options.map((o) => (
+            <div
+              key={o.value}
+              className={`custom-select-option${o.value === value ? ' selected' : ''}`}
+              onClick={() => { onChange(o.value); setOpen(false); }}
+            >
+              {o.label}
+              {o.value === value && <Icon name="check" />}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EmptyState({ icon = 'empty', title, sub }) {
   return (
     <div className="empty-state">
@@ -1760,23 +1806,25 @@ function PointsView({ pointsForm, setPointsForm, lookupUser, givePoints, foundUs
           </div>
           <div className="field">
             <label>Point type</label>
-            <select
+            <CustomSelect
               value={pointsForm.pointType}
-              onChange={(e) => setPointsForm({ ...pointsForm, pointType: e.target.value })}
-            >
-              <option value="balance">Wallet balance (Rs)</option>
-              <option value="vipExp">VIP EXP</option>
-            </select>
+              onChange={(v) => setPointsForm({ ...pointsForm, pointType: v })}
+              options={[
+                { value: 'balance', label: 'Wallet balance (Rs)' },
+                { value: 'vipExp', label: 'VIP EXP' }
+              ]}
+            />
           </div>
           <div className="field">
             <label>Mode</label>
-            <select
+            <CustomSelect
               value={pointsForm.mode}
-              onChange={(e) => setPointsForm({ ...pointsForm, mode: e.target.value })}
-            >
-              <option value="add">Add / Deduct (use negative to deduct)</option>
-              <option value="set">Set to exact value (e.g. reset to 0)</option>
-            </select>
+              onChange={(v) => setPointsForm({ ...pointsForm, mode: v })}
+              options={[
+                { value: 'add', label: 'Add / Deduct (use negative to deduct)' },
+                { value: 'set', label: 'Set to exact value (e.g. reset to 0)' }
+              ]}
+            />
           </div>
           <div className="field">
             <label>Amount</label>

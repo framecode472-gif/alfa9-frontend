@@ -358,6 +358,36 @@
   color: var(--text);
 }
 .admin-page .field input:focus, .admin-page .field select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.08); }
+
+/* ===== CUSTOM DROPDOWN (fully themed, replaces native <select> where the
+   open list matters — see CustomSelect component) ===== */
+.admin-page .custom-select { position: relative; width: 100%; }
+.admin-page .custom-select-trigger {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 13px; color: var(--text); font-size: 13px; font-family: inherit;
+  cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.admin-page .custom-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.admin-page .custom-select-trigger svg { flex-shrink: 0; color: var(--gold); transition: transform 0.18s; margin-left: 8px; }
+.admin-page .custom-select-trigger:hover { border-color: var(--gold-dim, rgba(212,175,55,0.5)); }
+.admin-page .custom-select-trigger.open { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.08); }
+.admin-page .custom-select-trigger.open svg { transform: rotate(180deg); }
+.admin-page .custom-select-list {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 60;
+  background: var(--panel, #141414); border: 1px solid var(--border); border-radius: 10px;
+  padding: 6px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); max-height: 240px; overflow-y: auto;
+  animation: customSelectPop 0.14s ease-out;
+}
+@keyframes customSelectPop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.admin-page .custom-select-option {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 9px 10px; border-radius: 7px; font-size: 13px; color: var(--text-muted);
+  cursor: pointer; transition: background 0.12s, color 0.12s;
+}
+.admin-page .custom-select-option:hover { background: rgba(212,175,55,0.1); color: var(--text); }
+.admin-page .custom-select-option.selected { color: var(--gold); font-weight: 600; }
+.admin-page .custom-select-option svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--gold); }
 .admin-page .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 16px; }
 
 /* small inline input used in table rows, e.g. Users -> Wagering editor */
@@ -482,8 +512,12 @@
     z-index: 350; backdrop-filter: blur(2px);
   }
   .admin-page .hamburger-btn { display: flex; }
-  .admin-page .admin-search { display: none; }
-  .admin-page .admin-topbar { padding: 14px 16px; }
+  .admin-page .admin-topbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 14px 16px; }
+  .admin-page .admin-topbar-right { width: 100%; flex-wrap: wrap; gap: 10px; }
+  .admin-page .admin-search {
+    display: flex; /* was: none — search is now available on mobile too */
+    order: -1; flex-basis: 100%; width: 100%;
+  }
   .admin-page .admin-content { padding: 18px 16px 50px; }
   .admin-page .admin-page-title { font-size: 16.5px; }
   .admin-page .notif-panel { width: 92vw; right: -8px; }
