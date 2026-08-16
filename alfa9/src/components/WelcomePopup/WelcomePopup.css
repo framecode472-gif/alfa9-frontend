@@ -12,16 +12,14 @@
 .wp-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55); /* Soft dark tint for homepage visibility */
-  backdrop-filter: blur(4px);      /* Gentle blur */
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.65); /* Slightly darker since blur is gone, keeps the same "dimmed" feel */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 99999;
   padding: 16px;
   perspective: 1500px;
-  animation: wpFadeIn 0.3s ease-out forwards;
+  animation: wpFadeIn 0.2s ease-out forwards;
 }
 
 @keyframes wpFadeIn {

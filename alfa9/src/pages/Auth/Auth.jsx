@@ -40,20 +40,11 @@ function getStrengthScore(val) {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// ── mock "backend" using localStorage, until a real API exists ──
+// normalizeId is still used to sanity-check the login/register identifier
+// fields before sending them to the real backend.
 const USERS_KEY = 'alfa9_users';
 const SESSION_KEY = 'alfa9_session';
 
-function getUsers() {
-  try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-  } catch {
-    return {};
-  }
-}
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
 function normalizeId(val) {
   return val.trim().toLowerCase();
 }
@@ -299,28 +290,57 @@ function Auth() {
   const openForgotModal = () => {
     setForgotStep(1);
     setForgotIdentifier('');
+    setForgotError('');
     setForgotOpen(true);
   };
   const closeForgotModal = () => setForgotOpen(false);
 
-  const forgotSendCode = () => {
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState('');
+
+  const forgotSendCode = async () => {
     if (!forgotIdentifier.trim()) {
       identifierRef.current?.focus();
       return;
     }
-    setForgotStep(2);
-    setTimeout(() => otpRefs.current[0]?.focus(), 50);
+    setForgotError('');
+    setForgotLoading(true);
+    try {
+      await apiCall('/auth/forgot-password', { identifier: forgotIdentifier.trim() });
+      setOtp(['', '', '', '']);
+      setForgotStep(2);
+      setTimeout(() => otpRefs.current[0]?.focus(), 50);
+    } catch (err) {
+      setForgotError(err.message || 'Failed to send code');
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
-  const forgotReset = () => {
-    if (forgotNewPass.length < 6) return;
-    const id = normalizeId(forgotIdentifier);
-    const users = getUsers();
-    if (users[id]) {
-      users[id] = forgotNewPass;
-      saveUsers(users);
+  const forgotReset = async () => {
+    if (forgotNewPass.length < 6) {
+      setForgotError('Password must be at least 6 characters');
+      return;
     }
-    setForgotStep(3);
+    const code = otp.join('');
+    if (code.length < 4) {
+      setForgotError('Enter the full 4-digit code');
+      return;
+    }
+    setForgotError('');
+    setForgotLoading(true);
+    try {
+      await apiCall('/auth/reset-password', {
+        identifier: forgotIdentifier.trim(),
+        otp: code,
+        newPassword: forgotNewPass
+      });
+      setForgotStep(3);
+    } catch (err) {
+      setForgotError(err.message || 'Failed to reset password');
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
   const handleOtpChange = (index, value) => {
@@ -594,7 +614,10 @@ function Auth() {
                 onChange={(e) => setForgotIdentifier(e.target.value)}
               />
             </div>
-            <button type="button" className="modal-btn" onClick={forgotSendCode}>Send Verification Code</button>
+            {forgotError && forgotStep === 1 && <div className="modal-error">{forgotError}</div>}
+            <button type="button" className="modal-btn" onClick={forgotSendCode} disabled={forgotLoading}>
+              {forgotLoading ? 'Sending…' : 'Send Verification Code'}
+            </button>
           </div>
 
           {/* STEP 2: OTP + new password */}
@@ -637,7 +660,10 @@ function Auth() {
                 {showForgotPass ? <EyeOffIcon /> : <EyeOpenIcon />}
               </button>
             </div>
-            <button type="button" className="modal-btn" onClick={forgotReset}>Reset Password</button>
+            <button type="button" className="modal-btn" onClick={forgotReset} disabled={forgotLoading}>
+              {forgotLoading ? 'Resetting…' : 'Reset Password'}
+            </button>
+            {forgotError && forgotStep === 2 && <div className="modal-error">{forgotError}</div>}
             <div className="modal-resend">Didn't get a code? <b onClick={forgotSendCode}>Resend</b></div>
           </div>
 

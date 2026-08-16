@@ -21,7 +21,7 @@ function WelcomePopup() {
           sessionStorage.removeItem('alfa9_show_welcome');
           setVisible(true);
         }
-      }, 400);
+      }, 150);
       return () => {
         cancelled = true;
         clearTimeout(t);
