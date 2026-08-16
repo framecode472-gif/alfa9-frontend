@@ -165,9 +165,18 @@ const INITIAL_GAMES = [
   { key: 'boom', name: 'Booms Mines', img: '/image/Booms.png', enabled: true, winRate: 50, maintenance: false },
 ];
 
+const VALID_NAV_KEYS = NAV_ITEMS.map((n) => n.key);
+
 export default function AdminPanel() {
   const navigate = useNavigate();
-  const [activeNav, setActiveNav] = useState('dashboard');
+  // ===== STAY ON REFRESH =====
+  // Reading these from localStorage on first render means F5/reload lands
+  // the admin back on whichever tab (and Pending/Approved/Rejected sub-tab)
+  // they were already looking at, instead of always resetting to Dashboard.
+  const [activeNav, setActiveNav] = useState(() => {
+    const saved = localStorage.getItem('alfa9_admin_nav');
+    return VALID_NAV_KEYS.includes(saved) ? saved : 'dashboard';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastShow, setToastShow] = useState(false);
@@ -177,9 +186,9 @@ export default function AdminPanel() {
   const [users, setUsers] = useState([]);
 
   const [deposits, setDeposits] = useState(INITIAL_DEPOSITS);
-  const [dTab, setDTab] = useState('pending');
+  const [dTab, setDTab] = useState(() => localStorage.getItem('alfa9_admin_dtab') || 'pending');
   const [withdrawals, setWithdrawals] = useState(INITIAL_WITHDRAWALS);
-  const [wTab, setWTab] = useState('pending');
+  const [wTab, setWTab] = useState(() => localStorage.getItem('alfa9_admin_wtab') || 'pending');
   const [bonuses, setBonuses] = useState(INITIAL_BONUSES);
   const [codes, setCodes] = useState(INITIAL_CODES);
   const [games, setGames] = useState(INITIAL_GAMES);
@@ -193,6 +202,12 @@ export default function AdminPanel() {
 
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
+
+  // Persist on every change — cheap, and means a refresh from anywhere
+  // (dashboard, deposits/approved tab, etc.) always comes back to the same view.
+  useEffect(() => { localStorage.setItem('alfa9_admin_nav', activeNav); }, [activeNav]);
+  useEffect(() => { localStorage.setItem('alfa9_admin_dtab', dTab); }, [dTab]);
+  useEffect(() => { localStorage.setItem('alfa9_admin_wtab', wTab); }, [wTab]);
 
   // ===== GLOBAL SEARCH (topbar) — filters whichever table is on screen =====
   const [searchQuery, setSearchQuery] = useState('');
@@ -313,11 +328,15 @@ export default function AdminPanel() {
     }
   };
 
-  // Generates a brand-new password for a locked-out user (never displays
-  // their real one — see resetUserPassword in adminController for why).
-  const resetUserPassword = async (userId) => {
+  // Generates a brand-new password for a locked-out user, OR sets a
+  // specific password the admin typed in (never displays their real
+  // one — see resetUserPassword in adminController for why).
+  const resetUserPassword = async (userId, newPassword) => {
     try {
-      const data = await apiFetch(`/users/${userId}/reset-password`, { method: 'POST' });
+      const data = await apiFetch(`/users/${userId}/reset-password`, {
+        method: 'POST',
+        body: JSON.stringify(newPassword ? { newPassword } : {})
+      });
       return data.tempPassword;
     } catch (err) {
       showToast(err.message || 'Failed to reset password');
@@ -441,9 +460,25 @@ export default function AdminPanel() {
     }
   };
   const clearNotifications = () => setNotifications([]); // clears the bell view only (backend history stays intact)
-  const openNotification = (id) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-    notifFetch(`/notifications/${id}/read`, { method: 'PUT' }).catch(() => {});
+  // Clicking a notification takes the admin straight to the relevant
+  // section — deposit/withdraw requests land on the Pending tab (that's
+  // what still needs review), chat messages go to AI Chats.
+  const openNotification = (n) => {
+    setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+    notifFetch(`/notifications/${n.id}/read`, { method: 'PUT' }).catch(() => {});
+    setNotifOpen(false);
+
+    if (n.type === 'deposit') {
+      setDTab('pending');
+      setActiveNav('deposits');
+    } else if (n.type === 'withdrawal') {
+      setWTab('pending');
+      setActiveNav('withdrawals');
+    } else if (n.type === 'chat') {
+      setActiveNav('chats');
+    } else {
+      setActiveNav('notifications');
+    }
   };
 
   /* ── deposit actions (REAL API) ── */
@@ -837,7 +872,7 @@ export default function AdminPanel() {
                     />
                   ) : (
                     notifications.slice(0, 8).map((n) => (
-                      <div key={n.id} className={`notif-item${n.read ? '' : ' unread'}`} onClick={() => openNotification(n.id)}>
+                      <div key={n.id} className={`notif-item${n.read ? '' : ' unread'}`} onClick={() => openNotification(n)}>
                         <div className="notif-icon"><Icon name={n.type === 'deposit' ? 'download' : n.type === 'withdrawal' ? 'upload' : n.type === 'chat' ? 'chat' : 'bell'} /></div>
                         <div className="notif-body">
                           <div className="notif-text">{n.message}</div>
@@ -854,7 +889,16 @@ export default function AdminPanel() {
 
         <div className="admin-content">
           {activeNav === 'dashboard' && (
-            <DashboardView deposits={deposits} withdrawals={withdrawals} stats={dashboardStats} />
+            <DashboardView
+              deposits={deposits}
+              withdrawals={withdrawals}
+              stats={dashboardStats}
+              onNavigate={(nav) => {
+                if (nav === 'deposits') setDTab('pending');
+                if (nav === 'withdrawals') setWTab('pending');
+                setActiveNav(nav);
+              }}
+            />
           )}
 
           {activeNav === 'users' && (
@@ -976,16 +1020,32 @@ function UsersView({ users, showToast, onSetWagering, onResetPassword }) {
   const unlockNow = (userId) => onSetWagering(userId, { required: 0, completed: 0 });
 
   // ===== RESET PASSWORD =====
-  // Shows the generated temp password ONCE in a modal so the admin can
-  // relay it to the user — see resetUserPassword in adminController for
-  // why we never show/store the user's real password.
+  // Custom styled modal (not the browser's ugly native confirm()) — lets
+  // the admin either type a specific password the user asked for, or leave
+  // it blank to auto-generate one.
   const [resetResult, setResetResult] = useState(null); // { name, password } | null
   const [resettingFor, setResettingFor] = useState(null); // userId currently resetting (loading state)
+  const [resetPromptFor, setResetPromptFor] = useState(null); // user object whose "set password" modal is open
+  const [resetDraft, setResetDraft] = useState('');
+  const [resetDraftVisible, setResetDraftVisible] = useState(false);
 
-  const handleResetPassword = async (u) => {
-    if (!window.confirm(`Reset ${u.name}'s password? Their old password will stop working immediately.`)) return;
+  const openResetPrompt = (u) => {
+    setResetPromptFor(u);
+    setResetDraft('');
+    setResetDraftVisible(false);
+  };
+  const closeResetPrompt = () => setResetPromptFor(null);
+
+  const confirmResetPassword = async () => {
+    const u = resetPromptFor;
+    if (!u) return;
+    if (resetDraft && resetDraft.trim().length < 4) {
+      showToast('Password must be at least 4 characters');
+      return;
+    }
+    setResetPromptFor(null);
     setResettingFor(u._id);
-    const tempPassword = await onResetPassword(u._id);
+    const tempPassword = await onResetPassword(u._id, resetDraft.trim() || undefined);
     setResettingFor(null);
     if (tempPassword) setResetResult({ name: u.name, password: tempPassword });
   };
@@ -1094,9 +1154,9 @@ function UsersView({ users, showToast, onSetWagering, onResetPassword }) {
                           )}
                           <button
                             className="btn btn-ghost btn-sm"
-                            onClick={() => handleResetPassword(u)}
+                            onClick={() => openResetPrompt(u)}
                             disabled={resettingFor === u._id}
-                            title="Generate a new password for this user if they're locked out"
+                            title="Set a new password for this user if they're locked out"
                           >
                             {resettingFor === u._id ? 'Resetting…' : 'Reset Password'}
                           </button>
@@ -1110,6 +1170,41 @@ function UsersView({ users, showToast, onSetWagering, onResetPassword }) {
           </div>
         )}
       </div>
+
+      {/* ===== RESET PASSWORD PROMPT (premium modal, replaces browser confirm()) ===== */}
+      {resetPromptFor && (
+        <div className="modal-overlay" onClick={closeResetPrompt}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginTop: 0 }}>Reset password for {resetPromptFor.name}</h3>
+            <p className="cell-muted" style={{ fontSize: 13, marginBottom: 16 }}>
+              Their old password stops working immediately. Type the password they asked for, or leave this blank to auto-generate one.
+            </p>
+            <div style={{ position: 'relative', marginBottom: 16 }}>
+              <input
+                type={resetDraftVisible ? 'text' : 'password'}
+                value={resetDraft}
+                onChange={(e) => setResetDraft(e.target.value)}
+                placeholder="New password (leave blank to auto-generate)"
+                className="admin-inline-input"
+                style={{ width: '100%', padding: '10px 40px 10px 12px', boxSizing: 'border-box' }}
+                autoFocus
+                onKeyDown={(e) => { if (e.key === 'Enter') confirmResetPassword(); }}
+              />
+              <button
+                type="button"
+                onClick={() => setResetDraftVisible((v) => !v)}
+                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gold, #D4AF37)', fontSize: 12 }}
+              >
+                {resetDraftVisible ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            <div className="btn-row" style={{ justifyContent: 'flex-end' }}>
+              <button className="btn btn-ghost btn-sm" onClick={closeResetPrompt}>Cancel</button>
+              <button className="btn btn-success btn-sm" onClick={confirmResetPassword}>Reset Password</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ===== RESET PASSWORD RESULT MODAL ===== */}
       {resetResult && (
@@ -1182,18 +1277,22 @@ function UsersView({ users, showToast, onSetWagering, onResetPassword }) {
   );
 }
 
-function DashboardView({ deposits, withdrawals, stats: apiStats }) {
+function DashboardView({ deposits, withdrawals, stats: apiStats, onNavigate }) {
   const totalDepositsLocal = deposits.filter((d) => d.status === 'approved').reduce((s, d) => s + d.amount, 0);
   const totalWithdrawalsLocal = withdrawals.filter((w) => w.status === 'approved').reduce((s, w) => s + w.amount, 0);
-  const pendingCount = (apiStats
-    ? apiStats.deposits.pending + apiStats.withdrawals.pending
-    : withdrawals.filter((w) => w.status === 'pending').length + deposits.filter((d) => d.status === 'pending').length);
+  const pendingDeposits = apiStats ? apiStats.deposits.pending : deposits.filter((d) => d.status === 'pending').length;
+  const pendingWithdrawals = apiStats ? apiStats.withdrawals.pending : withdrawals.filter((w) => w.status === 'pending').length;
+  const pendingCount = pendingDeposits + pendingWithdrawals;
 
   const stats = [
     { label: 'Total deposits', value: fmt(apiStats ? apiStats.deposits.totalAmount : totalDepositsLocal), icon: 'download', trend: apiStats ? `${apiStats.deposits.total} deposits` : 'No data yet', up: null, accent: 'gold' },
     { label: 'Total withdrawals', value: fmt(apiStats ? apiStats.withdrawals.totalAmount : totalWithdrawalsLocal), icon: 'upload', trend: apiStats ? `${apiStats.withdrawals.total} withdrawals` : 'No data yet', up: null, accent: 'danger' },
     { label: 'Active members', value: apiStats ? apiStats.users.active : '0', icon: 'users', trend: apiStats ? `${apiStats.users.total} total members` : 'No data yet', up: null, accent: 'info' },
-    { label: 'Pending requests', value: pendingCount, icon: 'wallet', trend: pendingCount > 0 ? 'Needs review' : 'All clear', up: pendingCount === 0, accent: pendingCount > 0 ? 'warning' : 'gold' },
+    {
+      label: 'Pending requests', value: pendingCount, icon: 'wallet', trend: pendingCount > 0 ? 'Needs review — click to open' : 'All clear', up: pendingCount === 0, accent: pendingCount > 0 ? 'warning' : 'gold',
+      // More deposits pending than withdrawals → jump to deposits, else withdrawals. Either way the admin lands on the Pending tab of whichever needs attention.
+      onClick: pendingCount > 0 ? () => onNavigate?.(pendingDeposits >= pendingWithdrawals ? 'deposits' : 'withdrawals') : null
+    },
     { label: 'Members who deposited', value: apiStats ? apiStats.users.deposited : '0', icon: 'download', trend: apiStats ? `of ${apiStats.users.total} total` : 'No data yet', up: null, accent: 'gold' },
     { label: 'Playing right now', value: apiStats ? apiStats.games.currentlyPlaying : '0', icon: 'dice', trend: 'active in the last 5 min', up: null, accent: 'info' },
   ];
@@ -1202,7 +1301,12 @@ function DashboardView({ deposits, withdrawals, stats: apiStats }) {
     <>
       <div className="stat-grid">
         {stats.map((s) => (
-          <div className="stat-card" key={s.label}>
+          <div
+            className="stat-card"
+            key={s.label}
+            onClick={s.onClick || undefined}
+            style={s.onClick ? { cursor: 'pointer' } : undefined}
+          >
             <div className="stat-top">
               <div className={`stat-icon icon-${s.accent}`}><Icon name={s.icon} /></div>
               <span className={`stat-trend ${s.up === null ? 'neutral' : s.up ? 'up' : 'down'}`}>{s.trend}</span>
@@ -1437,8 +1541,8 @@ function NotificationsView({ notifications, onOpen, onClear }) {
         ) : (
           <div className="code-list">
             {notifications.map((n) => (
-              <div className="code-row" key={n.id} onClick={() => onOpen(n.id)} style={{ cursor: 'pointer' }}>
-                <span className="code-user-tag"><Icon name={n.type === 'deposit' ? 'download' : 'upload'} />{n.type === 'deposit' ? 'Deposit' : 'Withdrawal'}</span>
+              <div className="code-row" key={n.id} onClick={() => onOpen(n)} style={{ cursor: 'pointer' }}>
+                <span className="code-user-tag"><Icon name={n.type === 'deposit' ? 'download' : n.type === 'withdrawal' ? 'upload' : n.type === 'chat' ? 'chat' : 'bell'} />{n.type === 'deposit' ? 'Deposit' : n.type === 'withdrawal' ? 'Withdrawal' : n.type === 'chat' ? 'Chat' : 'Alert'}</span>
                 <div className="code-meta">
                   <span>{n.message}</span>
                   <span className="cell-muted">{n.time}</span>
