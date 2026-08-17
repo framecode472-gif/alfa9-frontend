@@ -8,7 +8,7 @@ import './Deposit.css';
 // Toggle this to re-enable JazzCash later — just flip it back to false.
 // While true, tapping the JazzCash card shows a toast telling the user to
 // use Easypaisa instead, and does not select JazzCash as the gateway.
-const JAZZCASH_UNDER_MAINTENANCE = true;
+const JAZZCASH_UNDER_MAINTENANCE = false;
 
 const AMOUNTS = [
   { val: 300, bonus: '+Rs 10' },
@@ -207,8 +207,8 @@ function Deposit() {
             <p className="instruction-text">Niche diye gaye account par rakam bhejein aur payment ka screenshot upload karein.</p>
             <div className="account-box">
               <div className="info-row"><span className="info-label">Method</span><span className="info-value gold">{gateway}</span></div>
-              <div className="info-row"><span className="info-label">Account Number</span><span className="info-value gold">03163533206</span></div>
-              <div className="info-row"><span className="info-label">Account Name</span><span className="info-value">Asif Soomro</span></div>
+              <div className="info-row"><span className="info-label">Account Number</span><span className="info-value gold">{gateway === 'JazzCash' ? '03201303708' : '03163533206'}</span></div>
+              <div className="info-row"><span className="info-label">Account Name</span><span className="info-value">{gateway === 'JazzCash' ? 'SAIF ULLAH' : 'Asif Soomro'}</span></div>
               <div className="info-row"><span className="info-label">Amount to Send</span><span className="info-value gold">Rs {amount.toLocaleString()}</span></div>
             </div>
 
