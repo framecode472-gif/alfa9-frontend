@@ -1697,6 +1697,7 @@ function ChatsView({ logs, selectedId, onSelect, onMarkSeen, onReply }) {
   const [mobileShowChat, setMobileShowChat] = useState(false);
   const [replyDraft, setReplyDraft] = useState('');
   const [sending, setSending] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState(null);
 
   const handleSelect = (log) => {
     onSelect(log._id);
@@ -1716,6 +1717,7 @@ function ChatsView({ logs, selectedId, onSelect, onMarkSeen, onReply }) {
   };
 
   return (
+    <>
     <div className={`chats-view ${mobileShowChat ? 'chats-view--chat-open' : ''}`}>
       {/* conversation list */}
       <div className="chats-view-list">
@@ -1774,7 +1776,12 @@ function ChatsView({ logs, selectedId, onSelect, onMarkSeen, onReply }) {
                 >
                   {m.role === 'admin' && <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--gold)', marginBottom: 3 }}>You (Admin)</div>}
                   {m.imageUrl && (
-                    <img src={m.imageUrl} alt="Screenshot" style={{ maxWidth: '100%', borderRadius: 8, display: 'block', marginBottom: m.content ? 6 : 0 }} />
+                    <img
+                      src={m.imageUrl}
+                      alt="Screenshot"
+                      onClick={() => setLightboxUrl(m.imageUrl)}
+                      style={{ maxWidth: 200, maxHeight: 200, width: '100%', height: 'auto', objectFit: 'cover', borderRadius: 8, display: 'block', marginBottom: m.content ? 6 : 0, cursor: 'pointer' }}
+                    />
                   )}
                   {m.content && <div style={{ fontSize: 13, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{m.content}</div>}
                   <div style={{ fontSize: 10, opacity: 0.65, marginTop: 4 }}>
@@ -1803,6 +1810,16 @@ function ChatsView({ logs, selectedId, onSelect, onMarkSeen, onReply }) {
         )}
       </div>
     </div>
+
+    {lightboxUrl && (
+      <div className="modal-overlay" onClick={() => setLightboxUrl(null)}>
+        <div className="modal-card" style={{ maxWidth: 480, textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+          <img src={lightboxUrl} alt="Screenshot" style={{ width: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: 8, marginBottom: 16 }} />
+          <button className="btn btn-ghost btn-sm" onClick={() => setLightboxUrl(null)}>Close</button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 

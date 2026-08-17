@@ -230,8 +230,8 @@ function AboutUs() {
               <div className="agreement-text">
                 <p>For any privacy-related questions or concerns, please contact us:</p>
                 <ul>
-                  <li><strong>Telegram:</strong> @Saifmarko</li>
-                  <li><strong>WhatsApp:</strong> +92 316 3533206</li>
+                  <li><strong>Telegram:</strong> @the_john_David</li>
+                  <li><strong>WhatsApp:</strong> +92 328 2287821</li>
                 </ul>
               </div>
             </div>

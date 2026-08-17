@@ -461,7 +461,7 @@ function Auth() {
                     <span className="icon-chip md"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg></span>
                     <span>Forgot Password</span>
                   </div>
-                  <div className="help-card" onClick={() => window.open('https://wa.me/923163533206', '_blank')}>
+                  <div className="help-card" onClick={() => window.open('https://wa.me/923282287821', '_blank')}>
                     <span className="icon-chip md"><svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6" /><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" /></svg></span>
                     <span>Support</span>
                   </div>
