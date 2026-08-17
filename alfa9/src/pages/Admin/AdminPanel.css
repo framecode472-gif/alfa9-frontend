@@ -635,6 +635,25 @@
   background: rgba(255, 255, 255, 0.06);
   color: inherit;
 }
+.chats-view-bubble--admin {
+  align-self: flex-start;
+  background: rgba(212, 175, 55, 0.18);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: inherit;
+}
+.chats-unread-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px; margin-left: 6px;
+  background: #e05252; color: #fff; font-size: 10.5px; font-weight: 700; border-radius: 999px;
+}
+.chats-reply-bar {
+  display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border);
+}
+.chats-reply-bar input {
+  flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 13px; color: var(--text); font-size: 13px; outline: none; font-family: inherit;
+}
+.chats-reply-bar input:focus { border-color: var(--gold); }
 
 @media (max-width: 900px) {
   .chats-view { min-height: 65vh; }

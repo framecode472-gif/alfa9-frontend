@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { io as socketIOClient } from 'socket.io-client';
 import { apiFetch } from '../../utils/api';
 import './ChatWidget.css';
 
@@ -17,6 +18,8 @@ import './ChatWidget.css';
    ══════════════════════════════════════════════════ */
 
 /* ---------- small inline icon set ---------- */
+const SOCKET_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
 const Icon = {
     chat: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -208,7 +211,6 @@ const MENU_ITEMS = [
     { key: 'withdraw-history', label: 'Withdrawal problem', sub: 'Check a pending payout', icon: Icon.card },
     { key: 'password-choice', label: 'Change ID Login Password', sub: 'Reset your account access', icon: Icon.key },
     { key: 'ewallet-form', label: 'Modify E-Wallet Information', sub: 'Update payout details', icon: Icon.ewallet },
-    { key: 'usdt-address', label: 'Add USDT Address', sub: 'Link a crypto wallet', icon: Icon.usdt },
     { key: 'customer-service', label: 'Online service', sub: 'Chat with our team', icon: Icon.headset },
 ];
 
@@ -548,7 +550,11 @@ function ChatConversationScreen({
                             </div>
                             <div className="cw-msg-meta">
                                 {formatTime(m.time || Date.now())}
-                                {m.type === 'user' && <span className="cw-msg-ticks">{Icon.checkDouble}</span>}
+                                {m.type === 'user' && (
+                                    <span className={`cw-msg-ticks${m.seen ? ' seen' : ''}`} title={m.seen ? 'Seen' : 'Sent'}>
+                                        {Icon.checkDouble}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     );
@@ -660,11 +666,13 @@ export default function ChatWidget() {
     const open = () => {
         setIsOpen(true);
         setStack(['menu']);
-        setMessages([]);
         setChatInput('');
         setIsTyping(false);
         setAttachOpen(false);
         setRating('');
+        // Previous conversation is loaded lazily when the user actually
+        // enters the chat screen (openLiveChat / beginChat below) — not
+        // wiped here. See loadChatHistory.
     };
     const close = () => setIsOpen(false);
     const push = (s) => setStack((prev) => [...prev, s]);
@@ -689,6 +697,56 @@ export default function ChatWidget() {
     };
 
     /* ---------- live chat conversation logic ---------- */
+    const socketRef = useRef(null);
+
+    // Backend message shape { role, content, imageUrl, seen, at } ->
+    // the shape ChatConversationScreen already renders.
+    const toFrontendMessage = (m, i) => ({
+        id: m._id || `${m.role}-${m.at}-${i}`,
+        type: m.role === 'user' ? 'user' : 'agent',
+        text: m.content || '',
+        image: m.imageUrl || null,
+        seen: !!m.seen,
+        time: new Date(m.at).getTime(),
+    });
+
+    // Loads the real conversation from the backend (fixes the old bug
+    // where reopening the widget silently wiped everything — sessionId is
+    // stable across opens, so the history is always there server-side).
+    const loadChatHistory = () => {
+        return apiFetch(`/chatbot/history/${sessionIdRef.current}`)
+            .then((data) => {
+                const loaded = (data.messages || []).map(toFrontendMessage);
+                setMessages((prev) => {
+                    // Keep the local 'info' summary card (Alfa9 ID / help type) if present.
+                    const infoCard = prev.find((m) => m.type === 'info');
+                    return infoCard ? [infoCard, ...loaded] : loaded;
+                });
+            })
+            .catch(() => {}); // offline/first-ever chat — fine, just start empty
+    };
+
+    // ===== SOCKET.IO: real-time delivery of the delayed AI reply / an
+    // admin's manual reply / seen-status updates, without polling. =====
+    useEffect(() => {
+        const socket = socketIOClient(SOCKET_URL, { transports: ['websocket', 'polling'] });
+        socketRef.current = socket;
+        socket.emit('joinChat', sessionIdRef.current);
+
+        socket.on('chatMessage', (payload) => {
+            if (payload.sessionId !== sessionIdRef.current) return;
+            setIsTyping(false);
+            setMessages((prev) => [...prev, toFrontendMessage(payload.message, prev.length)]);
+        });
+
+        socket.on('chatSeen', (payload) => {
+            if (payload.sessionId !== sessionIdRef.current) return;
+            setMessages((prev) => prev.map((m) => (m.type === 'user' ? { ...m, seen: true } : m)));
+        });
+
+        return () => socket.disconnect();
+    }, []);
+
     // Shared greeting used whether the chat is auto-started (logged-in user)
     // or started manually via the ID/help-type form.
     const beginChat = (id, help) => {
@@ -697,11 +755,15 @@ export default function ChatWidget() {
             { id: 'info-' + Date.now(), type: 'info', alfa9Id: id, helpType: help || 'General', time: Date.now() },
         ]);
         push('livechat-chat');
-        setIsTyping(true);
-        setTimeout(() => {
-            setIsTyping(false);
-            setMessages((prev) => [...prev, { id: 'a-' + Date.now(), type: 'agent', text: 'Hi! How can I help you today? What issue are you facing?', time: Date.now() }]);
-        }, 700);
+        loadChatHistory().then(() => {
+            setMessages((prev) => {
+                // Only show the built-in greeting the very first time this
+                // conversation has no messages at all yet.
+                const hasRealMessages = prev.some((m) => m.type !== 'info');
+                if (hasRealMessages) return prev;
+                return [...prev, { id: 'a-greet', type: 'agent', text: 'How can I help you today?', time: Date.now() }];
+            });
+        });
     };
 
     // Called when the user taps "LiveChat" from the Customer Service menu.
@@ -725,40 +787,36 @@ export default function ChatWidget() {
         beginChat(alfa9Id, helpType);
     };
 
+    // Sends the message and returns immediately — the actual reply (AI,
+    // after a 2–3 min human-like delay, or an admin if they jump in
+    // sooner) arrives later over the socket.io connection above, not from
+    // this request. See sendMessage in the backend for why.
     const sendChatMessage = () => {
         const text = chatInput.trim();
         if (!text) return;
-        setMessages((prev) => [...prev, { id: 'u-' + Date.now(), type: 'user', text, time: Date.now() }]);
+        setMessages((prev) => [...prev, { id: 'u-' + Date.now(), type: 'user', text, seen: false, time: Date.now() }]);
         setChatInput('');
-        setIsTyping(true);
 
         apiFetch('/chatbot/message', {
             method: 'POST',
             body: { message: text, sessionId: sessionIdRef.current },
-        })
-            .then((data) => {
-                setIsTyping(false);
-                setMessages((prev) => [...prev, { id: 'a-' + Date.now(), type: 'agent', text: data.reply, time: Date.now() }]);
-            })
-            .catch(() => {
-                // Backend/Groq unreachable — fall back to a canned line instead of leaving the user stuck
-                setIsTyping(false);
-                const reply = AGENT_REPLIES[Math.floor(Math.random() * AGENT_REPLIES.length)];
-                setMessages((prev) => [...prev, { id: 'a-' + Date.now(), type: 'agent', text: reply, time: Date.now() }]);
-            });
+        }).then(() => {
+            showToast('Message sent — an agent will reply shortly');
+        }).catch(() => {
+            showToast("Couldn't send — check your connection and try again");
+        });
     };
 
-    // Uploads a picked file/screenshot, shows it in the chat immediately (with
-    // an "Uploading…" state), then tells the assistant it arrived so it can
-    // acknowledge it (matches the "ask for a screenshot" support-prompt rule).
+    // Uploads a picked file/screenshot, shows it in the chat immediately
+    // (with an "Uploading…" state), then attaches it to the conversation
+    // so the agent (AI or admin) can see it — no more asking for it again.
     const handleAttachFile = (file) => {
         if (!file) return;
         setAttachOpen(false);
 
         const previewUrl = URL.createObjectURL(file);
         const localId = 'u-' + Date.now();
-        setMessages((prev) => [...prev, { id: localId, type: 'user', image: previewUrl, text: '', time: Date.now(), uploading: true }]);
-        setIsTyping(true);
+        setMessages((prev) => [...prev, { id: localId, type: 'user', image: previewUrl, text: '', seen: false, time: Date.now(), uploading: true }]);
 
         const formData = new FormData();
         formData.append('image', file);
@@ -768,17 +826,10 @@ export default function ChatWidget() {
                 setMessages((prev) => prev.map((m) => (m.id === localId ? { ...m, uploading: false, image: res.url } : m)));
                 return apiFetch('/chatbot/message', {
                     method: 'POST',
-                    body: { message: `[User attached a screenshot: ${res.url}]`, sessionId: sessionIdRef.current },
+                    body: { message: '', sessionId: sessionIdRef.current, imageUrl: res.url },
                 });
             })
-            .then((data) => {
-                setIsTyping(false);
-                if (data?.reply) {
-                    setMessages((prev) => [...prev, { id: 'a-' + Date.now(), type: 'agent', text: data.reply, time: Date.now() }]);
-                }
-            })
             .catch((err) => {
-                setIsTyping(false);
                 setMessages((prev) => prev.map((m) => (m.id === localId ? { ...m, uploading: false, failed: true } : m)));
                 showToast(err?.message || 'Upload failed — please try again');
             });

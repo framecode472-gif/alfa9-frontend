@@ -379,6 +379,31 @@ export default function AdminPanel() {
     return () => clearInterval(interval);
   }, [activeNav]);
 
+  const markChatSeen = async (sessionId) => {
+    try {
+      await chatbotFetch(`/admin/${sessionId}/seen`, { method: 'PUT' });
+      setChatLogs((prev) => prev.map((l) => (
+        l.sessionId === sessionId ? { ...l, messages: l.messages.map((m) => (m.role === 'user' ? { ...m, seen: true } : m)) } : l
+      )));
+    } catch {
+      /* non-critical — worst case the Seen tick just doesn't flip locally until next poll */
+    }
+  };
+
+  const sendAdminChatReply = async (sessionId, message) => {
+    try {
+      const data = await chatbotFetch(`/admin/${sessionId}/reply`, {
+        method: 'PUT',
+        body: JSON.stringify({ message })
+      });
+      setChatLogs((prev) => prev.map((l) => (
+        l.sessionId === sessionId ? { ...l, messages: [...l.messages, data.message] } : l
+      )));
+    } catch (err) {
+      showToast(err.message || 'Failed to send reply');
+    }
+  };
+
   const fetchChatLogs = async () => {
     try {
       const data = await chatbotFetch('/admin/all');
@@ -415,9 +440,13 @@ export default function AdminPanel() {
     });
     socketRef.current = socket;
 
-    socket.on('connect', () => setLiveConnected(true));
+    socket.on('connect', () => { setLiveConnected(true); socket.emit('joinAdminChats'); });
     socket.on('disconnect', () => setLiveConnected(false));
     socket.on('connect_error', () => setLiveConnected(false));
+
+    socket.on('chatUpdated', () => {
+      if (liveStateRef.current.activeNav === 'chats') fetchChatLogs();
+    });
 
     socket.on('adminNotification', (notif) => {
       // Always refresh the bell immediately.
@@ -941,7 +970,7 @@ export default function AdminPanel() {
           )}
 
           {activeNav === 'chats' && (
-            <ChatsView logs={chatLogs} selectedId={selectedChatId} onSelect={setSelectedChatId} />
+            <ChatsView logs={chatLogs} selectedId={selectedChatId} onSelect={setSelectedChatId} onMarkSeen={markChatSeen} onReply={sendAdminChatReply} />
           )}
 
           {activeNav === 'bonuses' && (
@@ -1659,19 +1688,32 @@ function NotificationsView({ notifications, onOpen, onClear }) {
 }
 
 /* ============================================================ AI CHATS */
-function ChatsView({ logs, selectedId, onSelect }) {
+function ChatsView({ logs, selectedId, onSelect, onMarkSeen, onReply }) {
   const selected = logs.find((l) => l._id === selectedId) || logs[0] || null;
   // On mobile there's only room for one column at a time — show the list
   // until a conversation is picked, then show that conversation full-width
   // with a back button. On desktop (>= 860px, see AdminPanel.css) both
   // columns show side by side and this state is ignored.
   const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [replyDraft, setReplyDraft] = useState('');
+  const [sending, setSending] = useState(false);
 
-  const handleSelect = (id) => {
-    onSelect(id);
+  const handleSelect = (log) => {
+    onSelect(log._id);
     setMobileShowChat(true);
+    const hasUnseen = log.messages.some((m) => m.role === 'user' && !m.seen);
+    if (hasUnseen) onMarkSeen(log.sessionId);
   };
   const handleBack = () => setMobileShowChat(false);
+
+  const handleSend = async () => {
+    const text = replyDraft.trim();
+    if (!text || !selected || sending) return;
+    setSending(true);
+    setReplyDraft('');
+    await onReply(selected.sessionId, text);
+    setSending(false);
+  };
 
   return (
     <div className={`chats-view ${mobileShowChat ? 'chats-view--chat-open' : ''}`}>
@@ -1685,18 +1727,20 @@ function ChatsView({ logs, selectedId, onSelect }) {
           logs.map((l) => {
             const last = l.messages[l.messages.length - 1];
             const isActive = selected && selected._id === l._id;
+            const unseenCount = l.messages.filter((m) => m.role === 'user' && !m.seen).length;
             return (
               <div
                 key={l._id}
-                onClick={() => handleSelect(l._id)}
+                onClick={() => handleSelect(l)}
                 className={`chats-view-item ${isActive ? 'active' : ''}`}
               >
                 <div className="chats-view-item-name">
                   {l.userId?.name || 'Guest'}
                   {l.userId?._id ? <span className="cell-muted" style={{ fontWeight: 400 }}> · UID {l.userId._id.toString().slice(-6)}</span> : null}
+                  {unseenCount > 0 && <span className="chats-unread-badge">{unseenCount}</span>}
                 </div>
                 <div className="cell-muted chats-view-item-preview">
-                  {last ? last.content : 'No messages yet'}
+                  {last ? (last.content || (last.imageUrl ? '📷 Screenshot' : '')) : 'No messages yet'}
                 </div>
                 <div className="cell-muted" style={{ fontSize: 11, marginTop: 4 }}>
                   {new Date(l.updatedAt).toLocaleString()}
@@ -1726,12 +1770,34 @@ function ChatsView({ logs, selectedId, onSelect }) {
               {selected.messages.map((m, i) => (
                 <div
                   key={i}
-                  className={`chats-view-bubble ${m.role === 'user' ? 'chats-view-bubble--user' : 'chats-view-bubble--assistant'}`}
+                  className={`chats-view-bubble ${m.role === 'user' ? 'chats-view-bubble--user' : m.role === 'admin' ? 'chats-view-bubble--admin' : 'chats-view-bubble--assistant'}`}
                 >
-                  <div style={{ fontSize: 13, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{m.content}</div>
-                  <div style={{ fontSize: 10, opacity: 0.65, marginTop: 4 }}>{new Date(m.at).toLocaleTimeString()}</div>
+                  {m.role === 'admin' && <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--gold)', marginBottom: 3 }}>You (Admin)</div>}
+                  {m.imageUrl && (
+                    <img src={m.imageUrl} alt="Screenshot" style={{ maxWidth: '100%', borderRadius: 8, display: 'block', marginBottom: m.content ? 6 : 0 }} />
+                  )}
+                  {m.content && <div style={{ fontSize: 13, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{m.content}</div>}
+                  <div style={{ fontSize: 10, opacity: 0.65, marginTop: 4 }}>
+                    {new Date(m.at).toLocaleTimeString()}
+                    {m.role === 'user' && (m.seen ? ' · Seen' : ' · Sent')}
+                  </div>
                 </div>
               ))}
+            </div>
+
+            {/* Admin reply — takes over from the AI for this conversation, delivered instantly */}
+            <div className="chats-reply-bar">
+              <input
+                type="text"
+                placeholder="Reply as Alfa9 Support…"
+                value={replyDraft}
+                onChange={(e) => setReplyDraft(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+                disabled={sending}
+              />
+              <button className="btn btn-success btn-sm" onClick={handleSend} disabled={sending || !replyDraft.trim()}>
+                {sending ? '…' : 'Send'}
+              </button>
             </div>
           </>
         )}
