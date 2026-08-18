@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { io as socketIOClient } from 'socket.io-client';
 import { apiFetch } from '../../../utils/api';
 import ResultPopup from '../../../components/ResultPopup/ResultPopup';
 import './K3.css';
+
+const SOCKET_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
 
 const DURATIONS = [
   { key: '1m', seconds: 60, line1: 'K3', line2: '1 Min' },
@@ -206,10 +209,61 @@ function K3() {
   const [resultPopup, setResultPopup] = useState(null);
   const [betConfirmToast, setBetConfirmToast] = useState(false);
 
+  const userIdRef = useRef(null);
   useEffect(() => {
     apiFetch('/user/profile')
-      .then((data) => setBalance(data.user.balance))
+      .then((data) => {
+        setBalance(data.user.balance);
+        userIdRef.current = data.user._id;
+        socketRef.current?.emit('joinUser', data.user._id);
+      })
       .catch(() => {});
+  }, []);
+
+  // ===== REAL-TIME RESULTS (socket.io) — see WinGo.jsx for the full
+  // explanation of why this replaced duration-tab-dependent polling. =====
+  const socketRef = useRef(null);
+  useEffect(() => {
+    const socket = socketIOClient(SOCKET_URL, { transports: ['websocket', 'polling'] });
+    socketRef.current = socket;
+    if (userIdRef.current) socket.emit('joinUser', userIdRef.current);
+
+    socket.on('betSettled', (payload) => {
+      if (payload.game !== 'k3') return;
+      setBalance(payload.newBalance);
+      setMyBets((prev) => prev.map((b) => (
+        b.id === payload.betId ? { ...b, status: payload.status, winLose: payload.winLose } : b
+      )));
+      setPendingBet((pb) => {
+        if (!pb || pb.betId !== payload.betId) return pb;
+        const durCfg = DURATIONS.find((d) => d.key === payload.duration);
+        setResultPopup({
+          status: payload.status === 'Succeed' ? 'win' : 'loss',
+          amount: payload.status === 'Succeed' ? payload.winLose : payload.amount,
+          dice: payload.result?.dice,
+          sum: payload.result?.sum,
+          period: payload.period,
+          durationLabel: durCfg ? `${durCfg.line1} ${durCfg.line2}` : '',
+          betLabel: pb.label,
+        });
+        return null;
+      });
+    });
+
+    socket.on('roundSettled', (payload) => {
+      if (payload.game !== 'k3') return;
+      setGameStates((prev) => {
+        const entry = prev[payload.duration];
+        if (!entry) return prev;
+        if (entry.history.some((r) => r.period === payload.period)) return prev;
+        const newRow = { period: payload.period, dice: payload.result?.dice, sum: payload.result?.sum };
+        return { ...prev, [payload.duration]: { ...entry, history: [newRow, ...entry.history] } };
+      });
+      if (payload.duration === activeDuration) setPage(1);
+    });
+
+    return () => socket.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [myBets, setMyBets] = useState([]);
@@ -481,6 +535,13 @@ function K3() {
           odds: betModal.odds,
           amount: data.bet.amount,
         });
+        if (activeTab === 'my') {
+          setMyBets((prev) => [{
+            id: data.bet.id, orderNumber: data.bet.orderNumber, period: data.bet.period,
+            betType: 'k3', betValue: betModal.key, betLane: null,
+            status: 'Pending', winLose: 0, amount: data.bet.amount, createdAt: new Date().toISOString(),
+          }, ...prev]);
+        }
         closeBetModal();
         setBetConfirmToast(true);
         setTimeout(() => setBetConfirmToast(false), 1400);

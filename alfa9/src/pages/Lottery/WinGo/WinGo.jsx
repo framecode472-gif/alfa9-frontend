@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { io as socketIOClient } from 'socket.io-client';
 import { apiFetch } from '../../../utils/api';
 import ResultPopup from '../../../components/ResultPopup/ResultPopup';
 import './WinGo.css';
+
+const SOCKET_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
 
 const DURATIONS = [
   { key: '30s', seconds: 30, line1: 'WinGo', line2: '30sec' },
@@ -299,10 +302,83 @@ function WinGo() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDuration]);
 
+  const userIdRef = useRef(null);
   useEffect(() => {
     apiFetch('/user/profile')
-      .then((data) => setBalance(data.user.balance))
+      .then((data) => {
+        setBalance(data.user.balance);
+        userIdRef.current = data.user._id;
+        socketRef.current?.emit('joinUser', data.user._id);
+      })
       .catch(() => {});
+  }, []);
+
+  // ===== REAL-TIME RESULTS (socket.io) =====
+  // WHY: the old approach polled only the currently-active duration tab —
+  // if a user switched from "30s" to "1m" (or left the page) right after
+  // placing a bet, that duration's polling stopped entirely, so the
+  // win/loss popup, balance, and My History row for that bet would never
+  // update on their own (only fixed itself once they left and re-entered
+  // the game, which is exactly the bug reported). The backend now pushes
+  // two events the instant a round settles (see gameEngine.settleRound):
+  //   - 'betSettled' (private, to this user only): win/loss + new balance
+  //     for a bet THEY placed — used for the popup, balance, and history.
+  //   - 'roundSettled' (broadcast): the new result for the public
+  //     "Game history" table, for everyone currently watching that stream.
+  // This works instantly no matter which tab/duration is on screen.
+  const socketRef = useRef(null);
+  useEffect(() => {
+    const socket = socketIOClient(SOCKET_URL, { transports: ['websocket', 'polling'] });
+    socketRef.current = socket;
+    if (userIdRef.current) socket.emit('joinUser', userIdRef.current);
+
+    socket.on('betSettled', (payload) => {
+      if (payload.game !== 'wingo') return;
+      setBalance(payload.newBalance);
+
+      // Update this bet's row in My History immediately if we already have
+      // it loaded, so the "Pending" tag flips to won/lost without a refetch.
+      setMyBets((prev) => prev.map((b) => (
+        b.id === payload.betId ? { ...b, status: payload.status, winLose: payload.winLose } : b
+      )));
+
+      // Show the win/loss popup right away — no more waiting on a period
+      // change to be detected on the (possibly no-longer-active) duration.
+      setPendingBet((pb) => {
+        if (!pb || pb.betId !== payload.betId) return pb; // not the bet we're tracking a popup for
+        const durCfg = DURATIONS.find((d) => d.key === payload.duration);
+        setResultPopup({
+          status: payload.status === 'Succeed' ? 'win' : 'loss',
+          amount: payload.status === 'Succeed' ? payload.winLose : payload.amount,
+          resultNumber: payload.result?.number,
+          resultColors: payload.result?.colors,
+          resultBig: payload.result?.big,
+          period: payload.period,
+          durationLabel: durCfg ? `${durCfg.line1} ${durCfg.line2}` : '',
+        });
+        return null;
+      });
+    });
+
+    socket.on('roundSettled', (payload) => {
+      if (payload.game !== 'wingo') return;
+      // Prepend the new result to that duration's history table live —
+      // works even for a duration the user isn't currently looking at.
+      setGameStates((prev) => {
+        const entry = prev[payload.duration];
+        if (!entry) return prev;
+        if (entry.history.some((r) => r.period === payload.period)) return prev; // already have it
+        const newRow = {
+          period: payload.period, number: payload.result?.number,
+          big: payload.result?.big, colors: payload.result?.colors || []
+        };
+        return { ...prev, [payload.duration]: { ...entry, history: [newRow, ...entry.history] } };
+      });
+      if (payload.duration === activeDuration) setPage(1);
+    });
+
+    return () => socket.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [myBets, setMyBets] = useState([]);
@@ -506,6 +582,14 @@ function WinGo() {
           label: betModal.label,
           amount: data.bet.amount,
         });
+        // If My History is open right now, show this bet as Pending immediately.
+        if (activeTab === 'my') {
+          setMyBets((prev) => [{
+            id: data.bet.id, orderNumber: data.bet.orderNumber, period: data.bet.period,
+            betType: betModal.type, betValue: String(betModal.value), betLane: null,
+            status: 'Pending', winLose: 0, amount: data.bet.amount, createdAt: new Date().toISOString(),
+          }, ...prev]);
+        }
         closeBetModal();
         setBetConfirmToast(true);
         setTimeout(() => setBetConfirmToast(false), 1400);
