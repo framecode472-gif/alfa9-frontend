@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io as socketIOClient } from 'socket.io-client';
+import { isAdminDemoMode, demoFetch, endAdminDemo } from './demoData';
 import './AdminPanel.css';
 
 /* ============================================================
@@ -15,6 +16,8 @@ import './AdminPanel.css';
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api') + '/admin';
 
 const apiFetch = async (endpoint, options = {}) => {
+  if (isAdminDemoMode()) return demoFetch(endpoint, options);
+
   const token = localStorage.getItem('alfa9_admin_token');
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -42,6 +45,8 @@ const NOTIF_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const SOCKET_URL = NOTIF_BASE.replace(/\/api\/?$/, '');
 
 const notifFetch = async (endpoint, options = {}) => {
+  if (isAdminDemoMode()) return demoFetch(endpoint, options);
+
   const token = localStorage.getItem('alfa9_admin_token');
 
   const response = await fetch(`${NOTIF_BASE}${endpoint}`, {
@@ -65,6 +70,8 @@ const notifFetch = async (endpoint, options = {}) => {
 const CHATBOT_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api') + '/chatbot';
 
 const chatbotFetch = async (endpoint, options = {}) => {
+  if (isAdminDemoMode()) return demoFetch(endpoint, options);
+
   const token = localStorage.getItem('alfa9_admin_token');
 
   const response = await fetch(`${CHATBOT_BASE}${endpoint}`, {
@@ -230,6 +237,7 @@ export default function AdminPanel() {
   const handleLogout = () => {
     localStorage.removeItem('alfa9_role'); // clears the flag AdminRoute checks
     localStorage.removeItem('alfa9_admin_token');
+    endAdminDemo(); // no-op for a real session, ends a demo session cleanly
     setProfileOpen(false);
     navigate('/admin-login');
   };
@@ -433,6 +441,10 @@ export default function AdminPanel() {
   }, [activeNav, dTab, wTab]);
 
   useEffect(() => {
+    // Demo mode has no real backend to push live updates from — skip the
+    // socket connection entirely instead of leaving it stuck "Connecting…"
+    if (isAdminDemoMode()) return;
+
     const token = localStorage.getItem('alfa9_admin_token');
     const socket = socketIOClient(SOCKET_URL, {
       transports: ['websocket', 'polling'],
@@ -879,10 +891,17 @@ export default function AdminPanel() {
                 <button className="admin-search-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">×</button>
               )}
             </div>
-            <div className={`live-indicator ${liveConnected ? 'live-on' : 'live-off'}`} title={liveConnected ? 'Live — updates push instantly' : 'Reconnecting…'}>
-              <span className="live-dot" />
-              {liveConnected ? 'Live' : 'Connecting'}
-            </div>
+            {isAdminDemoMode() ? (
+              <div className="live-indicator demo-badge" title="Sample data only — nothing here is real">
+                <span className="live-dot" />
+                Demo Mode
+              </div>
+            ) : (
+              <div className={`live-indicator ${liveConnected ? 'live-on' : 'live-off'}`} title={liveConnected ? 'Live — updates push instantly' : 'Reconnecting…'}>
+                <span className="live-dot" />
+                {liveConnected ? 'Live' : 'Connecting'}
+              </div>
+            )}
             <div className="notif-wrap" ref={notifRef}>
               <div className="admin-icon-btn" onClick={() => { setNotifOpen((v) => !v); if (!notifOpen) markAllRead(); }}>
                 <Icon name="bell" />

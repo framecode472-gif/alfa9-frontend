@@ -172,6 +172,13 @@
 }
 .admin-page .live-indicator.live-on { color: #4ade80; border-color: rgba(74,222,128,0.35); }
 .admin-page .live-indicator.live-off { color: var(--text-dim); }
+
+/* Demo Mode badge — amber, distinct from the green "Live" state, so it's
+   unmistakable at a glance that this session is sample data only. */
+.admin-page .live-indicator.demo-badge {
+  color: var(--warning); border-color: rgba(224,160,32,0.4); background: rgba(224,160,32,0.08);
+}
+.admin-page .live-indicator.demo-badge .live-dot { background: var(--warning); animation: live-pulse 1.6s ease-in-out infinite; }
 .admin-page .live-dot {
   width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0;
 }

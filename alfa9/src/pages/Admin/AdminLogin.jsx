@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { startAdminDemo } from './demoData';
 import './AdminLogin.css';
 
 const ADMIN_ROLE_KEY = 'alfa9_role';
@@ -42,6 +43,16 @@ const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhos
     }
   };
 
+  // ===== TRY DEMO — no credentials, no real data =====
+  // Starts a fully sandboxed session: every admin API call this browser
+  // tab makes from now on is answered by demoData.js's in-memory mock
+  // data instead of the real backend. Nothing here ever reads or writes
+  // a real user, deposit, withdrawal, or balance.
+  const handleDemo = () => {
+    startAdminDemo();
+    navigate('/admin');
+  };
+
   return (
     <div className="admin-login-page">
       <div className="admin-login-card">
@@ -69,6 +80,13 @@ const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhos
             {loading ? 'Loading...' : 'Enter panel'}
           </button>
         </form>
+
+        <div className="admin-login-divider"><span>or</span></div>
+
+        <button type="button" className="admin-login-demo-btn" onClick={handleDemo}>
+          Try Demo — no login required
+        </button>
+        <div className="admin-login-demo-hint">Explore the full panel with sample data. Nothing here is real.</div>
       </div>
     </div>
   );
