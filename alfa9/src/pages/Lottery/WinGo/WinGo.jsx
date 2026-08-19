@@ -205,6 +205,7 @@ function WinGo() {
   // Data shown in the win/loss popup once a pending bet resolves
   const [resultPopup, setResultPopup] = useState(null);
   const [betConfirmToast, setBetConfirmToast] = useState(false);
+  const [betErrorToast, setBetErrorToast] = useState(null);
 
   const refreshRef = useRef(null);
 
@@ -559,44 +560,57 @@ function WinGo() {
       return;
     }
 
+    // ===== OPTIMISTIC UI =====
+    // Close the sheet and show "bet placed" the instant the button is
+    // tapped, instead of waiting on the network round-trip to Railway —
+    // that wait (even just a few hundred ms) was the "bet lagane mein time
+    // lagta hai" delay. The request still runs in the background; if it
+    // genuinely fails (e.g. betting just closed for this round a moment
+    // ago), we roll the balance back and show a proper themed toast
+    // instead of the browser's native alert() popup.
+    const snapshot = { type: betModal.type, value: betModal.value, label: betModal.label, duration: activeDuration };
+    setBalance((b) => Math.round((b - totalAmount) * 100) / 100);
+    closeBetModal();
+    setBetConfirmToast(true);
+    setTimeout(() => setBetConfirmToast(false), 1400);
+
     apiFetch('/game-round/bet', {
       method: 'POST',
       body: {
         gameName: 'wingo',
-        duration: activeDuration,
-        betType: betModal.type,
-        betValue: String(betModal.value),
+        duration: snapshot.duration,
+        betType: snapshot.type,
+        betValue: String(snapshot.value),
         unitAmount: balanceOption,
         quantity: safeQuantity,
         multiplier: multValue(multiplier),
       },
     })
       .then((data) => {
-        setBalance((b) => Math.round((b - data.bet.amount) * 100) / 100);
         setPendingBet({
           betId: data.bet.id,
-          duration: activeDuration,
+          duration: snapshot.duration,
           period: data.bet.period,
-          type: betModal.type,
-          value: betModal.value,
-          label: betModal.label,
+          type: snapshot.type,
+          value: snapshot.value,
+          label: snapshot.label,
           amount: data.bet.amount,
         });
         // If My History is open right now, show this bet as Pending immediately.
         if (activeTab === 'my') {
           setMyBets((prev) => [{
             id: data.bet.id, orderNumber: data.bet.orderNumber, period: data.bet.period,
-            betType: betModal.type, betValue: String(betModal.value), betLane: null,
+            betType: snapshot.type, betValue: String(snapshot.value), betLane: null,
             status: 'Pending', winLose: 0, amount: data.bet.amount, createdAt: new Date().toISOString(),
           }, ...prev]);
         }
-        closeBetModal();
-        setBetConfirmToast(true);
-        setTimeout(() => setBetConfirmToast(false), 1400);
       })
       .catch((err) => {
-        closeBetModal();
-        alert(err.message || 'Could not place bet');
+        // The bet never actually went through — undo the optimistic deduction.
+        setBalance((b) => Math.round((b + totalAmount) * 100) / 100);
+        setBetConfirmToast(false);
+        setBetErrorToast(err.message || 'Could not place bet — please try again');
+        setTimeout(() => setBetErrorToast(null), 2400);
       });
   };
 
@@ -1243,8 +1257,22 @@ function WinGo() {
       {betConfirmToast && (
         <div className="wg-betok-overlay">
           <div className="wg-betok-card">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#17d97a" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12.5 11 15.5 16 9"></polyline></svg>
+            <div className="wg-betok-icon-ring">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#17d97a" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12.5 11 15.5 16 9"></polyline></svg>
+            </div>
             <span>Bet placed successfully</span>
+          </div>
+        </div>
+      )}
+
+      {/* BET ERROR — themed toast instead of the browser's native alert() popup */}
+      {betErrorToast && (
+        <div className="wg-betok-overlay">
+          <div className="wg-betok-card wg-betok-card--error">
+            <div className="wg-betok-icon-ring wg-betok-icon-ring--error">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff5c5c" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="13"></line><circle cx="12" cy="16" r="1" fill="#ff5c5c" stroke="none"></circle></svg>
+            </div>
+            <span>{betErrorToast}</span>
           </div>
         </div>
       )}
