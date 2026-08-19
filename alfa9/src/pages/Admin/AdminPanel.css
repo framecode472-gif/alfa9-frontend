@@ -180,9 +180,6 @@
   0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
   50% { box-shadow: 0 0 0 5px rgba(74,222,128,0); }
 }
-@media (max-width: 900px) {
-  .admin-page .live-indicator span:last-child { display: none; }
-}
 .admin-page .admin-icon-btn {
   width: 38px; height: 38px; border-radius: 10px;
   background: var(--bg-input); border: 1px solid var(--border); color: var(--gold-light);
@@ -321,7 +318,8 @@
 .admin-page .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ══════ TABS ══════ */
-.admin-page .tab-row { display: flex; gap: 6px; padding: 14px 20px 0; overflow-x: auto; }
+.admin-page .tab-row { display: flex; gap: 6px; padding: 14px 20px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.admin-page .tab-row::-webkit-scrollbar { display: none; }
 .admin-page .tab-btn {
   padding: 9px 18px; border-radius: 10px 10px 0 0; font-size: 12.5px; font-weight: 700;
   color: var(--text-muted); background: transparent; border: 1px solid transparent; cursor: pointer;
@@ -512,15 +510,37 @@
     z-index: 350; backdrop-filter: blur(2px);
   }
   .admin-page .hamburger-btn { display: flex; }
+
+  /* Topbar: title row on top, search + live + bell wrap neatly underneath
+     instead of squeezing/overflowing off-screen. */
   .admin-page .admin-topbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 14px 16px; }
-  .admin-page .admin-topbar-right { width: 100%; flex-wrap: wrap; gap: 10px; }
+  .admin-page .topbar-left { width: 100%; }
+  .admin-page .admin-topbar-right { width: 100%; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
   .admin-page .admin-search {
     display: flex; /* was: none — search is now available on mobile too */
     order: -1; flex-basis: 100%; width: 100%;
   }
+  .admin-page .live-indicator { padding: 7px 10px; }
+  .admin-page .live-indicator span:last-child { display: none; }
   .admin-page .admin-content { padding: 18px 16px 50px; }
   .admin-page .admin-page-title { font-size: 16.5px; }
-  .admin-page .notif-panel { width: 92vw; right: -8px; }
+
+  /* ===== NOTIFICATION DROPDOWN — mobile fix =====
+     Absolute + right:-8px positioned the panel relative to the bell icon,
+     which shifts around as the topbar wraps on narrow screens — that's
+     what was clipping/cutting the panel off the left edge of the screen.
+     Fixed positioning centered on the viewport keeps it fully on-screen
+     and consistent no matter where the bell ends up. */
+  .admin-page .notif-panel {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 92vw;
+    max-width: 400px;
+    max-height: 72vh;
+  }
 }
 
 @media (max-width: 640px) {
@@ -536,12 +556,23 @@
   .admin-page .btn-row { width: 100%; }
   .admin-page .btn-row .btn { flex: 1; }
   .admin-page .admin-page-sub { font-size: 11px; }
+
+  /* Bigger, easier-to-tap icon buttons and slightly tighter table cells */
+  .admin-page .admin-icon-btn { width: 40px; height: 40px; }
+  .admin-page thead th { padding: 9px 14px; font-size: 10.5px; }
+  .admin-page tbody td { padding: 11px 14px; font-size: 12.5px; }
+  .admin-page .tab-btn { padding: 8px 14px; font-size: 12px; }
+  .admin-page .notif-panel { top: 56px; max-width: calc(100vw - 20px); max-height: 68vh; }
+  .admin-page .toast { left: 16px; right: 16px; top: 16px; max-width: calc(100vw - 32px); }
 }
 
 @media (max-width: 420px) {
   .admin-page .stat-grid { grid-template-columns: 1fr; }
   .admin-page .admin-logo-img { height: 44px; }
+  .admin-page .admin-topbar-right { justify-content: space-between; }
+  .admin-page .modal-card { padding: 18px; }
 }
+
 /* ══════ AI CHATS (responsive) ══════
    Desktop: list + conversation side by side.
    Mobile (<=900px): single column — list first, tap a conversation to
@@ -576,6 +607,9 @@
 .chats-view-item-name {
   font-weight: 600;
   font-size: 13px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 .chats-view-item-preview {
   font-size: 12px;
@@ -656,7 +690,7 @@
 .chats-reply-bar input:focus { border-color: var(--gold); }
 
 @media (max-width: 900px) {
-  .chats-view { min-height: 65vh; }
+  .chats-view { min-height: 65vh; border-radius: 12px; }
   .chats-view-list {
     width: 100%;
     border-right: none;
@@ -671,6 +705,14 @@
   .chats-view--chat-open .chats-view-detail { display: flex; }
   .chats-view--chat-open .chats-view-back-btn { display: flex; }
 }
+
+@media (max-width: 480px) {
+  .chats-view-item { padding: 11px 14px; }
+  .chats-reply-bar { padding: 8px; gap: 6px; }
+  .chats-reply-bar input { padding: 9px 12px; font-size: 12.5px; }
+  .chats-view-bubble { max-width: 95%; font-size: 12.5px; }
+}
+
 /* ===== MODAL (Reset Password result, Referrals list) =====
    Scoped under .admin-page — plain unscoped ".modal-overlay" collided with
    the SAME class name used on the login/Auth page and several other pages
