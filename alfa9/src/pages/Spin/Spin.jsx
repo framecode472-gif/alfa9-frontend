@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../utils/api';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import './Spin.css';
 
 /* Segment order matches the reference layout, clockwise from 12 o'clock.
@@ -157,7 +158,6 @@ function ConfettiBurst({ burstId }) {
   );
 }
 
-/* Content for the three info panels — matches the reference screenshots. */
 const DEPOSIT_TIERS = [
   { amount: 'Rs1,000.00',     spins: '+1',  time: '00:00-23:59' },
   { amount: 'Rs10,000.00',    spins: '+2',  time: '00:00-23:59' },
@@ -167,29 +167,12 @@ const DEPOSIT_TIERS = [
   { amount: 'Rs1,000,000.00', spins: '+10', time: '00:00-23:59' },
 ];
 
-const ACTIVITY_DETAIL_RULES = [
-  'Members must reach the single deposit amount and cumulative deposit amount to be eligible to participate in the lottery',
-  'Conditions for withdrawal of wheel rewards: 1 times turnover required.',
-  'If you receive monetary rewards, there is no need to apply, the system will automatically add them to your member ID (please contact customer service to receive physical rewards)',
-  'The lottery round starts every morning at 00:00. After making your deposit, you need to wait 5 minutes before the draw wheel starts.',
-];
+const ACTIVITY_DETAIL_RULE_KEYS = ['spin_rule_1', 'spin_rule_2', 'spin_rule_3', 'spin_rule_4'];
 
-const ACTIVITY_RULE_CARDS = [
-  {
-    num: '01',
-    text: 'The event is effective from now on. The discount can only be used once per address, per email address, per phone number and for the same payment method (debit/credit card/bank account) and IP address;',
-    sub: 'If a member applies repeatedly, the company reserves the right to cancel or withdraw member bonuses.',
-  },
-  {
-    num: '02',
-    text: 'All offers are specially designed for players.',
-    sub: 'If any group or individual is found to be dishonestly withdrawing bonuses or threatening or abusing company offers, the company reserves the right to freeze or cancel the account and account balance of that group or individual.',
-  },
-  {
-    num: '03',
-    text: 'The platform reserves the right of final outcome of this event;',
-    sub: 'and the right to modify or terminate the campaign without prior notice; these terms apply to all offers.',
-  },
+const ACTIVITY_RULE_CARD_KEYS = [
+  { num: '01', textKey: 'spin_card1_text', subKey: 'spin_card1_sub' },
+  { num: '02', textKey: 'spin_card2_text', subKey: 'spin_card2_sub' },
+  { num: '03', textKey: 'spin_card3_text', subKey: 'spin_card3_sub' },
 ];
 
 function segCenterAngle(i) {
@@ -198,13 +181,11 @@ function segCenterAngle(i) {
 
 function Spin() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [spinsLeft, setSpinsLeft] = useState(0);
-  // Which wheel is active. 'deposit' = the original recharge-based wheel
-  // (unchanged). 'referral' = the new invite-based wheel — same graphic,
-  // different prize pool and a different earning source.
   const [mode, setMode] = useState('deposit');
   const [referralSpinsLeft, setReferralSpinsLeft] = useState(0);
   const [referralCount, setReferralCount] = useState(0);
@@ -221,7 +202,7 @@ function Spin() {
   const [history, setHistory] = useState([]);
   const [resultPrize, setResultPrize] = useState(null);
   const [burstId, setBurstId] = useState(0);
-  const [activePanel, setActivePanel] = useState(null); // null | 'description' | 'details' | 'rules'
+  const [activePanel, setActivePanel] = useState(null);
   const spinTimeoutRef = useRef(null);
 
   const loadStatus = () => {
@@ -231,7 +212,7 @@ function Spin() {
         setTotalSpinsToday(data.totalSpinsToday || 0);
         setTotalRecharge(data.totalRecharge || 0);
       })
-      .catch(() => {}); // guest — page still renders with 0 spins
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -249,7 +230,7 @@ function Spin() {
           time: new Date(h.createdAt).toLocaleString('en-GB', {
             day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
           }).replace(',', ''),
-          type: h.source === 'referral' ? 'Referral Spin' : 'Wheel Spin',
+          type: h.source === 'referral' ? 'referral' : 'wheel',
           prize: h.prizeLabel
         })));
       })
@@ -262,9 +243,7 @@ function Spin() {
     if (spinning) return;
     const currentSpinsLeft = mode === 'referral' ? referralSpinsLeft : spinsLeft;
     if (currentSpinsLeft <= 0) {
-      showToast(mode === 'referral'
-        ? 'No referral spins left — invite friends and get them to deposit to earn more!'
-        : 'No spins left today — deposit to unlock more!');
+      showToast(mode === 'referral' ? t('spin_toast_no_referral_spins') : t('spin_toast_no_spins'));
       return;
     }
     setSpinning(true);
@@ -274,7 +253,7 @@ function Spin() {
 
     apiFetch(endpoint, { method: 'POST' })
       .then((data) => {
-        const prize = data.prize; // { label, amount } — decided server-side
+        const prize = data.prize;
         const prizeIndex = Math.max(0, activeSegments.findIndex((s) => s.label === prize.label));
         const segCenter = segCenterAngle(prizeIndex);
 
@@ -284,9 +263,6 @@ function Spin() {
         if (delta < 0) delta += 360;
         delta += 360 * EXTRA_SPINS;
 
-        // No random jitter — the whole point of the pointer-accuracy fix is
-        // that the wheel lands EXACTLY on the true sector center every
-        // time, matching the backend result with no ambiguity for the user.
         const targetRotation = rotation + delta;
         setRotation(targetRotation);
 
@@ -299,14 +275,14 @@ function Spin() {
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit',
           }).replace(',', '');
-          setHistory((h) => [{ time: timeStr, type: mode === 'referral' ? 'Referral Spin' : 'Wheel Spin', prize: prize.label }, ...h].slice(0, 20));
+          setHistory((h) => [{ time: timeStr, type: mode === 'referral' ? 'referral' : 'wheel', prize: prize.label }, ...h].slice(0, 20));
           setResultPrize(activeSegments[prizeIndex]);
           setBurstId((b) => b + 1);
         }, SPIN_DURATION);
       })
       .catch((err) => {
         setSpinning(false);
-        showToast(err.message || 'Could not spin right now');
+        showToast(err.message || t('spin_toast_error'));
       });
   };
 
@@ -322,7 +298,7 @@ function Spin() {
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <span className="page-title">Wheel Spin</span>
+        <span className="page-title">{t('spin_title')}</span>
         <button
           className="header-spacer"
           aria-label="Scroll to spin history"
@@ -339,19 +315,19 @@ function Spin() {
         <img src="/image/spin-hero bg.png" alt="Wheel Spin" className="hero-banner-img" />
       </div>
 
-      {/* WHEEL MODE TOGGLE — Deposit Spin (original) vs Referral Spin (new) */}
+      {/* WHEEL MODE TOGGLE */}
       <div className="spin-mode-toggle">
         <button
           className={`spin-mode-btn ${mode === 'deposit' ? 'active' : ''}`}
           onClick={() => !spinning && setMode('deposit')}
         >
-          Deposit Spin
+          {t('spin_deposit_spin')}
         </button>
         <button
           className={`spin-mode-btn ${mode === 'referral' ? 'active' : ''}`}
           onClick={() => !spinning && setMode('referral')}
         >
-          Referral Spin
+          {t('spin_referral_spin')}
         </button>
       </div>
 
@@ -360,22 +336,22 @@ function Spin() {
         {mode === 'deposit' ? (
           <>
             <div className="stat-card">
-              <span className="stat-label">Total Recharge Today</span>
+              <span className="stat-label">{t('spin_total_recharge_today')}</span>
               <span className="stat-value">Rs{totalRecharge.toLocaleString()}</span>
             </div>
             <div className="stat-card">
-              <span className="stat-label">Spins Left Today</span>
+              <span className="stat-label">{t('spin_spins_left_today')}</span>
               <span className="stat-value">{spinsLeft}</span>
             </div>
           </>
         ) : (
           <>
             <div className="stat-card">
-              <span className="stat-label">Referral Spins Left</span>
+              <span className="stat-label">{t('spin_referral_spins_left')}</span>
               <span className="stat-value">{referralSpinsLeft}</span>
             </div>
             <div className="stat-card">
-              <span className="stat-label">Total Referrals</span>
+              <span className="stat-label">{t('spin_total_referrals')}</span>
               <span className="stat-value">{referralCount}</span>
             </div>
           </>
@@ -389,13 +365,10 @@ function Spin() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="vip-badge-icon">
                 <path d="M3 8l4 3 5-6 5 6 4-3-2 11H5L3 8z" fill="currentColor" />
               </svg>
-              {thousandEligible ? 'VIP Wheel Unlocked' : 'Premium Spin Active'}
+              {thousandEligible ? t('spin_vip_wheel_unlocked') : t('spin_premium_spin_active')}
             </span>
           </div>
-          <p className="spin-mode-hint">
-            Earn 1 free spin every time someone you referred makes a deposit.
-            {' '}Keep referring to grow your VIP status and unlock bigger rewards.
-          </p>
+          <p className="spin-mode-hint">{t('spin_referral_hint')}</p>
         </>
       )}
 
@@ -432,7 +405,7 @@ function Spin() {
             >
               <img src="/image/spin-btn.png" alt="" className="go-btn-img" />
               {(spinning || isOutOfSpins) && (
-                <span className="go-btn-overlay">{spinning ? '···' : '0 LEFT'}</span>
+                <span className="go-btn-overlay">{spinning ? '···' : t('spin_zero_left')}</span>
               )}
             </button>
           </div>
@@ -440,10 +413,10 @@ function Spin() {
 
         {isOutOfSpins ? (
           <button className="recharge-cta" onClick={() => navigate('/account')}>
-            No spins left · Recharge to unlock more
+            {t('spin_no_spins_cta')}
           </button>
         ) : (
-          <p className="rules-note">Each recharge of Rs1,000 unlocks 1 additional spin. One tap, one prize — good luck!</p>
+          <p className="rules-note">{t('spin_rules_note')}</p>
         )}
       </div>
 
@@ -451,15 +424,15 @@ function Spin() {
       <div className="action-icons-row">
         <button className="action-icon-card" onClick={() => setActivePanel('description')}>
           <DocIcon badge="question" />
-          <span>Event Description</span>
+          <span>{t('spin_event_description')}</span>
         </button>
         <button className="action-icon-card" onClick={() => setActivePanel('details')}>
           <DocIcon badge="chat" />
-          <span>Event Details</span>
+          <span>{t('spin_event_details')}</span>
         </button>
         <button className="action-icon-card" onClick={() => setActivePanel('rules')}>
           <DocIcon badge="star" />
-          <span>Activity Rules</span>
+          <span>{t('spin_activity_rules')}</span>
         </button>
       </div>
 
@@ -469,23 +442,23 @@ function Spin() {
           <div className="section-title">
             <span className="title-bar"></span>
             <DocIcon />
-            <span>Spin History</span>
+            <span>{t('spin_history_title')}</span>
           </div>
         </div>
 
         <div className="history-table">
           <div className="history-head">
-            <span>Spin Time</span>
-            <span>Reward Type</span>
-            <span>Prize</span>
+            <span>{t('spin_history_time')}</span>
+            <span>{t('spin_history_type')}</span>
+            <span>{t('spin_history_prize')}</span>
           </div>
           {history.length === 0 ? (
-            <div className="history-empty">No spins yet — give the wheel a try!</div>
+            <div className="history-empty">{t('spin_history_empty')}</div>
           ) : (
             history.map((h, i) => (
               <div className="history-row" key={i}>
                 <span>{h.time}</span>
-                <span>{h.type}</span>
+                <span>{h.type === 'referral' ? t('spin_referral_spin_label') : t('spin_wheel_spin_label')}</span>
                 <span className="prize-cell">{h.prize}</span>
               </div>
             ))
@@ -504,25 +477,23 @@ function Spin() {
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <span className="page-title">Event Description</span>
+            <span className="page-title">{t('spin_event_description')}</span>
             <div className="header-spacer" style={{ visibility: 'hidden' }}></div>
           </header>
           <div className="spin-subpanel-body">
             <div className="spin-subpanel-section">
-              <div className="spin-subpanel-bar">Activity time</div>
-              <p className="spin-subpanel-text">From now on</p>
+              <div className="spin-subpanel-bar">{t('spin_activity_time')}</div>
+              <p className="spin-subpanel-text">{t('spin_from_now_on')}</p>
             </div>
             <div className="spin-subpanel-section">
-              <div className="spin-subpanel-bar">Validity period</div>
-              <p className="spin-subpanel-text">Official website notification shall prevail</p>
+              <div className="spin-subpanel-bar">{t('spin_validity_period')}</div>
+              <p className="spin-subpanel-text">{t('spin_official_notice')}</p>
             </div>
-            <div className="spin-subpanel-note">
-              Members whose single deposit amount or accumulated deposit amount reaches the set amount can participate in the lottery.
-            </div>
+            <div className="spin-subpanel-note">{t('spin_eligibility_note')}</div>
             <div className="spin-subpanel-section">
-              <div className="spin-subpanel-bar">Conditions of participation</div>
+              <div className="spin-subpanel-bar">{t('spin_conditions_participation')}</div>
               <p className="spin-subpanel-text">
-                Members who meet the requirements for <span className="spin-subpanel-highlight">Vip0, Vip1, Vip2, Vip3, Vip4, Vip5, Vip6, Vip7, Vip8, Vip9, Vip10</span> are eligible to participate in the Wheel Spin event. Members must bind a bank card before joining. Stand a chance to win hundreds of millions in cash and many other exciting prizes. Get ready for daily surprises and amazing rewards!
+                {t('spin_conditions_text_1')} <span className="spin-subpanel-highlight">Vip0, Vip1, Vip2, Vip3, Vip4, Vip5, Vip6, Vip7, Vip8, Vip9, Vip10</span> {t('spin_conditions_text_2')}
               </p>
             </div>
           </div>
@@ -537,21 +508,21 @@ function Spin() {
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <span className="page-title">Activity details</span>
+            <span className="page-title">{t('spin_activity_details')}</span>
             <div className="header-spacer" style={{ visibility: 'hidden' }}></div>
           </header>
           <div className="spin-subpanel-body">
             <div className="spin-subpanel-table">
               <div className="spin-subpanel-table-head">
-                <span>Task</span>
-                <span>Number of spins</span>
-                <span>spin time</span>
+                <span>{t('spin_task')}</span>
+                <span>{t('spin_number_of_spins')}</span>
+                <span>{t('spin_spin_time')}</span>
               </div>
               {DEPOSIT_TIERS.map((tier) => (
                 <div className="spin-subpanel-table-row" key={tier.amount}>
                   <span className="spin-subpanel-task">
                     <span className="spin-subpanel-highlight">{tier.amount}</span>
-                    <span className="spin-subpanel-task-sub">Total DepositBalance</span>
+                    <span className="spin-subpanel-task-sub">{t('spin_total_deposit_balance')}</span>
                   </span>
                   <span className="spin-subpanel-spins">{tier.spins}</span>
                   <span className="spin-subpanel-time">{tier.time}</span>
@@ -560,16 +531,16 @@ function Spin() {
             </div>
 
             <div className="spin-subpanel-section" style={{ marginTop: 16 }}>
-              <div className="spin-subpanel-bar">Rules</div>
+              <div className="spin-subpanel-bar">{t('spin_rules')}</div>
               <ul className="spin-subpanel-rules">
-                {ACTIVITY_DETAIL_RULES.map((rule, i) => (
-                  <li key={i}>{rule}</li>
+                {ACTIVITY_DETAIL_RULE_KEYS.map((key, i) => (
+                  <li key={i}>{t(key)}</li>
                 ))}
               </ul>
             </div>
 
             <div className="spin-subpanel-example">
-              <strong>For example:</strong> If a member makes cumulative deposits reaching <span className="spin-subpanel-highlight">Rs1,000,000.00</span> on the same day, they will receive <span className="spin-subpanel-highlight">10</span> lucky draw opportunities. The draw is valid for the same day and cannot be rolled over to the next day!
+              <strong>{t('spin_for_example')}</strong> {t('spin_example_text_1')} <span className="spin-subpanel-highlight">Rs1,000,000.00</span> {t('spin_example_text_2')} <span className="spin-subpanel-highlight">10</span> {t('spin_example_text_3')}
             </div>
           </div>
         </div>
@@ -583,15 +554,15 @@ function Spin() {
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <span className="page-title">Activity Rules</span>
+            <span className="page-title">{t('spin_activity_rules')}</span>
             <div className="header-spacer" style={{ visibility: 'hidden' }}></div>
           </header>
           <div className="spin-subpanel-body">
-            {ACTIVITY_RULE_CARDS.map((card) => (
+            {ACTIVITY_RULE_CARD_KEYS.map((card) => (
               <div className="spin-subpanel-rule-card" key={card.num}>
                 <div className="spin-subpanel-rule-badge">{card.num}</div>
-                <p className="spin-subpanel-text">{card.text}</p>
-                <p className="spin-subpanel-text spin-subpanel-text-muted">{card.sub}</p>
+                <p className="spin-subpanel-text">{t(card.textKey)}</p>
+                <p className="spin-subpanel-text spin-subpanel-text-muted">{t(card.subKey)}</p>
               </div>
             ))}
           </div>
@@ -608,17 +579,17 @@ function Spin() {
             <div className="result-icon-frame">
               <img src={resultPrize.icon} alt="" className="result-icon-img" />
             </div>
-            <span className="result-eyebrow">Congratulations</span>
-            <span className="result-title">You Won</span>
+            <span className="result-eyebrow">{t('spin_congratulations')}</span>
+            <span className="result-title">{t('spin_you_won')}</span>
             <span className="result-amount">{resultPrize.label}</span>
             <button className="result-btn" onClick={() => setResultPrize(null)}>
-              <span>Claim Reward</span>
+              <span>{t('spin_claim_reward')}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* WARNING TOAST — e.g. tapping spin with none left */}
+      {/* WARNING TOAST */}
       <div className={`spin-toast ${toastMsg ? 'show' : ''}`}>{toastMsg}</div>
     </div>
   );

@@ -2,28 +2,30 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../utils/api';
 import Footer from '../../components/Footer/Footer.jsx';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import './Activity.css';
 
 const ICON_ROW1 = [
-  { to: '/activity/activity-award', img: '/image/Reward.webp', label: 'Activity Award' },
-  { to: '/activity/invitation-bonus', img: '/image/Invite Bouns.webp', label: <>Invitation<br />bonus</> },
-  { to: '/activity/betting-rebate', img: '/image/Betting rebate.webp', label: 'Betting rebate' },
-  { to: '/activity/super-jackpot', img: '/image/Super Jackpot.webp', label: 'Super Jackpot' },
+  { to: '/activity/activity-award', img: '/image/Reward.webp', key: 'act_activity_award' },
+  { to: '/activity/invitation-bonus', img: '/image/Invite Bouns.webp', key: 'invite' },
+  { to: '/activity/betting-rebate', img: '/image/Betting rebate.webp', key: 'act_betting_rebate' },
+  { to: '/activity/super-jackpot', img: '/image/Super Jackpot.webp', key: 'act_super_jackpot' },
 ];
 
 const PROMO_CARDS = [
-  { to: '/activity/new-member-deposit', img: '/image/activity-1.png', title: 'NEW MEMBER 1st DEPOSIT' },
-  { to: '/activity/other-platform', img: '/image/activity-8.png', title: 'Click to explore our other platform' },
-  { to: '/activity/vip-rewards', img: '/image/activity-7.png', title: 'VIP REWARDS AND BENEFITS' },
-  { to: '/activity/aviator-award', img: '/image/activity-6.png', title: 'AVIATOR ADDITIONAL AWARD' },
-  { to: '/activity/win-streak', img: '/image/activity-5.png', title: 'WIN STREAK BONUS' },
-  { to: '/activity/creative-video', img: '/image/activity-3.png', title: 'CREATIVE VIDEO BONUS' },
-  { to: '/activity/lucky10-days', img: '/image/activity-4.png', title: 'Lucky 10 Days of Interest' },
-  { to: '/activity/additional-rewards', img: '/image/activity-2.png', title: 'ADDITIONAL REWARDS' },
+  { to: '/activity/new-member-deposit', img: '/image/activity-1.png', key: 'act_new_member_deposit' },
+  { to: '/activity/other-platform', img: '/image/activity-8.png', key: 'act_other_platform' },
+  { to: '/activity/vip-rewards', img: '/image/activity-7.png', key: 'act_vip_rewards' },
+  { to: '/activity/aviator-award', img: '/image/activity-6.png', key: 'act_aviator_award' },
+  { to: '/activity/win-streak', img: '/image/activity-5.png', key: 'act_win_streak' },
+  { to: '/activity/creative-video', img: '/image/activity-3.png', key: 'act_creative_video' },
+  { to: '/activity/lucky10-days', img: '/image/activity-4.png', key: 'act_lucky10_days' },
+  { to: '/activity/additional-rewards', img: '/image/activity-2.png', key: 'act_additional_rewards' },
 ];
 
 function Activity() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [summary, setSummary] = useState({ todayBonus: 0, totalBonus: 0 });
 
   useEffect(() => {
@@ -41,16 +43,16 @@ function Activity() {
         </div>
         <div className="bonus-row">
           <div className="bonus-cell">
-            <div className="bonus-label">Today's bonus</div>
+            <div className="bonus-label">{t('act_todays_bonus')}</div>
             <div className="bonus-amount">Rs{summary.todayBonus.toFixed(2)}</div>
           </div>
           <div className="bonus-divider"></div>
           <div className="bonus-cell">
-            <div className="bonus-label">Total bonus</div>
+            <div className="bonus-label">{t('act_total_bonus')}</div>
             <div className="bonus-amount">Rs{summary.totalBonus.toFixed(2)}</div>
           </div>
         </div>
-        <button className="bonus-btn" onClick={() => navigate('/activity/bonus-details')}>Bonus details</button>
+        <button className="bonus-btn" onClick={() => navigate('/activity/bonus-details')}>{t('act_bonus_details')}</button>
       </div>
 
       {/* ICON GRID */}
@@ -58,15 +60,21 @@ function Activity() {
         <div className="icon-row">
           {ICON_ROW1.map((item) => (
             <Link to={item.to} className="icon-item" key={item.to}>
-              <img src={item.img} className="icon-img" alt={typeof item.label === 'string' ? item.label : 'icon'} />
-              <span className="icon-label">{item.label}</span>
+              <img src={item.img} className="icon-img" alt={t(item.key)} />
+              <span className="icon-label">
+                {item.key === 'invite' ? (
+                  <>{t('act_invitation_bonus_1')}<br />{t('act_invitation_bonus_2')}</>
+                ) : (
+                  t(item.key)
+                )}
+              </span>
             </Link>
           ))}
         </div>
         <div className="icon-row-single">
           <Link to="/spin" className="icon-item">
             <img src="/image/Invite Wheel.webp" className="icon-img" alt="Invite Wheel" />
-            <span className="icon-label">Invite Wheel</span>
+            <span className="icon-label">{t('act_invite_wheel')}</span>
           </Link>
         </div>
       </div>
@@ -76,20 +84,20 @@ function Activity() {
         <div className="promo-row-2">
           <Link to="/gifts" className="promo-card">
             <img src="/image/Gift.png" className="promo-img" style={{ height: '120px' }} alt="Gifts" />
-            <div className="promo-title" style={{ fontSize: '14px', fontWeight: 800 }}>Gifts</div>
-            <div className="promo-desc">Enter the redemption code to receive gift rewards</div>
+            <div className="promo-title" style={{ fontSize: '14px', fontWeight: 800 }}>{t('acc_gifts')}</div>
+            <div className="promo-desc">{t('act_gifts_desc')}</div>
           </Link>
           <Link to="/activity/attendance-bonus" className="promo-card">
             <img src="/image/Attendence.png" className="promo-img" style={{ height: '120px' }} alt="Attendance bonus" />
-            <div className="promo-title" style={{ fontSize: '14px', fontWeight: 800 }}>Attendance bonus</div>
-            <div className="promo-desc">The more consecutive days you sign in, the higher the reward will be.</div>
+            <div className="promo-title" style={{ fontSize: '14px', fontWeight: 800 }}>{t('act_attendance_bonus')}</div>
+            <div className="promo-desc">{t('act_attendance_desc')}</div>
           </Link>
         </div>
 
         {PROMO_CARDS.map((card) => (
           <Link to={card.to} className="promo-card" key={card.to}>
-            <img src={card.img} className="promo-img" alt={card.title} />
-            <div className="promo-title">{card.title}</div>
+            <img src={card.img} className="promo-img" alt={t(card.key)} />
+            <div className="promo-title">{t(card.key)}</div>
           </Link>
         ))}
       </div>

@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiFetch } from '../../utils/api';
 import Footer from '../../components/Footer/Footer.jsx';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import './Promotion.css';
 
 const INVITE_CODE = '856761184061';
 
 const MENU_ITEMS = [
   {
-    label: 'Partner rewards',
+    labelKey: 'promo_partner_rewards',
     to: '/promotion/partner-rewards',
     gradId: 'ig1',
     icon: (
@@ -21,7 +22,7 @@ const MENU_ITEMS = [
     ),
   },
   {
-    label: 'Subordinate data',
+    labelKey: 'promo_subordinate_data',
     to: '/promotion/subordinate-data',
     gradId: 'ig3',
     icon: (
@@ -32,7 +33,7 @@ const MENU_ITEMS = [
     ),
   },
   {
-    label: 'Commission detail',
+    labelKey: 'promo_commission_detail',
     to: '/promotion/commission-detail',
     gradId: 'ig4',
     icon: (
@@ -43,7 +44,7 @@ const MENU_ITEMS = [
     ),
   },
   {
-    label: 'Invitation rules',
+    labelKey: 'promo_invitation_rules',
     to: '/promotion/invitation-rules',
     gradId: 'ig5',
     icon: (
@@ -54,7 +55,7 @@ const MENU_ITEMS = [
     ),
   },
   {
-    label: 'Agent line customer service',
+    labelKey: 'promo_agent_customer_service',
     to: '/customer-service',
     gradId: 'ig6',
     icon: (
@@ -67,7 +68,7 @@ const MENU_ITEMS = [
     ),
   },
   {
-    label: 'Rebate ratio',
+    labelKey: 'promo_rebate_ratio',
     to: '/promotion/rebate-ratio',
     gradId: 'ig7',
     icon: (
@@ -81,20 +82,21 @@ const MENU_ITEMS = [
 ];
 
 const STATS_ROWS = [
-  { label: 'number of register', vals: [0, 0], gold: false },
-  { label: 'Deposit number', vals: [0, 0], gold: true },
-  { label: 'Deposit amount', vals: [0, 0], gold: true },
-  { label: 'Number of people making first deposit', vals: [0, 0], gold: false },
+  { labelKey: 'promo_number_of_register', vals: [0, 0], gold: false },
+  { labelKey: 'promo_deposit_number', vals: [0, 0], gold: true },
+  { labelKey: 'promo_deposit_amount', vals: [0, 0], gold: true },
+  { labelKey: 'promo_first_deposit_people', vals: [0, 0], gold: false },
 ];
 
 const PROMO_DATA = [
-  { label: 'This Week', val: 0, gold: false },
-  { label: 'Total commission', val: 0, gold: true },
-  { label: 'direct subordinate', val: 0, gold: false },
-  { label: 'Total number of subordinates in the team', val: 0, gold: false },
+  { labelKey: 'promo_this_week', val: 0, gold: false },
+  { labelKey: 'promo_total_commission', val: 0, gold: true },
+  { labelKey: 'promo_direct_subordinate', val: 0, gold: false },
+  { labelKey: 'promo_total_team_subordinates', val: 0, gold: false },
 ];
 
 function Promotion() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState(0);
   const [toast, setToast] = useState({ show: false, msg: '' });
   const [inviteCode, setInviteCode] = useState(INVITE_CODE);
@@ -106,16 +108,16 @@ function Promotion() {
       .then((data) => {
         setInviteCode(data.inviteCode || INVITE_CODE);
         setStatsRows([
-          { label: 'number of register', vals: [data.stats.register.direct, data.stats.register.team], gold: false },
-          { label: 'Deposit number', vals: [data.stats.depositNumber.direct, data.stats.depositNumber.team], gold: true },
-          { label: 'Deposit amount', vals: [data.stats.depositAmount.direct, data.stats.depositAmount.team], gold: true },
-          { label: 'Number of people making first deposit', vals: [data.stats.firstDeposit.direct, data.stats.firstDeposit.team], gold: false },
+          { labelKey: 'promo_number_of_register', vals: [data.stats.register.direct, data.stats.register.team], gold: false },
+          { labelKey: 'promo_deposit_number', vals: [data.stats.depositNumber.direct, data.stats.depositNumber.team], gold: true },
+          { labelKey: 'promo_deposit_amount', vals: [data.stats.depositAmount.direct, data.stats.depositAmount.team], gold: true },
+          { labelKey: 'promo_first_deposit_people', vals: [data.stats.firstDeposit.direct, data.stats.firstDeposit.team], gold: false },
         ]);
         setPromoData([
-          { label: 'This Week', val: data.promoData.thisWeekCommission, gold: false },
-          { label: 'Total commission', val: data.promoData.totalCommission, gold: true },
-          { label: 'direct subordinate', val: data.promoData.directSubordinateCount, gold: false },
-          { label: 'Total number of subordinates in the team', val: data.promoData.teamSubordinateCount, gold: false },
+          { labelKey: 'promo_this_week', val: data.promoData.thisWeekCommission, gold: false },
+          { labelKey: 'promo_total_commission', val: data.promoData.totalCommission, gold: true },
+          { labelKey: 'promo_direct_subordinate', val: data.promoData.directSubordinateCount, gold: false },
+          { labelKey: 'promo_total_team_subordinates', val: data.promoData.teamSubordinateCount, gold: false },
         ]);
       })
       .catch(() => {}); // guest — page still renders with zeros
@@ -133,22 +135,22 @@ function Promotion() {
     const url = `${window.location.origin}/auth?ref=${inviteCode}`;
     navigator.clipboard
       .writeText(url)
-      .then(() => showToast('✓ Invitation link copied!'))
-      .catch(() => showToast('✓ Link copied!'));
+      .then(() => showToast('✓ ' + t('promo_toast_link_copied')))
+      .catch(() => showToast('✓ ' + t('promo_toast_link_copied')));
   };
 
   const copyCode = () => {
     navigator.clipboard
       .writeText(inviteCode)
-      .then(() => showToast(`✓ Code ${inviteCode} copied!`))
-      .catch(() => showToast('✓ Copied!'));
+      .then(() => showToast(`✓ ${inviteCode} — ${t('promo_toast_code_copied')}`))
+      .catch(() => showToast('✓ ' + t('promo_toast_code_copied')));
   };
 
   return (
     <div className="promotion-page">
       {/* HEADER */}
       <div className="top-bar">
-        <span className="top-title">Agency</span>
+        <span className="top-title">{t('promo_agency')}</span>
         <Link to="/promotion/new-subordinates" className="header-icon-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2" strokeLinecap="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
@@ -171,7 +173,7 @@ function Promotion() {
               <circle cx="22" cy="4.5" r="1.8" fill="#140A03" fillOpacity="0.85" />
             </svg>
           </div>
-          <div className="hero-eyebrow">VIP Agency Earnings</div>
+          <div className="hero-eyebrow">{t('promo_vip_earnings')}</div>
           <div className="hero-amount-row">
             <span className="hero-currency">Rs</span>
             <span className="hero-amount">0</span>
@@ -180,19 +182,19 @@ function Promotion() {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.5" strokeLinecap="round">
               <path d="M12 20V10M18 20V4M6 20v-6" />
             </svg>
-            Yesterday&apos;s total commission
+            {t('promo_yesterday_commission')}
           </div>
-          <div className="commission-hint">Upgrade the level to increase commission income</div>
+          <div className="commission-hint">{t('promo_upgrade_hint')}</div>
         </div>
       </div>
 
       {/* TABS */}
       <div className="tabs-wrap">
         <button className={`tab-btn ${activeTab === 0 ? 'active' : ''}`} onClick={() => setActiveTab(0)}>
-          Direct subordinates
+          {t('promo_direct_subordinates')}
         </button>
         <button className={`tab-btn ${activeTab === 1 ? 'active' : ''}`} onClick={() => setActiveTab(1)}>
-          Team subordinates
+          {t('promo_team_subordinates')}
         </button>
       </div>
 
@@ -203,7 +205,7 @@ function Promotion() {
             {row.vals.map((v, i) => (
               <div className="stat-cell" key={i}>
                 <div className={`stat-num ${row.gold ? 'gold' : ''}`}>{v}</div>
-                <div className="stat-label">{row.label}</div>
+                <div className="stat-label">{t(row.labelKey)}</div>
               </div>
             ))}
           </div>
@@ -216,7 +218,7 @@ function Promotion() {
           <rect x="9" y="9" width="13" height="13" rx="2" />
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
         </svg>
-        Copy Invitation Link
+        {t('promo_copy_invitation_link')}
       </button>
 
       {/* MENU LIST */}
@@ -238,7 +240,7 @@ function Promotion() {
               </defs>
             </svg>
           </div>
-          <span className="menu-label">Copy invitation code</span>
+          <span className="menu-label">{t('promo_copy_invitation_code')}</span>
           <span className="menu-extra">{inviteCode}</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2">
             <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -255,14 +257,14 @@ function Promotion() {
       <div className="promo-data-wrap">
         <div className="section-title-row">
           <div className="section-title-bar"></div>
-          <span className="section-title-text">promotion data</span>
+          <span className="section-title-text">{t('promo_promotion_data')}</span>
         </div>
         <div className="promo-data-card">
           <div className="promo-data-grid">
             {promoData.map((d) => (
               <div className="pd-cell" key={d.label}>
                 <div className={`pd-num ${d.gold ? 'gold' : ''}`}>{d.val}</div>
-                <div className="pd-label">{d.label}</div>
+                <div className="pd-label">{t(d.labelKey)}</div>
               </div>
             ))}
           </div>
@@ -309,6 +311,7 @@ function Promotion() {
 }
 
 function MenuLink({ item }) {
+  const { t } = useLanguage();
   return (
     <Link to={item.to} className="menu-item">
       <div className="menu-icon-box">
@@ -316,7 +319,7 @@ function MenuLink({ item }) {
           {item.icon}
         </svg>
       </div>
-      <span className="menu-label">{item.label}</span>
+      <span className="menu-label">{t(item.labelKey)}</span>
       <span className="menu-arrow">›</span>
     </Link>
   );
