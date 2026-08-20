@@ -3,15 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer.jsx';
 import WelcomePopup from '../../components/WelcomePopup/WelcomePopup.jsx';
 import SplashScreen from '../../components/SplashScreen/SplashScreen.jsx';
+import LanguageSwitcher from '../../components/LanguageSwitcher/LanguageSwitcher.jsx';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import './Home.css';
 
 const SLIDES = [1, 2, 3, 4, 5].map((n) => `/image/slider-image-${n}.png`);
 
-const ANNOUNCEMENTS = [
-  'Dear members, please verify your wallet before withdrawing',
-  'Win big with our daily bonus rewards!',
-  'New games added! Check out the latest slots',
-];
+const ANNOUNCEMENT_KEYS = ['home_announce_1', 'home_announce_2', 'home_announce_3'];
 
 const CATEGORIES_ROW1 = [
   { key: 'popular', label: 'Popular', bg: '/image/clickfunnelimage10 (2).png', icon: '/image/clickfunnelimage09 (1).png' },
@@ -195,6 +193,8 @@ function ComingSoonOverlay({ active }) {
 
 function Home() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const [showLangSwitcher, setShowLangSwitcher] = useState(false);
 
   // ── SPLASH SCREEN (only right after login/register, not on refresh) ──
   const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem('alfa9_show_splash') === '1');
@@ -251,7 +251,7 @@ function Home() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setAnnIndex((i) => (i + 1) % ANNOUNCEMENTS.length);
+      setAnnIndex((i) => (i + 1) % ANNOUNCEMENT_KEYS.length);
       setAnnKey((k) => k + 1);
     }, 18000);
     return () => clearInterval(interval);
@@ -332,7 +332,7 @@ function Home() {
       onClick={() => handleCategoryClick(cat.key)}
     >
       <img src={cat.icon} alt={cat.label} className="category-icon" />
-      <span className="category-label">{cat.label}</span>
+      <span className="category-label">{t(`cat_${cat.key}`)}</span>
     </div>
   );
 
@@ -352,6 +352,13 @@ function Home() {
           <img src="/image/ultraalf9.png" alt="Alfa9 Logo" id="logo-img" />
         </div>
         <div className="header-icon">
+          <div className="lang-icon" onClick={() => setShowLangSwitcher(true)} title={t('language')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+          </div>
           <div className="msg-icon" onClick={() => navigate('/notification')}>
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2">
               <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -385,10 +392,10 @@ function Home() {
         </div>
         <div className="announce-text-wrapper">
           <div className="announce-text" key={annKey}>
-            <span>{ANNOUNCEMENTS[annIndex]}</span>
+            <span>{t(ANNOUNCEMENT_KEYS[annIndex])}</span>
           </div>
         </div>
-        <button className="detail-btn" onClick={() => navigate('/notification')}>Detail</button>
+        <button className="detail-btn" onClick={() => navigate('/notification')}>{t('detail')}</button>
       </div>
 
       {/* CATEGORY GRID */}
@@ -703,6 +710,8 @@ function Home() {
       <div className="bottom-spacer"></div>
 
       <Footer active="home" />
+
+      <LanguageSwitcher open={showLangSwitcher} onClose={() => setShowLangSwitcher(false)} />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { addLogoutNotif } from '../Shared/Notification/notifUtils';
 import { apiFetch } from '../../utils/api';
+import LanguageSwitcher from '../../components/LanguageSwitcher/LanguageSwitcher.jsx';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import './Account.css';
 
 /* ══ SHARED AVATAR LIST — must be identical to Settings page ══ */
@@ -23,6 +25,9 @@ const AVATAR_EVENT = 'alfa9-avatar-change';
 
 export default function Account() {
   const navigate = useNavigate();
+  const { t, language, languages } = useLanguage();
+  const [showLangSwitcher, setShowLangSwitcher] = useState(false);
+  const currentLangNative = languages.find((l) => l.code === language)?.native || 'English';
 
   const [userName, setUserName] = useState('USER');
   const [avatar, setAvatar] = useState(AVATARS[0]);
@@ -322,52 +327,52 @@ const confirmLogout = () => {
         </Link>
         <Link className="hist-card" to="/account/deposit-history">
           <div className="hist-icon"><img src="./image/deposit.png" alt="Deposit History" /></div>
-          <div className="hist-text"><div className="hist-title">Deposit</div><div className="hist-sub">My deposit history</div></div>
+          <div className="hist-text"><div className="hist-title">{t('acc_deposit')}</div><div className="hist-sub">{t('acc_deposit_sub')}</div></div>
         </Link>
         <Link className="hist-card" to="/account/withdraw-history">
           <div className="hist-icon"><img src="./image/withdrwal-image.png" alt="Withdraw History" /></div>
-          <div className="hist-text"><div className="hist-title">Withdraw</div><div className="hist-sub">My withdraw history</div></div>
+          <div className="hist-text"><div className="hist-title">{t('acc_withdraw')}</div><div className="hist-sub">{t('acc_withdraw_sub')}</div></div>
         </Link>
       </div>
 
-      <div className="section-label">Settings & More</div>
+      <div className="section-label">{t('acc_settings_more')}</div>
       <div className="settings-list">
         <Link className="set-item" to="/notification">
           <div className="set-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg></div>
-          <span className="set-label">Notification</span>
+          <span className="set-label">{t('acc_notification')}</span>
           <svg className="set-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
         </Link>
         <Link className="set-item" to="/gifts">
           <div className="set-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></svg></div>
-          <span className="set-label">Gifts</span>
+          <span className="set-label">{t('acc_gifts')}</span>
           <svg className="set-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
         </Link>
         <Link className="set-item" to="/account/game-stats">
           <div className="set-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></div>
-          <span className="set-label">Game statistics</span>
+          <span className="set-label">{t('acc_game_stats')}</span>
           <svg className="set-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
         </Link>
-        <a className="set-item" href="#" onClick={(e) => e.preventDefault()}>
+        <a className="set-item" href="#" onClick={(e) => { e.preventDefault(); setShowLangSwitcher(true); }}>
           <div className="set-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg></div>
-          <span className="set-label">Language</span>
-          <span className="set-value">English</span>
+          <span className="set-label">{t('language')}</span>
+          <span className="set-value">{currentLangNative}</span>
           <svg className="set-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
         </a>
       </div>
 
-      <div className="section-label">Service center</div>
+      <div className="section-label">{t('acc_service_center')}</div>
       <div className="service-grid">
         <div className="svc-card" onClick={() => navigate('/account/settings')}>
           <div className="svc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg></div>
-          <span className="svc-label">Settings</span>
+          <span className="svc-label">{t('acc_settings')}</span>
         </div>
         <div className="svc-card" onClick={() => navigate('/account/feedback')}>
           <div className="svc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg></div>
-          <span className="svc-label">Feedback</span>
+          <span className="svc-label">{t('acc_feedback')}</span>
         </div>
         <div className="svc-card" onClick={() => navigate('/notification')}>
           <div className="svc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg></div>
-          <span className="svc-label">Announcement</span>
+          <span className="svc-label">{t('acc_announcement')}</span>
         </div>
 
         <div className="svc-card" onClick={() => navigate('/customer-service')}>
@@ -547,6 +552,8 @@ const confirmLogout = () => {
       )}
 
       <div className={`toast${toastShow ? ' show' : ''}`}>{toastMsg}</div>
+
+      <LanguageSwitcher open={showLangSwitcher} onClose={() => setShowLangSwitcher(false)} />
     </div>
   );
 }

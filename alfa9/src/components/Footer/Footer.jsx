@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import './Footer.css';
 
 // active: 'home' | 'activity' | 'promotion' | 'account' | ''
 function Footer({ active = '' }) {
+  const { t } = useLanguage();
   return (
     <div className="casino-sticky-container">
       <div className="add-to-desktop-container">
         <div className="add-to-desktop-btn">
           <img className="add-to-desktop-icon" src="/image/favi.png" alt="Icon" />
-          <span className="add-to-desktop-text">Add to Desktop</span>
+          <span className="add-to-desktop-text">{t('add_to_desktop')}</span>
         </div>
       </div>
 
@@ -24,7 +26,7 @@ function Footer({ active = '' }) {
             <circle cx="23" cy="2" r="2" fill="url(#gold-5d)" /><circle cx="11" cy="7" r="1.5" fill="url(#gold-5d)" /><circle cx="35" cy="7" r="1.5" fill="url(#gold-5d)" />
             <path d="M9 34H37V36H9V34Z" fill="url(#gold-5d)" />
           </svg>
-          <span className="casino-nav-text">Home</span>
+          <span className="casino-nav-text">{t('nav_home')}</span>
         </Link>
 
         <Link to="/activity" className={`casino-nav-item ${active === 'activity' ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
@@ -35,14 +37,14 @@ function Footer({ active = '' }) {
             <path d="M23 3L26 6L23 9L20 6L23 3Z" fill="url(#gold-5d)" />
             <path d="M24.5 31.5V36.5L26.5 34.5L28.5 36.5V31.5H24.5Z" fill="url(#gold-5d)" />
           </svg>
-          <span className="casino-nav-text">Activity</span>
+          <span className="casino-nav-text">{t('nav_activity')}</span>
         </Link>
 
         <Link to="/spin" className="casino-wheel-wrapper" style={{ textDecoration: 'none' }}>
           <div className="wheel-image-container">
             <img className="wheel-img" src="/image/Spin Wheel.png" alt="Spin Wheel" />
           </div>
-          <span className="wheel-text">Get Rs3,000</span>
+          <span className="wheel-text">{t('nav_spin')}</span>
         </Link>
 
         <Link to="/promotion" className={`casino-nav-item ${active === 'promotion' ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
@@ -53,7 +55,7 @@ function Footer({ active = '' }) {
             <circle cx="22.5" cy="25.5" r="6" fill="url(#gold-5d)" />
             <text x="22.5" y="28.5" fontFamily="sans-serif" fontSize="9px" fontWeight="bold" fill="#140A03" textAnchor="middle">$</text>
           </svg>
-          <span className="casino-nav-text">Promotion</span>
+          <span className="casino-nav-text">{t('nav_promotion')}</span>
         </Link>
 
         <Link to="/account" className={`casino-nav-item ${active === 'account' ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
@@ -64,7 +66,7 @@ function Footer({ active = '' }) {
             <circle cx="22.5" cy="23.5" r="3" fill="url(#gold-5d)" />
             <path d="M16 31.5C18 29.5 27 29.5 29 31.5V33.5H16V31.5Z" fill="url(#gold-5d)" />
           </svg>
-          <span className="casino-nav-text">Account</span>
+          <span className="casino-nav-text">{t('nav_account')}</span>
         </Link>
       </div>
 
