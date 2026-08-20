@@ -63,6 +63,33 @@ export const translations = {
     acc_settings: 'Settings',
     acc_feedback: 'Feedback',
     acc_announcement: 'Announcement',
+
+    // Home page — info/trust section
+    info_point_1: 'The platform advocates fairness, justice, and openness. We mainly operate fair lottery, blockchain games, live casinos, and slot machine games.',
+    info_point_2: 'Alfa9 works with more than 10,000 online live game dealers and slot games, all of which are verified fair games.',
+    info_point_3: 'Alfa9 supports fast deposit and withdrawal, and looks forward to your visit.',
+    info_warning_1: 'Gambling can be addictive, please play rationally.',
+    info_warning_2: 'Alfa9 only accepts customers above the age of 18.',
+
+    // Home page — page menu list
+    menu_customer_service: '24/7 Customer service',
+    menu_beginner_guide: 'Beginner\u2019s Guide',
+    menu_about_us: 'About us',
+    menu_download_app: 'Download APP',
+
+    // Account page — header/balance/history
+    acc_uid: 'UID',
+    acc_last_login: 'Last login:',
+    acc_total_balance: 'Total balance',
+    acc_wallet: 'Wallet',
+    acc_vip: 'VIP',
+    acc_safe: 'Safe',
+    acc_safe_desc: 'Daily interest 0.1% \u2014 income calculated every 1 min',
+    acc_my_history: 'My history',
+    acc_game_history: 'Game History',
+    acc_game_history_sub: 'My game history',
+    acc_transaction: 'Transaction',
+    acc_transaction_sub: 'My transaction history',
   },
 
   ur: {
@@ -102,6 +129,30 @@ export const translations = {
     acc_settings: 'ترتیبات',
     acc_feedback: 'رائے',
     acc_announcement: 'اعلان',
+
+    info_point_1: 'یہ پلیٹ فارم انصاف، شفافیت اور کشادگی کا حامی ہے۔ ہم بنیادی طور پر منصفانہ لاٹری، بلاک چین گیمز، لائیو کیسینو، اور سلاٹ مشین گیمز چلاتے ہیں۔',
+    info_point_2: 'Alfa9 10,000 سے زیادہ آن لائن لائیو گیم ڈیلرز اور سلاٹ گیمز کے ساتھ کام کرتا ہے، جو سب تصدیق شدہ منصفانہ گیمز ہیں۔',
+    info_point_3: 'Alfa9 تیز ڈپازٹ اور نکلوانے کی سہولت فراہم کرتا ہے، اور آپ کی آمد کا منتظر ہے۔',
+    info_warning_1: 'جوا نشہ آور ہو سکتا ہے، براہ کرم سمجھداری سے کھیلیں۔',
+    info_warning_2: 'Alfa9 صرف 18 سال یا اس سے زیادہ عمر کے صارفین کو قبول کرتا ہے۔',
+
+    menu_customer_service: '24/7 کسٹمر سروس',
+    menu_beginner_guide: 'ابتدائی رہنما',
+    menu_about_us: 'ہمارے بارے میں',
+    menu_download_app: 'ایپ ڈاؤن لوڈ کریں',
+
+    acc_uid: 'UID',
+    acc_last_login: 'آخری لاگ ان:',
+    acc_total_balance: 'کل بیلنس',
+    acc_wallet: 'والٹ',
+    acc_vip: 'VIP',
+    acc_safe: 'سیف',
+    acc_safe_desc: 'روزانہ سود 0.1% — آمدنی ہر 1 منٹ میں شمار کی جاتی ہے',
+    acc_my_history: 'میری ہسٹری',
+    acc_game_history: 'گیم ہسٹری',
+    acc_game_history_sub: 'میری گیم ہسٹری',
+    acc_transaction: 'ٹرانزیکشن',
+    acc_transaction_sub: 'میری ٹرانزیکشن ہسٹری',
   },
 
   hi: {
@@ -141,6 +192,30 @@ export const translations = {
     acc_settings: 'सेटिंग्स',
     acc_feedback: 'फीडबैक',
     acc_announcement: 'घोषणा',
+
+    info_point_1: 'यह प्लेटफ़ॉर्म निष्पक्षता, न्याय और खुलेपन का समर्थन करता है। हम मुख्य रूप से निष्पक्ष लॉटरी, ब्लॉकचेन गेम्स, लाइव कैसीनो और स्लॉट मशीन गेम्स संचालित करते हैं।',
+    info_point_2: 'Alfa9 10,000 से अधिक ऑनलाइन लाइव गेम डीलरों और स्लॉट गेम्स के साथ काम करता है, जो सभी सत्यापित निष्पक्ष गेम हैं।',
+    info_point_3: 'Alfa9 तेज़ जमा और निकासी का समर्थन करता है, और आपके आगमन की प्रतीक्षा करता है।',
+    info_warning_1: 'जुआ नशे की लत बन सकता है, कृपया समझदारी से खेलें।',
+    info_warning_2: 'Alfa9 केवल 18 वर्ष या उससे अधिक आयु के ग्राहकों को स्वीकार करता है।',
+
+    menu_customer_service: '24/7 ग्राहक सेवा',
+    menu_beginner_guide: 'शुरुआती गाइड',
+    menu_about_us: 'हमारे बारे में',
+    menu_download_app: 'ऐप डाउनलोड करें',
+
+    acc_uid: 'UID',
+    acc_last_login: 'अंतिम लॉगिन:',
+    acc_total_balance: 'कुल बैलेंस',
+    acc_wallet: 'वॉलेट',
+    acc_vip: 'VIP',
+    acc_safe: 'सेफ',
+    acc_safe_desc: 'दैनिक ब्याज 0.1% — आय हर 1 मिनट में गणना की जाती है',
+    acc_my_history: 'मेरी हिस्ट्री',
+    acc_game_history: 'गेम हिस्ट्री',
+    acc_game_history_sub: 'मेरी गेम हिस्ट्री',
+    acc_transaction: 'ट्रांज़ैक्शन',
+    acc_transaction_sub: 'मेरी ट्रांज़ैक्शन हिस्ट्री',
   },
 
   bn: {
@@ -180,5 +255,29 @@ export const translations = {
     acc_settings: 'সেটিংস',
     acc_feedback: 'ফিডব্যাক',
     acc_announcement: 'ঘোষণা',
+
+    info_point_1: 'এই প্ল্যাটফর্ম ন্যায্যতা, ন্যায়বিচার এবং উন্মুক্ততার পক্ষে। আমরা মূলত ন্যায্য লটারি, ব্লকচেইন গেম, লাইভ ক্যাসিনো এবং স্লট মেশিন গেম পরিচালনা করি।',
+    info_point_2: 'Alfa9 10,000+ অনলাইন লাইভ গেম ডিলার এবং স্লট গেমের সাথে কাজ করে, যার সবগুলো যাচাইকৃত ন্যায্য গেম।',
+    info_point_3: 'Alfa9 দ্রুত ডিপোজিট এবং উত্তোলন সমর্থন করে, এবং আপনার আগমনের অপেক্ষায় আছে।',
+    info_warning_1: 'জুয়া আসক্তিকর হতে পারে, অনুগ্রহ করে বিচক্ষণতার সাথে খেলুন।',
+    info_warning_2: 'Alfa9 শুধুমাত্র ১৮ বছর বা তার বেশি বয়সী গ্রাহকদের গ্রহণ করে।',
+
+    menu_customer_service: '24/7 কাস্টমার সার্ভিস',
+    menu_beginner_guide: 'শিক্ষানবিস গাইড',
+    menu_about_us: 'আমাদের সম্পর্কে',
+    menu_download_app: 'অ্যাপ ডাউনলোড করুন',
+
+    acc_uid: 'UID',
+    acc_last_login: 'সর্বশেষ লগইন:',
+    acc_total_balance: 'মোট ব্যালেন্স',
+    acc_wallet: 'ওয়ালেট',
+    acc_vip: 'VIP',
+    acc_safe: 'সেফ',
+    acc_safe_desc: 'দৈনিক সুদ 0.1% — আয় প্রতি 1 মিনিটে গণনা করা হয়',
+    acc_my_history: 'আমার হিস্টোরি',
+    acc_game_history: 'গেম হিস্টোরি',
+    acc_game_history_sub: 'আমার গেম হিস্টোরি',
+    acc_transaction: 'ট্রানজেকশন',
+    acc_transaction_sub: 'আমার ট্রানজেকশন হিস্টোরি',
   },
 };

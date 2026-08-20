@@ -631,26 +631,26 @@ function Home() {
           ))}
         </div>
         <div className="info-points">
-          <div className="info-point"><span className="info-diamond">◆</span><span>The platform advocates fairness, justice, and openness. We mainly operate fair lottery, blockchain games, live casinos, and slot machine games.</span></div>
-          <div className="info-point"><span className="info-diamond">◆</span><span>Alfa9 works with more than 10,000 online live game dealers and slot games, all of which are verified fair games.</span></div>
-          <div className="info-point"><span className="info-diamond">◆</span><span>Alfa9 supports fast deposit and withdrawal, and looks forward to your visit.</span></div>
+          <div className="info-point"><span className="info-diamond">◆</span><span>{t('info_point_1')}</span></div>
+          <div className="info-point"><span className="info-diamond">◆</span><span>{t('info_point_2')}</span></div>
+          <div className="info-point"><span className="info-diamond">◆</span><span>{t('info_point_3')}</span></div>
         </div>
         <div className="info-warning">
-          <p>Gambling can be addictive, please play rationally.</p>
-          <p>Alfa9 only accepts customers above the age of 18.</p>
+          <p>{t('info_warning_1')}</p>
+          <p>{t('info_warning_2')}</p>
         </div>
       </Reveal>
 
       {/* PAGE MENU LIST */}
       <Reveal as="div" className="page-menu">
-        <div className="menu-item" style={{ '--i': 0 }}>
+        <div className="menu-item" style={{ '--i': 0 }} onClick={() => setShowLangSwitcher(true)}>
           <div className="menu-icon-wrap">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
             </svg>
           </div>
-          <span className="menu-label">Language</span>
+          <span className="menu-label">{t('language')}</span>
           <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b7355" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
 
@@ -661,7 +661,7 @@ function Home() {
               <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
             </svg>
           </div>
-          <span className="menu-label">Announcement</span>
+          <span className="menu-label">{t('acc_announcement')}</span>
           <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b7355" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
 
@@ -671,7 +671,7 @@ function Home() {
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
           </div>
-          <span className="menu-label">24/7 Customer service</span>
+          <span className="menu-label">{t('menu_customer_service')}</span>
           <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b7355" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
 
@@ -681,7 +681,7 @@ function Home() {
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
           </div>
-          <span className="menu-label">Beginner's Guide</span>
+          <span className="menu-label">{t('menu_beginner_guide')}</span>
           <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b7355" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
 
@@ -691,7 +691,7 @@ function Home() {
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
           </div>
-          <span className="menu-label">About us</span>
+          <span className="menu-label">{t('menu_about_us')}</span>
           <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b7355" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
 
@@ -702,7 +702,7 @@ function Home() {
               <polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
           </div>
-          <span className="menu-label">Download APP</span>
+          <span className="menu-label">{t('menu_download_app')}</span>
           <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b7355" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </div>
       </Reveal>

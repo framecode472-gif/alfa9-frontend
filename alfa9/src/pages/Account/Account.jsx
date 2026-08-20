@@ -252,7 +252,7 @@ const confirmLogout = () => {
               </div>
             </div>
             <div className="uid-row">
-              <span className="uid-label">UID</span>
+              <span className="uid-label">{t('acc_uid')}</span>
               <span className="uid-value">{uid}</span>
               <div className="uid-copy" onClick={copyUID} title="Copy UID">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5">
@@ -260,13 +260,13 @@ const confirmLogout = () => {
                 </svg>
               </div>
             </div>
-            <div className="last-login">Last login: <span>{lastLoginTime}</span></div>
+            <div className="last-login">{t('acc_last_login')} <span>{lastLoginTime}</span></div>
           </div>
         </div>
       </div>
 
       <div className="balance-card">
-        <div className="balance-label">Total balance</div>
+        <div className="balance-label">{t('acc_total_balance')}</div>
         <div className="balance-row">
           <div className="balance-amount">Rs{balance.toFixed(2)}</div>
           <div className={`refresh-btn${refreshing ? ' spinning' : ''}`} onClick={refreshBalance} title="Refresh">
@@ -279,19 +279,19 @@ const confirmLogout = () => {
         <div className="quick-actions">
           <div className="qa-item" onClick={() => navigate('/account/wallet')}>
             <div className="qa-icon wallet"><img src="./image/account-wallet.png" alt="Wallet" /></div>
-            <span className="qa-label">Wallet</span>
+            <span className="qa-label">{t('acc_wallet')}</span>
           </div>
           <div className="qa-item" onClick={() => navigate('/account/deposit')}>
             <div className="qa-icon deposit"><img src="./image/deposit-wallet.png" alt="Deposit" /></div>
-            <span className="qa-label">Deposit</span>
+            <span className="qa-label">{t('acc_deposit')}</span>
           </div>
           <div className="qa-item" onClick={() => navigate('/account/withdraw')}>
             <div className="qa-icon withdraw"><img src="./image/withdrawal-wallet.png" alt="Withdraw" /></div>
-            <span className="qa-label">Withdraw</span>
+            <span className="qa-label">{t('acc_withdraw')}</span>
           </div>
           <div className="qa-item" onClick={() => navigate('/account/vip')}>
             <div className="qa-icon vip"><img src="./image/VIP-wallet.png" alt="VIP" /></div>
-            <span className="qa-label">VIP</span>
+            <span className="qa-label">{t('acc_vip')}</span>
           </div>
         </div>
       </div>
@@ -306,8 +306,8 @@ const confirmLogout = () => {
           </svg>
         </div>
         <div className="safe-info">
-          <div className="safe-title">Safe</div>
-          <div className="safe-desc">Daily interest 0.1% — income calculated every 1 min</div>
+          <div className="safe-title">{t('acc_safe')}</div>
+          <div className="safe-desc">{t('acc_safe_desc')}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <span className="safe-amount">Rs0.00</span>
@@ -315,15 +315,15 @@ const confirmLogout = () => {
         </div>
       </div>
 
-      <div className="section-label">My History</div>
+      <div className="section-label">{t('acc_my_history')}</div>
       <div className="history-grid">
         <Link className="hist-card" to="/account/game-history">
           <div className="hist-icon"><img src="./image/Game History.png" alt="Game History" /></div>
-          <div className="hist-text"><div className="hist-title">Game History</div><div className="hist-sub">My game history</div></div>
+          <div className="hist-text"><div className="hist-title">{t('acc_game_history')}</div><div className="hist-sub">{t('acc_game_history_sub')}</div></div>
         </Link>
         <Link className="hist-card" to="/account/transaction">
           <div className="hist-icon"><img src="./image/Transaction.png" alt="Transaction" /></div>
-          <div className="hist-text"><div className="hist-title">Transaction</div><div className="hist-sub">My transaction history</div></div>
+          <div className="hist-text"><div className="hist-title">{t('acc_transaction')}</div><div className="hist-sub">{t('acc_transaction_sub')}</div></div>
         </Link>
         <Link className="hist-card" to="/account/deposit-history">
           <div className="hist-icon"><img src="./image/deposit.png" alt="Deposit History" /></div>
