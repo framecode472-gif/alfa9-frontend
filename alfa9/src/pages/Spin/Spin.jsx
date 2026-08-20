@@ -34,16 +34,27 @@ const REFERRAL_SEGMENTS = [
   { label: 'Rs50',   icon: '/image/spin-icon-6.png' },
   { label: 'Rs20',   icon: '/image/spin-icon-5.png' },
 ];
-// If spin-bg.png's wedges don't start exactly at the 12 o'clock seam,
-// nudge this value (in degrees) until the labels sit inside the right wedge.
+
+/* ================= WHEEL ALIGNMENT FIX =================
+   BUG: the wheel visually stopped on one sector while the outcome modal
+   showed a different reward. Root cause: the CSS label positions
+   (.wheel-segment-label.seg-0 ... seg-7) were hand-tuned against the real
+   spin-bg.png artwork (2.5°, 47.5°, 90.5°...) because the wedges in the
+   image are not perfectly even 45° slices. But the JS rotation math used
+   a separate, perfectly-even formula (i * 45 + 22.5) to decide where to
+   spin the wheel. Two different angle systems for the same physical wheel
+   = guaranteed mismatch between what lands under the pointer and what the
+   backend says was won.
+
+   FIX: one single source of truth for every sector's true center angle,
+   shared by both the CSS label placement AND the JS spin-to-angle math.
+   WHEEL_IMAGE_OFFSET is kept as a single global fudge factor in case the
+   whole wheel graphic itself is rotated relative to the pointer. */
+const SEGMENT_CENTER_ANGLES = [2.5, 47.5, 90.5, 135.5, 180.5, 225.5, 270.5, 317.5];
 const WHEEL_IMAGE_OFFSET = 0;
+
 const EXTRA_SPINS = 6;
 const SPIN_DURATION = 4200;
-
-// TESTING ONLY — deposit/backend not wired up yet, so spins are unlimited
-// for now to make it easy to test the wheel repeatedly. Flip this to false
-// once the real deposit → spin-count logic is connected.
-
 
 const HISTORY_KEY = 'alfa9_spin_history';
 const SPIN_COUNT_KEY = 'alfa9_spin_count';
@@ -76,6 +87,73 @@ function DocIcon({ badge }) {
         </g>
       )}
     </svg>
+  );
+}
+
+/* Fixed pointer indicator — does NOT rotate with the wheel. Sits at 12
+   o'clock so there's one unambiguous "this is what you won" reference
+   point, instead of relying on the viewer's eye to guess the top. */
+function WheelPointer() {
+  return (
+    <div className="wheel-pointer" aria-hidden="true">
+      <svg width="34" height="40" viewBox="0 0 34 40" fill="none">
+        <path d="M17 40 L2 12 A17 17 0 0 1 32 12 Z" fill="url(#ptrGrad)" stroke="#3a2705" strokeWidth="1.5" />
+        <circle cx="17" cy="13" r="7.5" fill="url(#ptrGemGrad)" stroke="#fff7dc" strokeWidth="0.75" />
+        <defs>
+          <linearGradient id="ptrGrad" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#fff2c0" />
+            <stop offset="0.4" stopColor="#ffd700" />
+            <stop offset="1" stopColor="#a8760c" />
+          </linearGradient>
+          <radialGradient id="ptrGemGrad" cx="0.35" cy="0.3" r="0.9">
+            <stop offset="0" stopColor="#fff7dc" />
+            <stop offset="0.5" stopColor="#c41e3a" />
+            <stop offset="1" stopColor="#6e0f1e" />
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+/* Lightweight confetti burst — no external libs. Renders N absolutely
+   positioned gold/ruby shards that fling outward and fade, retriggered
+   each time a new prize is set (key={burstId} forces remount). */
+function ConfettiBurst({ burstId }) {
+  const pieces = useRef(
+    Array.from({ length: 26 }, (_, i) => {
+      const angle = (i / 26) * 360 + (Math.random() * 14 - 7);
+      const distance = 90 + Math.random() * 70;
+      const rad = (angle * Math.PI) / 180;
+      return {
+        id: i,
+        tx: Math.cos(rad) * distance,
+        ty: Math.sin(rad) * distance,
+        rot: Math.random() * 720 - 360,
+        delay: Math.random() * 0.15,
+        size: 5 + Math.random() * 5,
+        gold: i % 3 !== 0,
+      };
+    })
+  ).current;
+
+  return (
+    <div className="confetti-burst" key={burstId} aria-hidden="true">
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className={`confetti-piece ${p.gold ? 'confetti-gold' : 'confetti-ruby'}`}
+          style={{
+            '--tx': `${p.tx}px`,
+            '--ty': `${p.ty}px`,
+            '--rot': `${p.rot}deg`,
+            animationDelay: `${p.delay}s`,
+            width: p.size,
+            height: p.size,
+          }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -115,7 +193,7 @@ const ACTIVITY_RULE_CARDS = [
 ];
 
 function segCenterAngle(i) {
-  return WHEEL_IMAGE_OFFSET + i * SEG_ANGLE + SEG_ANGLE / 2;
+  return WHEEL_IMAGE_OFFSET + SEGMENT_CENTER_ANGLES[i];
 }
 
 function Spin() {
@@ -142,6 +220,7 @@ function Spin() {
   const [totalRecharge, setTotalRecharge] = useState(0);
   const [history, setHistory] = useState([]);
   const [resultPrize, setResultPrize] = useState(null);
+  const [burstId, setBurstId] = useState(0);
   const [activePanel, setActivePanel] = useState(null); // null | 'description' | 'details' | 'rules'
   const spinTimeoutRef = useRef(null);
 
@@ -205,8 +284,10 @@ function Spin() {
         if (delta < 0) delta += 360;
         delta += 360 * EXTRA_SPINS;
 
-        const jitter = (Math.random() - 0.5) * (SEG_ANGLE * 0.5);
-        const targetRotation = rotation + delta + jitter;
+        // No random jitter — the whole point of the pointer-accuracy fix is
+        // that the wheel lands EXACTLY on the true sector center every
+        // time, matching the backend result with no ambiguity for the user.
+        const targetRotation = rotation + delta;
         setRotation(targetRotation);
 
         spinTimeoutRef.current = setTimeout(() => {
@@ -220,6 +301,7 @@ function Spin() {
           }).replace(',', '');
           setHistory((h) => [{ time: timeStr, type: mode === 'referral' ? 'Referral Spin' : 'Wheel Spin', prize: prize.label }, ...h].slice(0, 20));
           setResultPrize(activeSegments[prizeIndex]);
+          setBurstId((b) => b + 1);
         }, SPIN_DURATION);
       })
       .catch((err) => {
@@ -294,22 +376,34 @@ function Spin() {
             </div>
             <div className="stat-card">
               <span className="stat-label">Total Referrals</span>
-              <span className="stat-value">{referralCount}{!thousandEligible ? ' / 20 for Rs1000' : ''}</span>
+              <span className="stat-value">{referralCount}</span>
             </div>
           </>
         )}
       </div>
+
       {mode === 'referral' && (
-        <p className="spin-mode-hint">
-          Earn 1 free spin every time someone you referred makes a deposit.
-          {!thousandEligible && ' Reach 20 total referrals to unlock a shot at the Rs1000 prize.'}
-        </p>
+        <>
+          <div className="vip-badge-row">
+            <span className={`vip-badge ${thousandEligible ? 'vip-badge-elite' : ''}`}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="vip-badge-icon">
+                <path d="M3 8l4 3 5-6 5 6 4-3-2 11H5L3 8z" fill="currentColor" />
+              </svg>
+              {thousandEligible ? 'VIP Wheel Unlocked' : 'Premium Spin Active'}
+            </span>
+          </div>
+          <p className="spin-mode-hint">
+            Earn 1 free spin every time someone you referred makes a deposit.
+            {' '}Keep referring to grow your VIP status and unlock bigger rewards.
+          </p>
+        </>
       )}
 
       {/* WHEEL */}
       <div className="wheel-section">
         <div className="wheel-wrap">
           <div className="wheel-ring-glow" aria-hidden="true"></div>
+          <WheelPointer />
           <div
             className="wheel-disc"
             style={{ '--wheel-rotation': `${rotation}deg` }}
@@ -510,10 +604,16 @@ function Spin() {
           <div className="result-modal" onClick={(e) => e.stopPropagation()}>
             <div className="result-glow"></div>
             <div className="result-rays" aria-hidden="true"></div>
-            <img src={resultPrize.icon} alt="" className="result-icon-img" />
-            <span className="result-title">Congratulations!</span>
-            <span className="result-amount">You won {resultPrize.label}</span>
-            <button className="result-btn" onClick={() => setResultPrize(null)}>Claim Reward</button>
+            <ConfettiBurst burstId={burstId} />
+            <div className="result-icon-frame">
+              <img src={resultPrize.icon} alt="" className="result-icon-img" />
+            </div>
+            <span className="result-eyebrow">Congratulations</span>
+            <span className="result-title">You Won</span>
+            <span className="result-amount">{resultPrize.label}</span>
+            <button className="result-btn" onClick={() => setResultPrize(null)}>
+              <span>Claim Reward</span>
+            </button>
           </div>
         </div>
       )}
