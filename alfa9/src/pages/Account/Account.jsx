@@ -391,17 +391,17 @@ const confirmLogout = () => {
               </defs>
             </svg>
           </div>
-          <span className="svc-label">Customer Service</span>
+          <span className="svc-label">{t('acc_customer_service')}</span>
         </div>
 
         <div className="svc-card" onClick={() => navigate('/account/beginner-guide')}>
           <div className="svc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg></div>
-          <span className="svc-label">Beginner's Guide</span>
+          <span className="svc-label">{t('acc_beginner_guide')}</span>
         </div>
 
         <div className="svc-card" onClick={() => navigate('/account/about-us')}>
           <div className="svc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg></div>
-          <span className="svc-label">About us</span>
+          <span className="svc-label">{t('acc_about_us')}</span>
         </div>
       </div>
 
@@ -409,7 +409,7 @@ const confirmLogout = () => {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18.36 6.64a9 9 0 1 1-12.73 0" /><line x1="12" y1="2" x2="12" y2="12" />
         </svg>
-        Log out
+        {t('logout')}
       </button>
 
       <div className="casino-sticky-container">
@@ -489,7 +489,7 @@ const confirmLogout = () => {
         <div className="modal-overlay open" onClick={(e) => { if (e.target === e.currentTarget) closeAvatarModal(); }}>
           <div className="avatar-modal">
             <div className="modal-handle"></div>
-            <div className="modal-title">Change avatar</div>
+            <div className="modal-title">{t('change_avatar')}</div>
             <div className="avatar-grid">
               {AVATARS.map((url, i) => (
                 <div
@@ -513,23 +513,23 @@ const confirmLogout = () => {
         <div className="modal-overlay open" onClick={(e) => { if (e.target === e.currentTarget) closeNameModal(); }}>
           <div className="name-modal">
             <div className="modal-handle"></div>
-            <div className="modal-title">Edit Name</div>
+            <div className="modal-title">{t('edit_name')}</div>
             <div className="name-input-wrap">
               <input
                 ref={nameInputRef}
                 className="name-input"
                 type="text"
                 maxLength={40}
-                placeholder="Enter your name"
+                placeholder={t('enter_name_placeholder')}
                 value={nameInput}
                 onChange={handleNameInput}
               />
               <span className="name-char-count">{wordCount}/8</span>
             </div>
-            <div className="name-hint">Maximum 8 words</div>
+            <div className="name-hint">{t('name_max_words')}</div>
             <div className="name-modal-btns">
-              <button className="btn-cancel" onClick={closeNameModal}>Cancel</button>
-              <button className="btn-confirm" onClick={saveName}>Confirm</button>
+              <button className="btn-cancel" onClick={closeNameModal}>{t('cancel')}</button>
+              <button className="btn-confirm" onClick={saveName}>{t('confirm')}</button>
             </div>
           </div>
         </div>
@@ -539,13 +539,13 @@ const confirmLogout = () => {
         <div className="modal-overlay open" onClick={(e) => { if (e.target === e.currentTarget) closeLogoutModal(); }}>
           <div className="name-modal">
             <div className="modal-handle"></div>
-            <div className="modal-title">Log Out</div>
+            <div className="modal-title">{t('logout_title')}</div>
             <p style={{ color: '#B8935A', fontSize: '14px', textAlign: 'center', margin: '10px 0 22px', lineHeight: '1.5' }}>
-              Are you sure you want to log out of your account?
+              {t('logout_confirm_msg')}
             </p>
             <div className="name-modal-btns">
-              <button className="btn-cancel" onClick={closeLogoutModal}>Cancel</button>
-              <button className="btn-confirm" onClick={confirmLogout}>Log Out</button>
+              <button className="btn-cancel" onClick={closeLogoutModal}>{t('cancel')}</button>
+              <button className="btn-confirm" onClick={confirmLogout}>{t('logout_title')}</button>
             </div>
           </div>
         </div>

@@ -408,8 +408,8 @@ function Home() {
       {/* PLATFORM RECOMMENDATION */}
       <Reveal as="section" className="section" id="section-popular">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Platform recommendation</span></div>
-          <button className="all-btn">All 6 <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('section_platform_recommendation')}</span></div>
+          <button className="all-btn">{t('all')} 6 <span className="arrow">›</span></button>
         </div>
         <div className="games-grid">
           {PLATFORM_GAMES.map((g, i) => (
@@ -430,8 +430,8 @@ function Home() {
       {/* LOTTERY */}
       <Reveal as="section" className="section" id="section-lottery">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Lottery</span></div>
-          <button className="all-btn">All <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('cat_lottery')}</span></div>
+          <button className="all-btn">{t('all')} <span className="arrow">›</span></button>
         </div>
         <div className="lottery-grid">
           {LOTTERY_GAMES.map((g, i) => (
@@ -446,8 +446,8 @@ function Home() {
       {/* ORIGINAL */}
       <Reveal as="section" className="section" id="section-original">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Original</span></div>
-          <button className="all-btn">All 6 <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('cat_original')}</span></div>
+          <button className="all-btn">{t('all')} 6 <span className="arrow">›</span></button>
         </div>
         <div className="games-grid">
           {ORIGINAL_GAMES.map((g, i) => (
@@ -462,8 +462,8 @@ function Home() {
       {/* SLOTS */}
       <Reveal as="section" className="section" id="section-slots">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Slots</span></div>
-          <button className="all-btn">All 5 <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('cat_slots')}</span></div>
+          <button className="all-btn">{t('all')} 5 <span className="arrow">›</span></button>
         </div>
         <div className="providers-grid">
           {SLOT_PROVIDERS.map((p, i) => (
@@ -478,8 +478,8 @@ function Home() {
       {/* SPORTS */}
       <Reveal as="section" className="section" id="section-sports">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Sports</span></div>
-          <button className="all-btn">All 2 <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('cat_sports')}</span></div>
+          <button className="all-btn">{t('all')} 2 <span className="arrow">›</span></button>
         </div>
         <div className="sports-grid">
           {SPORTS_GAMES.map((s, i) => (
@@ -494,8 +494,8 @@ function Home() {
       {/* CASINO */}
       <Reveal as="section" className="section" id="section-casino">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Casino</span></div>
-          <button className="all-btn">All <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('cat_casino')}</span></div>
+          <button className="all-btn">{t('all')} <span className="arrow">›</span></button>
         </div>
         <div className="games-grid">
           {CASINO_GAMES.map((g, i) => (
@@ -510,8 +510,8 @@ function Home() {
       {/* FISHING */}
       <Reveal as="section" className="section" id="section-fishing">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Fishing</span></div>
-          <button className="all-btn">All <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('cat_fishing')}</span></div>
+          <button className="all-btn">{t('all')} <span className="arrow">›</span></button>
         </div>
         <div className="games-grid">
           {FISHING_GAMES.map((g, i) => (
@@ -526,8 +526,8 @@ function Home() {
       {/* RUMMY */}
       <Reveal as="section" className="section" id="section-rummy">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Rummy</span></div>
-          <button className="all-btn">All 2 <span className="arrow">›</span></button>
+          <div className="section-title"><span className="title-bar"></span><span>{t('cat_rummy')}</span></div>
+          <button className="all-btn">{t('all')} 2 <span className="arrow">›</span></button>
         </div>
         <div className="sports-grid">
           {RUMMY_GAMES.map((g, i) => (
@@ -542,7 +542,7 @@ function Home() {
       {/* WINNING INFORMATION */}
       <Reveal as="section" className="section">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Winning information</span></div>
+          <div className="section-title"><span className="title-bar"></span><span>{t('section_winning_info')}</span></div>
           <span className="live-badge"><span className="live-dot"></span>LIVE</span>
         </div>
         <div className="winning-list">
@@ -563,7 +563,7 @@ function Home() {
       {/* TODAY'S EARNINGS CHART */}
       <Reveal as="section" className="section">
         <div className="section-header">
-          <div className="section-title"><span className="title-bar"></span><span>Today's earnings chart</span></div>
+          <div className="section-title"><span className="title-bar"></span><span>{t('section_earnings_chart')}</span></div>
         </div>
         <div className="podium-container">
           <div className="podium-col second-col" style={{ '--i': 0 }}>
