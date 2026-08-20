@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { io as socketIOClient } from 'socket.io-client';
 import { apiFetch } from '../../utils/api';
+import AnimatedFabAvatar from './AnimatedFabAvatar';
 import './ChatWidget.css';
 
 /* ══════════════════════════════════════════════════
@@ -631,7 +632,6 @@ export default function ChatWidget() {
     const [helpType, setHelpType] = useState(initial?.helpType ?? '');
     const [toast, setToast] = useState('');
     const [otpSent, setOtpSent] = useState(false);
-    const [fabImgFailed, setFabImgFailed] = useState(false);
     const [attachOpen, setAttachOpen] = useState(false);
     const [rating, setRating] = useState(initial?.rating ?? '');
 
@@ -849,16 +849,7 @@ export default function ChatWidget() {
             {/* Floating icon — always visible */}
             {!isOpen && (
                 <div className="cw-fab" onClick={open} title="Support">
-                    {fabImgFailed ? (
-                        <div className="cw-fab-fallback">{Icon.chat}</div>
-                    ) : (
-                        <img
-                            src="/image/chat-bot-image.png"
-                            alt="Support"
-                            className="cw-fab-img"
-                            onError={() => setFabImgFailed(true)}
-                        />
-                    )}
+                    <AnimatedFabAvatar />
                     <span className="cw-fab-dot" />
                 </div>
             )}
