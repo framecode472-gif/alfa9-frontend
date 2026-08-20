@@ -18,6 +18,22 @@ const SEGMENTS = [
 ];
 
 const SEG_ANGLE = 360 / SEGMENTS.length;
+
+// ===== REFERRAL SPIN — separate reward pool, same wheel graphic =====
+// Earned by inviting friends who go on to deposit (see spinRewards.js on
+// the backend — every approved deposit from someone you referred = +1
+// spin here). Mostly small prizes; Rs1000 only appears once you have 20+
+// referrals, and even then it's capped at 2 lifetime wins.
+const REFERRAL_SEGMENTS = [
+  { label: 'Rs1000', icon: '/image/spin-icon-1.png' },
+  { label: 'Rs500',  icon: '/image/spin-icon-2.png' },
+  { label: 'Rs200',  icon: '/image/spin-icon-3.png' },
+  { label: 'Rs100',  icon: '/image/spin-icon-4.png' },
+  { label: 'Rs100',  icon: '/image/spin-icon-7.png' },
+  { label: 'Rs50',   icon: '/image/spin-icon-8.png' },
+  { label: 'Rs50',   icon: '/image/spin-icon-6.png' },
+  { label: 'Rs20',   icon: '/image/spin-icon-5.png' },
+];
 // If spin-bg.png's wedges don't start exactly at the 12 o'clock seam,
 // nudge this value (in degrees) until the labels sit inside the right wedge.
 const WHEEL_IMAGE_OFFSET = 0;
@@ -108,6 +124,13 @@ function Spin() {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [spinsLeft, setSpinsLeft] = useState(0);
+  // Which wheel is active. 'deposit' = the original recharge-based wheel
+  // (unchanged). 'referral' = the new invite-based wheel — same graphic,
+  // different prize pool and a different earning source.
+  const [mode, setMode] = useState('deposit');
+  const [referralSpinsLeft, setReferralSpinsLeft] = useState(0);
+  const [referralCount, setReferralCount] = useState(0);
+  const [thousandEligible, setThousandEligible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const toastTimerRef = useRef(null);
   const showToast = (msg) => {
@@ -134,13 +157,20 @@ function Spin() {
 
   useEffect(() => {
     loadStatus();
+    apiFetch('/spin/referral-status')
+      .then((data) => {
+        setReferralSpinsLeft(data.spinsAvailable || 0);
+        setReferralCount(data.referralCount || 0);
+        setThousandEligible((data.referralCount || 0) >= data.thousandRequiresReferrals);
+      })
+      .catch(() => {});
     apiFetch('/spin/history')
       .then((data) => {
         setHistory((data.history || []).map((h) => ({
           time: new Date(h.createdAt).toLocaleString('en-GB', {
             day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
           }).replace(',', ''),
-          type: 'Wheel Spin',
+          type: h.source === 'referral' ? 'Referral Spin' : 'Wheel Spin',
           prize: h.prizeLabel
         })));
       })
@@ -151,16 +181,22 @@ function Spin() {
 
   const handleSpin = () => {
     if (spinning) return;
-    if (spinsLeft <= 0) {
-      showToast('No spins left today — deposit to unlock more!');
+    const currentSpinsLeft = mode === 'referral' ? referralSpinsLeft : spinsLeft;
+    if (currentSpinsLeft <= 0) {
+      showToast(mode === 'referral'
+        ? 'No referral spins left — invite friends and get them to deposit to earn more!'
+        : 'No spins left today — deposit to unlock more!');
       return;
     }
     setSpinning(true);
 
-    apiFetch('/spin/play', { method: 'POST' })
+    const activeSegments = mode === 'referral' ? REFERRAL_SEGMENTS : SEGMENTS;
+    const endpoint = mode === 'referral' ? '/spin/referral-play' : '/spin/play';
+
+    apiFetch(endpoint, { method: 'POST' })
       .then((data) => {
-        const prize = data.prize; // { label, amount } — decided server-side (respects the daily Rs200 cap)
-        const prizeIndex = Math.max(0, SEGMENTS.findIndex((s) => s.label === prize.label));
+        const prize = data.prize; // { label, amount } — decided server-side
+        const prizeIndex = Math.max(0, activeSegments.findIndex((s) => s.label === prize.label));
         const segCenter = segCenterAngle(prizeIndex);
 
         const currentMod = ((rotation % 360) + 360) % 360;
@@ -175,23 +211,25 @@ function Spin() {
 
         spinTimeoutRef.current = setTimeout(() => {
           setSpinning(false);
-          setSpinsLeft(data.spinsAvailable);
+          if (mode === 'referral') setReferralSpinsLeft(data.spinsAvailable);
+          else setSpinsLeft(data.spinsAvailable);
           const now = new Date();
           const timeStr = now.toLocaleString('en-GB', {
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit',
           }).replace(',', '');
-          setHistory((h) => [{ time: timeStr, type: 'Wheel Spin', prize: prize.label }, ...h].slice(0, 20));
-          setResultPrize(SEGMENTS[prizeIndex]);
+          setHistory((h) => [{ time: timeStr, type: mode === 'referral' ? 'Referral Spin' : 'Wheel Spin', prize: prize.label }, ...h].slice(0, 20));
+          setResultPrize(activeSegments[prizeIndex]);
         }, SPIN_DURATION);
       })
       .catch((err) => {
         setSpinning(false);
-        alert(err.message || 'Could not spin right now');
+        showToast(err.message || 'Could not spin right now');
       });
   };
 
-  const isOutOfSpins = spinsLeft <= 0;
+  const isOutOfSpins = (mode === 'referral' ? referralSpinsLeft : spinsLeft) <= 0;
+  const activeSegments = mode === 'referral' ? REFERRAL_SEGMENTS : SEGMENTS;
 
   return (
     <div className="spin-page">
@@ -219,13 +257,54 @@ function Spin() {
         <img src="/image/spin-hero bg.png" alt="Wheel Spin" className="hero-banner-img" />
       </div>
 
+      {/* WHEEL MODE TOGGLE — Deposit Spin (original) vs Referral Spin (new) */}
+      <div className="spin-mode-toggle">
+        <button
+          className={`spin-mode-btn ${mode === 'deposit' ? 'active' : ''}`}
+          onClick={() => !spinning && setMode('deposit')}
+        >
+          Deposit Spin
+        </button>
+        <button
+          className={`spin-mode-btn ${mode === 'referral' ? 'active' : ''}`}
+          onClick={() => !spinning && setMode('referral')}
+        >
+          Referral Spin
+        </button>
+      </div>
+
       {/* STATS ROW */}
       <div className="stats-row">
-        <div className="stat-card">
-          <span className="stat-label">Total Recharge</span>
-          <span className="stat-value">Rs0.00</span>
-        </div>
+        {mode === 'deposit' ? (
+          <>
+            <div className="stat-card">
+              <span className="stat-label">Total Recharge Today</span>
+              <span className="stat-value">Rs{totalRecharge.toLocaleString()}</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">Spins Left Today</span>
+              <span className="stat-value">{spinsLeft}</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="stat-card">
+              <span className="stat-label">Referral Spins Left</span>
+              <span className="stat-value">{referralSpinsLeft}</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">Total Referrals</span>
+              <span className="stat-value">{referralCount}{!thousandEligible ? ' / 20 for Rs1000' : ''}</span>
+            </div>
+          </>
+        )}
       </div>
+      {mode === 'referral' && (
+        <p className="spin-mode-hint">
+          Earn 1 free spin every time someone you referred makes a deposit.
+          {!thousandEligible && ' Reach 20 total referrals to unlock a shot at the Rs1000 prize.'}
+        </p>
+      )}
 
       {/* WHEEL */}
       <div className="wheel-section">
@@ -237,13 +316,13 @@ function Spin() {
           >
             <img src="/image/spin-bg.png" alt="" className="wheel-disc-img" draggable="false" />
 
-            {SEGMENTS.map((seg, i) => (
+            {activeSegments.map((seg, i) => (
               <div
-                key={seg.label}
+                key={seg.label + i}
                 className={`wheel-segment-label seg-${i}`}
               >
                 <div className="wheel-segment-label-inner">
-                  <span className={`seg-text ${seg.label === 'Rs50,000' ? 'jackpot' : ''}`}>{seg.label}</span>
+                  <span className={`seg-text ${seg.label === 'Rs50,000' || seg.label === 'Rs1000' ? 'jackpot' : ''}`}>{seg.label}</span>
                   <img src={seg.icon} alt={seg.label} className="seg-icon-img" />
                 </div>
               </div>

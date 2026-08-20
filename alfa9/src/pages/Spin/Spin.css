@@ -121,6 +121,23 @@
 
 /* ===== Stats row ===== */
 .spin-page .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 12px 14px; }
+
+.spin-page .spin-mode-toggle {
+  display: flex; gap: 8px; margin: 12px 12px 14px;
+  background: #111111; border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 4px;
+}
+.spin-page .spin-mode-btn {
+  flex: 1; border: none; background: transparent; color: #8b7355;
+  font-size: 12.5px; font-weight: 700; padding: 9px 6px; border-radius: 9px;
+  cursor: pointer; transition: background 0.18s, color 0.18s;
+}
+.spin-page .spin-mode-btn.active {
+  background: linear-gradient(135deg, #d4af37, #a8842c);
+  color: #1a1305;
+}
+.spin-page .spin-mode-hint {
+  margin: -6px 12px 14px; font-size: 11.5px; color: #8b7355; text-align: center; line-height: 1.5;
+}
 .spin-page .stat-card {
   display: flex; flex-direction: column; gap: 4px;
   background: linear-gradient(#111111, #111111) padding-box,
