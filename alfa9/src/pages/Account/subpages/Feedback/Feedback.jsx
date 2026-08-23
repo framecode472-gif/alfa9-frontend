@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './Feedback.css';
 
 const TYPES = ['Bug Report', 'Suggestion', 'Payment Issue', 'Other'];
+const TYPE_KEYS = { 'Bug Report': 'fb_type_bug', 'Suggestion': 'fb_type_suggestion', 'Payment Issue': 'fb_type_payment', 'Other': 'fb_type_other' };
 const CONFETTI_COLORS = ['#D4AF37', '#F3DA95', '#C9971F', '#F5E6C8', '#2FBE72', '#E8C458'];
 
 function Feedback() {
+  const { t: tr } = useLanguage();
   const navigate = useNavigate();
 
   const [type, setType] = useState('Bug Report');
@@ -62,8 +65,8 @@ function Feedback() {
 
   const submitFeedback = () => {
     const val = text.trim();
-    if (!val) { showToast('⚠️ Please describe your issue first'); return; }
-    if (val.length < 10) { showToast('⚠️ Please provide more detail'); return; }
+    if (!val) { showToast(tr('fb_toast_empty')); return; }
+    if (val.length < 10) { showToast(tr('fb_toast_short')); return; }
 
     setSubmitting(true);
 
@@ -83,7 +86,7 @@ function Feedback() {
       })
       .catch((err) => {
         setSubmitting(false);
-        showToast('⚠️ ' + (err.message || 'Could not send feedback'));
+        showToast('⚠️ ' + (err.message || tr('fb_toast_error')));
       });
   };
 
@@ -103,10 +106,10 @@ function Feedback() {
 
       <div className="main-content">
         <div>
-          <div className="type-label">Feedback Type</div>
+          <div className="type-label">{tr('fb_feedback_type')}</div>
           <div className="type-chips">
-            {TYPES.map((t) => (
-              <button key={t} type="button" className={`type-chip${type === t ? ' active' : ''}`} onClick={() => setType(t)}>{t}</button>
+            {TYPES.map((typ) => (
+              <button key={typ} type="button" className={`type-chip${type === typ ? ' active' : ''}`} onClick={() => setType(typ)}>{tr(TYPE_KEYS[typ])}</button>
             ))}
           </div>
         </div>
@@ -119,14 +122,14 @@ function Feedback() {
               </svg>
             </div>
             <div>
-              <div className="card-title">Describe your issue</div>
-              <div className="card-sub">More detail = faster resolution</div>
+              <div className="card-title">{tr('fb_describe_issue')}</div>
+              <div className="card-sub">{tr('fb_more_detail')}</div>
             </div>
           </div>
 
           <textarea
             className="feedback-textarea"
-            placeholder="Welcome to feedback, please give feedback — please describe the problem in detail when providing feedback, preferably attach a screenshot of the problem you encountered, we will immediately process your feedback!"
+            placeholder={tr('fb_placeholder')}
             maxLength={500}
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -143,10 +146,10 @@ function Feedback() {
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <polyline points="21 15 16 10 5 21" />
               </svg>
-              <span>Add Photo</span>
+              <span>{tr('fb_add_photo')}</span>
             </div>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>Attach screenshot to help us understand the issue better (max 3 images)</span>
+              <span style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>{tr('fb_attach_hint')}</span>
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleUpload} />
           </div>
@@ -168,7 +171,7 @@ function Feedback() {
         <div className="info-banner">
           <div className="info-dot"></div>
           <div className="info-text">
-            <strong>Note:</strong> Our team reviews all feedback within 24 hours. For urgent issues, please contact <strong>Customer Service</strong> directly for faster assistance.
+            <strong>{tr('fb_note_label')}</strong> {tr('fb_note_text')} <strong>{tr('fb_customer_service_bold')}</strong> {tr('fb_note_text_2')}
           </div>
         </div>
 
@@ -177,10 +180,10 @@ function Feedback() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
-            <span>MYSTERY REWARD</span>
+            <span>{tr('fb_mystery_reward')}</span>
           </div>
-          <div className="reward-title">Send Helpful Feedback</div>
-          <div className="reward-sub">Chance to win Mystery Rewards 🎁</div>
+          <div className="reward-title">{tr('fb_send_helpful')}</div>
+          <div className="reward-sub">{tr('fb_chance_win')}</div>
           <div className="reward-illustration">
             <img
               src="/image/feedback-illustration.png"
@@ -218,7 +221,7 @@ function Feedback() {
 
         <div className="submit-section">
           <button type="button" className={`submit-btn${submitting ? ' loading' : ''}`} onClick={submitFeedback}>
-            {submitting ? (<><span className="spinner"></span>Sending...</>) : 'Submit Feedback'}
+            {submitting ? (<><span className="spinner"></span>{tr('fb_sending')}</>) : tr('fb_submit_btn')}
           </button>
         </div>
       </div>
@@ -256,13 +259,13 @@ function Feedback() {
           <svg className="sparkle" style={{ top: 20, right: -6, animationDelay: '1s' }} width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" /></svg>
         </div>
 
-        <div className="success-title">Feedback Sent! 🎉</div>
-        <div className="success-sub">Thank you! Our team will review your feedback within 24 hours.</div>
+        <div className="success-title">{tr('fb_sent_title')}</div>
+        <div className="success-sub">{tr('fb_sent_sub')}</div>
         <div className="reward-chip">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
-          <span>You're eligible for a Mystery Reward!</span>
+          <span>{tr('fb_eligible_reward')}</span>
         </div>
-        <button className="success-back-btn" onClick={goBack}>Back to Account</button>
+        <button className="success-back-btn" onClick={goBack}>{tr('fb_back_to_account')}</button>
       </div>
 
       <div className={`toast${toast.show ? ' show' : ''}${toast.type ? ' ' + toast.type : ''}`}>{toast.msg}</div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './Vip.css';
 
 const IMG = {
@@ -53,6 +54,7 @@ function formatNum(n) {
 
 function Vip() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [profileName, setProfileName] = useState('USER');
   const [exp, setExp] = useState(0);
@@ -99,7 +101,7 @@ function Vip() {
   const showToast = (msg) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ msg, show: true });
-    toastTimerRef.current = setTimeout(() => setToast((t) => ({ ...t, show: false })), 2000);
+    toastTimerRef.current = setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2000);
   };
 
   const scrollToCard = (idx) => {
@@ -147,7 +149,7 @@ function Vip() {
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </div>
-          <div className="top-title">VIP</div>
+          <div className="top-title">{t('vip_title')}</div>
         </div>
 
         <div className="profile-row">
@@ -167,15 +169,15 @@ function Vip() {
       <div className="stat-row">
         <div className="stat-box">
           <div className="stat-val">{exp.toLocaleString()} EXP</div>
-          <div className="stat-label">My experience</div>
+          <div className="stat-label">{t('vip_my_experience')}</div>
         </div>
         <div className="stat-box">
-          <div className="stat-val">{getPayoutDays()} Days</div>
-          <div className="stat-label">Payout time</div>
+          <div className="stat-val">{getPayoutDays()} {t('vip_days')}</div>
+          <div className="stat-label">{t('vip_payout_time')}</div>
         </div>
       </div>
 
-      <div className="notice-bar">VIP level rewards are settled at 2:00 am on the 1st of every month</div>
+      <div className="notice-bar">{t('vip_notice')}</div>
 
       <div className="card-slider-wrap">
         <div
@@ -202,22 +204,22 @@ function Vip() {
                       <span className="card-level-txt">VIP{lvl.level}</span>
                       <div className="card-lock-row">
                         <img className="card-lock-icon" src={IMG.lockIcon} alt="lock" onError={(e) => { e.target.style.display = 'none'; }} />
-                        <span className="card-lock-txt">{unlocked ? '✓ Unlocked' : 'Not open yet'}</span>
+                        <span className="card-lock-txt">{unlocked ? t('vip_unlocked') : t('vip_not_open_yet')}</span>
                       </div>
                     </div>
-                    <div className="card-req">Upgrading VIP{lvl.level} requires {formatNum(lvl.expReq)} EXP</div>
+                    <div className="card-req">{t('vip_req_1')} VIP{lvl.level} {t('vip_req_2')} {formatNum(lvl.expReq)} {t('vip_req_3')}</div>
                   </div>
                   <img className="card-star-img" src={IMG.cardStar(lvl.level)} alt={`VIP${lvl.level}`} onError={(e) => { e.target.style.display = 'none'; }} />
                 </div>
                 <div className="card-bottom">
-                  <div className="card-bet-badge">Bet Rs100=1EXP</div>
+                  <div className="card-bet-badge">{t('vip_bet_badge')}</div>
                   <div className="card-level-label">VIP{lvl.level}</div>
                   <div className="card-progress-bar">
                     <div className="card-progress-fill" style={{ width: `${pct}%` }}></div>
                   </div>
                   <div className="card-progress-txt">
                     <span>{formatNum(progress)}/{formatNum(lvl.expReq)}</span>
-                    <span>{formatNum(lvl.expReq)} EXP can be leveled up</span>
+                    <span>{formatNum(lvl.expReq)} {t('vip_can_level_up')}</span>
                   </div>
                 </div>
               </div>
@@ -234,15 +236,15 @@ function Vip() {
       <div className="benefits-section">
         <div className="benefits-title">
           <img className="benefits-gem" src={IMG.gem} alt="gem" onError={(e) => { e.target.style.display = 'none'; }} />
-          <span className="benefits-heading">VIP{v.level} Benefits level</span>
-          <span className="benefits-link" onClick={() => navigate('/account/my-benefits')}>My Benefits ›</span>
+          <span className="benefits-heading">VIP{v.level} {t('vip_benefits_level')}</span>
+          <span className="benefits-link" onClick={() => navigate('/account/my-benefits')}>{t('vip_my_benefits_link')}</span>
         </div>
 
         <div className="benefit-row">
           <img className="benefit-icon" src={IMG.benefitLevelup} alt="Level up" onError={(e) => { e.target.style.opacity = '0.3'; }} />
           <div className="benefit-info">
-            <div className="benefit-name">Level up rewards</div>
-            <div className="benefit-desc">Each account can only receive 1 time</div>
+            <div className="benefit-name">{t('vip_level_up_rewards')}</div>
+            <div className="benefit-desc">{t('vip_received_once')}</div>
           </div>
           <div className="benefit-tags">
             <div className="benefit-tag gold-tag">
@@ -259,8 +261,8 @@ function Vip() {
         <div className="benefit-row">
           <img className="benefit-icon" src={IMG.benefitMonthly} alt="Monthly" onError={(e) => { e.target.style.opacity = '0.3'; }} />
           <div className="benefit-info">
-            <div className="benefit-name">Monthly reward</div>
-            <div className="benefit-desc">Each account can only receive 1 time per month</div>
+            <div className="benefit-name">{t('vip_monthly_reward')}</div>
+            <div className="benefit-desc">{t('vip_received_monthly')}</div>
           </div>
           <div className="benefit-tags">
             <div className="benefit-tag gold-tag">
@@ -277,8 +279,8 @@ function Vip() {
         <div className="benefit-row">
           <img className="benefit-icon" src={IMG.benefitSafe} alt="Safe" onError={(e) => { e.target.style.opacity = '0.3'; }} />
           <div className="benefit-info">
-            <div className="benefit-name">Safe</div>
-            <div className="benefit-desc">Increase the extra income of the safe</div>
+            <div className="benefit-name">{t('vip_safe')}</div>
+            <div className="benefit-desc">{t('vip_safe_desc')}</div>
           </div>
           <div className="benefit-tags">
             <div className="benefit-tag green-tag">
@@ -291,8 +293,8 @@ function Vip() {
         <div className="benefit-row">
           <img className="benefit-icon" src={IMG.benefitRebate} alt="Rebate" onError={(e) => { e.target.style.opacity = '0.3'; }} />
           <div className="benefit-info">
-            <div className="benefit-name">Rebate rate</div>
-            <div className="benefit-desc">Increase income of rebate</div>
+            <div className="benefit-name">{t('vip_rebate_rate')}</div>
+            <div className="benefit-desc">{t('vip_rebate_desc')}</div>
           </div>
           <div className="benefit-tags">
             <div className="benefit-tag green-tag">
@@ -305,8 +307,8 @@ function Vip() {
 
       <div className="tab-section">
         <div className="tab-bar">
-          <button className={`tab-btn${activeTab === 'history' ? ' active' : ''}`} onClick={() => setActiveTab('history')}>History</button>
-          <button className={`tab-btn${activeTab === 'rules' ? ' active' : ''}`} onClick={() => setActiveTab('rules')}>Rules</button>
+          <button className={`tab-btn${activeTab === 'history' ? ' active' : ''}`} onClick={() => setActiveTab('history')}>{t('vip_history')}</button>
+          <button className={`tab-btn${activeTab === 'rules' ? ' active' : ''}`} onClick={() => setActiveTab('rules')}>{t('vip_rules')}</button>
         </div>
 
         {activeTab === 'history' && (
@@ -319,7 +321,7 @@ function Vip() {
                   <rect x="30" y="48" width="30" height="4" rx="2" fill="#8B7355" opacity="0.5" />
                   <rect x="30" y="61" width="20" height="4" rx="2" fill="#8B7355" opacity="0.5" />
                 </svg>
-                <p>No data</p>
+                <p>{t('vip_no_data')}</p>
               </div>
             ) : (
               <div>
@@ -331,7 +333,7 @@ function Vip() {
                       </svg>
                     </div>
                     <div className="hist-item-info">
-                      <div className="hist-item-name">Bet Rs{b.amount.toLocaleString()}</div>
+                      <div className="hist-item-name">{t('vip_bet')}{b.amount.toLocaleString()}</div>
                       <div className="hist-item-time">{b.time}</div>
                     </div>
                     <div className="hist-item-exp">+{Math.floor(b.amount / 100)} EXP</div>
@@ -339,47 +341,47 @@ function Vip() {
                 ))}
               </div>
             )}
-            <button className="view-all-btn" onClick={() => showToast('No more history')}>View All</button>
+            <button className="view-all-btn" onClick={() => showToast(t('vip_no_more_history'))}>{t('vip_view_all')}</button>
           </div>
         )}
 
         {activeTab === 'rules' && (
           <div className="tab-content active">
             <div className="rules-title-block">
-              <h2>VIP privileges</h2>
-              <p>VIP rule description</p>
+              <h2>{t('vip_privileges')}</h2>
+              <p>{t('vip_rule_desc')}</p>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Upgrade standard</div>
-              <div className="rule-body">The VIP member&apos;s experience points (valid bet amount) that meet the requirements of the corresponding rank will be promoted to the corresponding VIP level. The member&apos;s VIP data statistics period starts from 00:00:00 days VIP system launched. VIP level calculation is refreshed every 10 minutes! The corresponding experience level is calculated according to valid odds 100:1 — Bet Rs100 = 1 EXP.</div>
+              <div className="rule-header">{t('vip_r1_title')}</div>
+              <div className="rule-body">{t('vip_r1_body')}</div>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Upgrade order</div>
-              <div className="rule-body">The VIP level that meets the corresponding requirements can be promoted by one level every day, but the VIP level cannot be promoted by leapfrogging.</div>
+              <div className="rule-header">{t('vip_r2_title')}</div>
+              <div className="rule-body">{t('vip_r2_body')}</div>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Level maintenance</div>
-              <div className="rule-body">VIP members need to complete the maintenance requirements of the corresponding level within 30 days after the &quot;VIP level change&quot;; if the promotion is completed during this period, the maintenance requirements will be calculated according to the current level.</div>
+              <div className="rule-header">{t('vip_r3_title')}</div>
+              <div className="rule-body">{t('vip_r3_body')}</div>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Downgrade standard</div>
-              <div className="rule-body">If a VIP member fails to complete the corresponding level maintenance requirements within 30 days, the system will automatically deduct the experience points corresponding to the level. If the experience points are insufficient, the level will be downgraded, and the corresponding discounts will be adjusted to the downgraded level accordingly.</div>
+              <div className="rule-header">{t('vip_r4_title')}</div>
+              <div className="rule-body">{t('vip_r4_body')}</div>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Upgrade Bonus</div>
-              <div className="rule-body">The upgrade benefits can be claimed on the VIP page after the member reaches the VIP membership level, and each VIP member can only get the upgrade reward of each level once.</div>
+              <div className="rule-header">{t('vip_r5_title')}</div>
+              <div className="rule-body">{t('vip_r5_body')}</div>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Monthly reward</div>
-              <div className="rule-body">VIP members can earn the highest level of VIP rewards once a month. Can only be received once a month. Prizes cannot be accumulated. Any unclaimed rewards will be refreshed on the next settlement day.</div>
+              <div className="rule-header">{t('vip_r6_title')}</div>
+              <div className="rule-body">{t('vip_r6_body')}</div>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Real-time rebate</div>
-              <div className="rule-body">The higher the VIP level, the higher the return rate. All the games are calculated in real time and can be self-rewarded!</div>
+              <div className="rule-header">{t('vip_r7_title')}</div>
+              <div className="rule-body">{t('vip_r7_body')}</div>
             </div>
             <div className="rule-block">
-              <div className="rule-header">Safe</div>
-              <div className="rule-body">VIP members who have reached the corresponding level will get additional benefits on safe deposit based on the member&apos;s VIP level.</div>
+              <div className="rule-header">{t('vip_r8_title')}</div>
+              <div className="rule-body">{t('vip_r8_body')}</div>
             </div>
           </div>
         )}

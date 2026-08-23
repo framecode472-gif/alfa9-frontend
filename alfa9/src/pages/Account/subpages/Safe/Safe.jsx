@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './Safe.css';
 
 const DAILY_RATE = 0.001; // 0.1%
@@ -96,6 +97,7 @@ function historyIconSvg(type) {
 
 function Safe() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [safeBalance, setSafeBalance] = useState(0);
   const [walletBalance, setWalletBalance] = useState(0);
@@ -131,7 +133,7 @@ function Safe() {
   const [noIncomeOpen, setNoIncomeOpen] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successRing, setSuccessRing] = useState(false);
-  const [successTitle, setSuccessTitle] = useState('Transfer Complete');
+  const [successTitle, setSuccessTitle] = useState('sf_transferred_to_safe');
   const [successAmt, setSuccessAmt] = useState('0.00');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -163,7 +165,7 @@ function Safe() {
   const showToast = useCallback((msg, isError) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ msg, show: true, error: !!isError });
-    toastTimerRef.current = setTimeout(() => setToast((t) => ({ ...t, show: false })), 2400);
+    toastTimerRef.current = setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2400);
   }, []);
 
   const vibrate = (ms) => {
@@ -311,7 +313,7 @@ function Safe() {
   };
 
   const showSuccessModal = (amount, type) => {
-    setSuccessTitle(type === 'in' ? 'Transferred to Safe' : 'Transferred to Wallet');
+    setSuccessTitle(type === 'in' ? 'sf_transferred_to_safe' : 'sf_transferred_to_wallet');
     setSuccessAmt(amount.toFixed(2));
     setSuccessRing(false);
     setTimeout(() => setSuccessRing(true), 10);
@@ -322,10 +324,10 @@ function Safe() {
 
   const confirmTransferOut = () => {
     const val = outAmountNum;
-    if (val <= 0) { showToast('Enter amount to transfer', true); return; }
-    if (val > safeBalance) { showToast('Insufficient safe balance', true); return; }
+    if (val <= 0) { showToast(t('sf_toast_enter_amount'), true); return; }
+    if (val > safeBalance) { showToast(t('sf_toast_insufficient_safe'), true); return; }
     const rounded = Math.floor(val / EACH_AMOUNT) * EACH_AMOUNT;
-    if (rounded <= 0) { showToast('Minimum transfer is Rs' + EACH_AMOUNT, true); return; }
+    if (rounded <= 0) { showToast(t('sf_toast_min_transfer') + EACH_AMOUNT, true); return; }
 
     apiFetch('/safe/transfer-out', { method: 'POST', body: { amount: rounded } })
       .then((data) => {
@@ -338,7 +340,7 @@ function Safe() {
         showSuccessModal(data.amount, 'out');
         setTimeout(startInterest, 0);
       })
-      .catch((err) => showToast(err.message || 'Transfer failed', true));
+      .catch((err) => showToast(err.message || t('sf_toast_transfer_failed'), true));
   };
 
   // ─── TRANSFER IN ───
@@ -382,10 +384,10 @@ function Safe() {
 
   const confirmTransferIn = () => {
     const val = inAmountNum;
-    if (val <= 0) { showToast('Enter amount to transfer', true); return; }
-    if (val > walletBalance) { showToast('Insufficient wallet balance', true); return; }
+    if (val <= 0) { showToast(t('sf_toast_enter_amount'), true); return; }
+    if (val > walletBalance) { showToast(t('sf_toast_insufficient_wallet'), true); return; }
     const rounded = Math.floor(val / EACH_AMOUNT) * EACH_AMOUNT;
-    if (rounded <= 0) { showToast('Minimum transfer is Rs' + EACH_AMOUNT, true); return; }
+    if (rounded <= 0) { showToast(t('sf_toast_min_transfer') + EACH_AMOUNT, true); return; }
 
     apiFetch('/safe/transfer-in', { method: 'POST', body: { amount: rounded } })
       .then((data) => {
@@ -397,7 +399,7 @@ function Safe() {
         showSuccessModal(data.amount, 'in');
         setTimeout(startInterest, 0);
       })
-      .catch((err) => showToast(err.message || 'Transfer failed', true));
+      .catch((err) => showToast(err.message || t('sf_toast_transfer_failed'), true));
   };
 
   // ─── HISTORY PAGE ───
@@ -499,7 +501,7 @@ function Safe() {
         <div className="back-btn" onClick={() => navigate(-1)}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
         </div>
-        <div className="page-title">⚜ SAFE</div>
+        <div className="page-title">⚜ {t('sf_title')}</div>
         <div className="top-right"></div>
       </div>
 
@@ -507,7 +509,7 @@ function Safe() {
       <div className="interest-badge-wrap">
         <div className="interest-badge">
           <div className="interest-dot"></div>
-          Interest rate &nbsp;<strong>0.10%</strong>&nbsp; daily
+          {t('sf_interest_rate')} &nbsp;<strong>0.10%</strong>&nbsp; {t('sf_daily')}
         </div>
       </div>
 
@@ -541,16 +543,16 @@ function Safe() {
           </div>
           <div className="fin-security-badge">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-            Financial security
+            {t('sf_financial_security')}
           </div>
         </div>
-        <div className="safe-balance-label">Safe Balance</div>
+        <div className="safe-balance-label">{t('sf_safe_balance')}</div>
         <div className="safe-balance-amt">
           <span style={{ fontSize: 18, opacity: 0.7 }}>Rs</span>
           <Odometer value={formatMoney(safeBalance)} />
         </div>
         <div className="safe-revenue-row">
-          <span className="safe-revenue-label"><span className="tick-pulse"></span>24-hour estimated revenue</span>
+          <span className="safe-revenue-label"><span className="tick-pulse"></span>{t('sf_24h_revenue')}</span>
           <span className="safe-revenue-val">Rs <Odometer value={formatMoney(dailyRevenue)} /></span>
         </div>
         <div className="safe-card-dots">
@@ -565,40 +567,40 @@ function Safe() {
         <div className="stats-row">
           <div className="stat-item">
             <div className="stat-val red"><Odometer value={formatMoney(generatedRevenue)} /></div>
-            <div className="stat-label">Generated revenue</div>
+            <div className="stat-label">{t('sf_generated_revenue')}</div>
           </div>
           <div className="stats-divider"></div>
           <div className="stat-item">
             <div className="stat-val gold"><Odometer value={formatMoney(accumulatedRevenue)} /></div>
-            <div className="stat-label">Accumulated revenue</div>
+            <div className="stat-label">{t('sf_accumulated_revenue')}</div>
           </div>
         </div>
 
         <div className="my-rate-row">
           <div className="my-rate-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9971F" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-            My interest rate &nbsp;<span className="my-rate-val">0.1%</span>
+            {t('sf_my_interest_rate')} &nbsp;<span className="my-rate-val">0.1%</span>
           </div>
         </div>
 
         <div className="transfer-btns">
           <button className="btn-transfer-out" onClick={(e) => { addRipple(e); openTransferOut(); }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ marginRight: 5, verticalAlign: -2 }}><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-            Transfer Out
+            {t('sf_transfer_out')}
           </button>
           <button className="btn-transfer-in" onClick={(e) => { addRipple(e); openTransferIn(); }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.5" strokeLinecap="round" style={{ marginRight: 5, verticalAlign: -2 }}><path d="M12 5v14M5 12l7 7 7-7" /></svg>
-            Transfer In
+            {t('sf_transfer_in')}
           </button>
         </div>
 
         <div className="safe-info-row">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-          <span className="safe-info-text">Funds are safe and secure, and can be transferred at any time</span>
+          <span className="safe-info-text">{t('sf_funds_safe')}</span>
         </div>
 
         <div className="learn-link" onClick={() => { setLearnOpen(true); document.body.style.overflow = 'hidden'; }}>
-          Learn about safes
+          {t('sf_learn_about')}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2"><polyline points="9 18 15 12 9 6" /><polyline points="15 18 21 12 15 6" /></svg>
         </div>
       </div>
@@ -608,20 +610,20 @@ function Safe() {
         <div className="section-label-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
         </div>
-        <span className="section-label-text">Historical Records</span>
+        <span className="section-label-text">{t('sf_historical_records')}</span>
       </div>
       <button className="all-history-btn" onClick={(e) => { addRipple(e); openHistoryPage(); }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-        All History
+        {t('sf_all_history')}
       </button>
 
       {/* ═══ TRANSFER OUT MODAL ═══ */}
       <div className={`modal-overlay${transferOutOpen ? ' open' : ''}`} onClick={(e) => { if (e.target === e.currentTarget) closeTransferOut(); }}>
         <div className="transfer-modal">
           <div className="modal-handle"></div>
-          <div className="modal-title">Transfer Out</div>
+          <div className="modal-title">{t('sf_transfer_out')}</div>
           <div className="each-amount-row">
-            <span className="each-amount-label">Each amount</span>
+            <span className="each-amount-label">{t('sf_each_amount')}</span>
             <span className="each-amount-val">{EACH_AMOUNT}</span>
           </div>
           <div className="amount-input-wrap">
@@ -632,7 +634,7 @@ function Safe() {
           </div>
           <div className={`insuff-error${outInsuff ? ' show' : ''}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-            Insufficient amount available
+            {t('sf_insufficient')}
           </div>
           <div className="slider-wrap">
             <input
@@ -651,25 +653,25 @@ function Safe() {
           </div>
           <div className="details-table">
             <div className="detail-row">
-              <span className="detail-label">Amount available</span>
+              <span className="detail-label">{t('sf_amount_available')}</span>
               <span className="detail-val">{safeBalance.toFixed(2)}</span>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Amount transferred</span>
+              <span className="detail-label">{t('sf_amount_transferred')}</span>
               <span className="detail-val red">{outAmountNum.toFixed(2)}</span>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Daily interest rate</span>
+              <span className="detail-label">{t('sf_daily_interest_rate')}</span>
               <span className="detail-val gold">0.1%</span>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Income</span>
+              <span className="detail-label">{t('sf_income')}</span>
               <span className="detail-val green">{generatedRevenue.toFixed(2)}</span>
             </div>
           </div>
           <button className="modal-cta-btn" onClick={(e) => { addRipple(e); confirmTransferOut(); }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.5" strokeLinecap="round" style={{ marginRight: 6, verticalAlign: -3 }}><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-            Transfer Out
+            {t('sf_transfer_out')}
           </button>
         </div>
       </div>
@@ -678,18 +680,18 @@ function Safe() {
       <div className={`modal-overlay${transferInOpen ? ' open' : ''}`} onClick={(e) => { if (e.target === e.currentTarget) closeTransferIn(); }}>
         <div className="transfer-modal">
           <div className="modal-handle"></div>
-          <div className="modal-title">Transfer In</div>
+          <div className="modal-title">{t('sf_transfer_in')}</div>
           <div className="each-amount-row">
-            <span className="each-amount-label">Each amount</span>
+            <span className="each-amount-label">{t('sf_each_amount')}</span>
             <span className="each-amount-val">{EACH_AMOUNT}</span>
           </div>
           <div className="amount-input-wrap">
             <input className="amount-input" type="number" placeholder="0" min="0" value={inAmount} onChange={handleInAmountChange} />
-            <div className="amount-all-btn" onClick={setInAll}>All</div>
+            <div className="amount-all-btn" onClick={setInAll}>{t('all')}</div>
           </div>
           <div className={`insuff-error${inInsuff ? ' show' : ''}`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-            Insufficient amount available
+            {t('sf_insufficient')}
           </div>
           <div className="multi-grid">
             {MULTIPLIERS.map((m) => (
@@ -698,7 +700,7 @@ function Safe() {
           </div>
           <div className="details-table">
             <div className="detail-row">
-              <span className="detail-label">Amount available</span>
+              <span className="detail-label">{t('sf_amount_available')}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span className="detail-val">{walletBalance.toFixed(2)}</span>
                 <div onClick={refreshInBalance} style={{ cursor: 'pointer', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -707,17 +709,17 @@ function Safe() {
               </div>
             </div>
             <div className="detail-row">
-              <span className="detail-label">Amount transferred</span>
+              <span className="detail-label">{t('sf_amount_transferred')}</span>
               <span className="detail-val red">{inAmountNum.toFixed(2)}</span>
             </div>
           </div>
           <div className="detail-estimated">
-            24-hour estimated revenue
+            {t('sf_24h_revenue')}
             <span>{inEstimated}</span>
           </div>
           <button className="modal-cta-btn" disabled={inInsuff || inAmountNum <= 0} onClick={(e) => { addRipple(e); confirmTransferIn(); }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.5" strokeLinecap="round" style={{ marginRight: 6, verticalAlign: -3 }}><path d="M12 5v14M5 12l7 7 7-7" /></svg>
-            Transfer In
+            {t('sf_transfer_in')}
           </button>
         </div>
       </div>
@@ -731,10 +733,10 @@ function Safe() {
               <path d="M12 8v4M12 16h.01" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
           </div>
-          <div className="popup-title">No income</div>
-          <div className="popup-desc">No income at the moment, want to transfer out?</div>
-          <button className="popup-btn-primary" onClick={(e) => { addRipple(e); proceedTransferOut(); }}>Transfer Out</button>
-          <button className="popup-btn-cancel" onClick={() => closeModal(setNoIncomeOpen)}>Cancel</button>
+          <div className="popup-title">{t('sf_no_income')}</div>
+          <div className="popup-desc">{t('sf_no_income_desc')}</div>
+          <button className="popup-btn-primary" onClick={(e) => { addRipple(e); proceedTransferOut(); }}>{t('sf_transfer_out')}</button>
+          <button className="popup-btn-cancel" onClick={() => closeModal(setNoIncomeOpen)}>{t('hist_cancel')}</button>
         </div>
       </div>
 
@@ -748,7 +750,7 @@ function Safe() {
               <path d="M20 33l8 8 16-16" />
             </svg>
           </div>
-          <div className="success-title">{successTitle}</div>
+          <div className="success-title">{t(successTitle)}</div>
           <div className="success-amount">Rs {successAmt}</div>
         </div>
       </div>
@@ -759,30 +761,30 @@ function Safe() {
           <div className="back-btn" onClick={closeHistoryPage}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
           </div>
-          <div className="page-title" style={{ fontSize: 15 }}>Safes History</div>
+          <div className="page-title" style={{ fontSize: 15 }}>{t('sf_safes_history')}</div>
           <div style={{ width: 36 }}></div>
         </div>
         <div className="hist-banner">
           <div style={{ overflow: 'hidden' }}>
             <button className="hist-month-btn" onClick={openDatePicker}>
-              <span>{histYear} Year {String(histMonth).padStart(2, '0')} Month</span>
+              <span>{histYear} {t('sf_year')} {String(histMonth).padStart(2, '0')} {t('sf_month')}</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F3DA95" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
             </button>
           </div>
           <div className="hist-stats-row">
             <div className="hist-stat">
               <div className="hist-stat-val">{histIn}</div>
-              <div className="hist-stat-label">Transfer In</div>
+              <div className="hist-stat-label">{t('sf_transfer_in')}</div>
             </div>
             <div style={{ width: 1, background: 'rgba(212,175,55,0.2)', margin: '4px 0' }}></div>
             <div className="hist-stat">
               <div className="hist-stat-val">{histOut}</div>
-              <div className="hist-stat-label">Transfer Out</div>
+              <div className="hist-stat-label">{t('sf_transfer_out')}</div>
             </div>
             <div style={{ width: 1, background: 'rgba(212,175,55,0.2)', margin: '4px 0' }}></div>
             <div className="hist-stat">
               <div className="hist-stat-val">{histIncome.toFixed(2)}</div>
-              <div className="hist-stat-label">Income</div>
+              <div className="hist-stat-label">{t('sf_income')}</div>
             </div>
           </div>
         </div>
@@ -794,7 +796,7 @@ function Safe() {
                 <path d="M8 12h8M8 8h5M8 16h3" />
               </svg>
             </div>
-            <div className="empty-text">No data available</div>
+            <div className="empty-text">{t('sf_no_data_available')}</div>
           </div>
         ) : (
           <div style={{ padding: '0 14px 8px' }}>
@@ -803,7 +805,7 @@ function Safe() {
                 <div className="hist-day-label">{g.label}</div>
                 {g.items.map((h, hi) => {
                   const d = new Date(h.date);
-                  const label = h.type === 'in' ? 'Transfer In' : h.type === 'out' ? 'Transfer Out' : 'Interest Income';
+                  const label = h.type === 'in' ? t('sf_transfer_in') : h.type === 'out' ? t('sf_transfer_out') : t('sf_interest_income');
                   const color = h.type === 'in' ? 'var(--gold)' : h.type === 'out' ? 'var(--red)' : 'var(--green)';
                   const sign = h.type === 'out' ? '-' : '+';
                   return (
@@ -827,20 +829,20 @@ function Safe() {
       <div className={`modal-overlay datepicker-z${datePickerOpen ? ' open' : ''}`} onClick={(e) => { if (e.target === e.currentTarget) closeDatePicker(); }}>
         <div className="datepicker-modal">
           <div className="datepicker-top">
-            <span className="dp-cancel" onClick={closeDatePicker}>Cancel</span>
-            <span className="dp-title">Choose a date</span>
-            <span className="dp-confirm" onClick={confirmDatePicker}>Confirm</span>
+            <span className="dp-cancel" onClick={closeDatePicker}>{t('hist_cancel')}</span>
+            <span className="dp-title">{t('hist_choose_date')}</span>
+            <span className="dp-confirm" onClick={confirmDatePicker}>{t('hist_confirm')}</span>
           </div>
           <div className="dp-columns">
             <div className="dp-highlight"></div>
             <div className="dp-col" ref={dpYearColRef}>
               {years.map((y) => (
-                <div key={y} className={`dp-item${dpYear === y ? ' selected' : ''}`} data-val={y}>Year {y}</div>
+                <div key={y} className={`dp-item${dpYear === y ? ' selected' : ''}`} data-val={y}>{t('sf_year')} {y}</div>
               ))}
             </div>
             <div className="dp-col" ref={dpMonthColRef}>
               {months.map((m) => (
-                <div key={m} className={`dp-item${dpMonth === m ? ' selected' : ''}`} data-val={m}>Month {String(m).padStart(2, '0')}</div>
+                <div key={m} className={`dp-item${dpMonth === m ? ' selected' : ''}`} data-val={m}>{t('sf_month')} {String(m).padStart(2, '0')}</div>
               ))}
             </div>
           </div>
@@ -853,13 +855,13 @@ function Safe() {
           <div className="back-btn" onClick={() => { setLearnOpen(false); document.body.style.overflow = ''; }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
           </div>
-          <div className="page-title" style={{ fontSize: 14 }}>Learn about safes</div>
+          <div className="page-title" style={{ fontSize: 14 }}>{t('sf_learn_about')}</div>
           <div style={{ width: 36 }}></div>
         </div>
         <div className="learn-banner">
           <div className="learn-interest-badge">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF8A80" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
-            Minimum return, daily interest &nbsp;<strong>0.1%</strong>
+            {t('sf_min_return')} &nbsp;<strong>0.1%</strong>
           </div>
         </div>
 
@@ -867,20 +869,20 @@ function Safe() {
           <div className="learn-section">
             <div className="learn-section-header">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-              <span className="learn-section-title">Income</span>
+              <span className="learn-section-title">{t('sf_income')}</span>
             </div>
             <div className="learn-section-body">
               <div className="learn-item">
                 <div className="learn-arrow"></div>
-                <p className="learn-item-text">The Income Calculation Method is the Base Interest Rate plus the VIP Level Extra Interest Rate.</p>
+                <p className="learn-item-text">{t('sf_learn_income_1')}</p>
               </div>
               <div className="learn-item">
                 <div className="learn-arrow"></div>
-                <p className="learn-item-text">After the balance is transferred in, profit will be calculated once every 1 minute.</p>
+                <p className="learn-item-text">{t('sf_learn_income_2')}</p>
               </div>
               <div className="learn-item">
                 <div className="learn-arrow"></div>
-                <p className="learn-item-text">Profit will be paid on the 2nd transfer or transfer out and the previous profit will be transferred to the wallet balance.</p>
+                <p className="learn-item-text">{t('sf_learn_income_3')}</p>
               </div>
             </div>
           </div>
@@ -888,16 +890,16 @@ function Safe() {
           <div className="learn-section">
             <div className="learn-section-header">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
-              <span className="learn-section-title">Transfer In</span>
+              <span className="learn-section-title">{t('sf_transfer_in')}</span>
             </div>
             <div className="learn-section-body">
               <div className="learn-item">
                 <div className="learn-arrow"></div>
-                <p className="learn-item-text">Wallet balance transferred to the safe must be transferred in points.</p>
+                <p className="learn-item-text">{t('sf_learn_transfer_in_1')}</p>
               </div>
               <div className="learn-example-box">
-                <div className="learn-example-label">FOR EXAMPLE</div>
-                <p className="learn-example-text">1 point is 1000, transfer in 2 points is 2000, 10 points is 10000, 50 points is 50000. Transfer amount must be a multiple of 1000.</p>
+                <div className="learn-example-label">{t('sf_for_example')}</div>
+                <p className="learn-example-text">{t('sf_learn_transfer_in_example')}</p>
               </div>
             </div>
           </div>
@@ -905,16 +907,16 @@ function Safe() {
           <div className="learn-section">
             <div className="learn-section-header">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-              <span className="learn-section-title">Transfer Out</span>
+              <span className="learn-section-title">{t('sf_transfer_out')}</span>
             </div>
             <div className="learn-section-body">
               <div className="learn-item">
                 <div className="learn-arrow"></div>
-                <p className="learn-item-text">Provided your income is guaranteed, you can transfer out at any time, from the balance of the safe to the balance of the wallet. The amount transferred must be a multiple of the number of copies.</p>
+                <p className="learn-item-text">{t('sf_learn_transfer_out_1')}</p>
               </div>
               <div className="learn-example-box">
-                <div className="learn-reminder">⚠ Reminder</div>
-                <p className="learn-reminder-text">Please do not transfer in and out frequently. Earnings will be calculated from 1 minute after deposit. If the cumulative amount of an earned amount is less than 0.01, the amount will not be counted in &quot;earnings&quot;.</p>
+                <div className="learn-reminder">{t('sf_reminder')}</div>
+                <p className="learn-reminder-text">{t('sf_learn_transfer_out_reminder')}</p>
               </div>
             </div>
           </div>
@@ -922,16 +924,16 @@ function Safe() {
           <div className="learn-section">
             <div className="learn-section-header">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-              <span className="learn-section-title">Safe</span>
+              <span className="learn-section-title">{t('sf_title')}</span>
             </div>
             <div className="learn-section-body">
               <div className="learn-item">
                 <div className="learn-arrow"></div>
-                <p className="learn-item-text">Security technical team to ensure the safety of your money.</p>
+                <p className="learn-item-text">{t('sf_learn_safe_1')}</p>
               </div>
               <div className="learn-item">
                 <div className="learn-arrow"></div>
-                <p className="learn-item-text">To keep your funds safe, it is recommended that you transfer money to the safe.</p>
+                <p className="learn-item-text">{t('sf_learn_safe_2')}</p>
               </div>
             </div>
           </div>

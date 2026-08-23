@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './Settings.css';
 
 const AVATARS = [
@@ -81,6 +82,7 @@ function pushOtpNotification(email, otp) {
 
 function Settings() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [view, setView] = useState('settings'); // settings | avatar | password | mail
 
   const [nickname, setNickname] = useState(() => {
@@ -158,7 +160,7 @@ function Settings() {
   const showToast = (msg) => {
     setToast({ show: true, msg });
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast((t) => ({ ...t, show: false })), 2400);
+    toastTimer.current = setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2400);
   };
 
   const openView = (v) => {
@@ -176,19 +178,19 @@ function Settings() {
     setAvatar(url);
     setSelectedAvatar(url);
     window.dispatchEvent(new CustomEvent(AVATAR_EVENT, { detail: url }));
-    showToast('Avatar updated successfully!');
+    showToast(t('st_toast_avatar_updated'));
     openView('settings');
   };
 
   const openNicknameModal = () => { setNicknameInput(nickname); setNicknameModalOpen(true); };
   const confirmNickname = () => {
     const val = nicknameInput.trim();
-    if (!val) { showToast('Enter a nickname'); return; }
+    if (!val) { showToast(t('st_toast_enter_nickname')); return; }
     const upper = val.toUpperCase();
     setNickname(upper);
     localStorage.setItem('alfa9_username', val);
     setNicknameModalOpen(false);
-    showToast('Nickname updated!');
+    showToast(t('st_toast_nickname_updated'));
   };
 
   const copyUID = () => {
@@ -198,15 +200,15 @@ function Settings() {
       ta.select(); document.execCommand('copy');
       document.body.removeChild(ta);
     });
-    showToast('UID Copied: ' + uid);
+    showToast(t('st_toast_uid_copied') + uid);
   };
 
   const savePassword = () => {
-    if (!oldPass) { showToast('Enter current password'); return; }
-    if (newPass.length < 6) { showToast('Password must be 6+ characters'); return; }
-    if (newPass !== confirmPass) { showToast('Passwords do not match'); return; }
+    if (!oldPass) { showToast(t('st_toast_enter_current_password')); return; }
+    if (newPass.length < 6) { showToast(t('st_toast_password_length')); return; }
+    if (newPass !== confirmPass) { showToast(t('st_toast_password_mismatch')); return; }
     localStorage.setItem('alfa9_pass', newPass);
-    showToast('Password changed successfully!');
+    showToast(t('st_toast_password_changed'));
     setOldPass(''); setNewPass(''); setConfirmPass('');
     setTimeout(() => openView('settings'), 1200);
   };
@@ -214,7 +216,7 @@ function Settings() {
   const sendOTP = () => {
     const em = emailInput.trim();
     if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
-      showToast('Please enter a valid email');
+      showToast(t('st_toast_valid_email'));
       return;
     }
     fetch('/api/send-otp', {
@@ -225,19 +227,19 @@ function Settings() {
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
-          showToast('OTP sent to ' + em);
+          showToast(t('st_toast_otp_sent') + em);
           startOtpTimer(em); // real backend verifies the code, we only persist the cooldown
           setOtpSecs(OTP_COOLDOWN_SECS);
           tickOtpCountdown();
         } else {
-          showToast(data.message || 'Failed to send OTP');
+          showToast(data.message || t('st_toast_otp_failed'));
         }
       })
       .catch(() => {
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         startOtpTimer(em, otp);
         pushOtpNotification(em, otp);
-        showToast('OTP sent — check your notifications');
+        showToast(t('st_toast_otp_check_notifs'));
         setOtpSecs(OTP_COOLDOWN_SECS);
         tickOtpCountdown();
       });
@@ -250,15 +252,15 @@ function Settings() {
     clearInterval(otpTimerRef.current);
     setOtpSecs(0);
     setOtpInput('');
-    showToast('Email bound successfully!');
+    showToast(t('st_toast_email_bound'));
     setTimeout(() => openView('settings'), 1200);
   };
 
   const bindEmail = () => {
     const em = emailInput.trim();
     const otp = otpInput.trim();
-    if (!em) { showToast('Enter your email'); return; }
-    if (!otp || otp.length < 6) { showToast('Enter the 6-digit OTP'); return; }
+    if (!em) { showToast(t('st_toast_enter_email')); return; }
+    if (!otp || otp.length < 6) { showToast(t('st_toast_enter_otp')); return; }
     fetch('/api/verify-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -267,18 +269,18 @@ function Settings() {
       .then((r) => r.json())
       .then((data) => {
         if (data.success) onBindSuccess(em);
-        else showToast(data.message || 'Invalid OTP');
+        else showToast(data.message || t('st_toast_invalid_otp'));
       })
       .catch(() => {
         const store = getOtpStore();
         if (!store || store.email !== em) {
-          showToast('Request a new code for this email');
+          showToast(t('st_toast_request_new_code'));
         } else if (Date.now() > store.expiry) {
-          showToast('Your code has expired. Request a new one.');
+          showToast(t('st_toast_code_expired'));
         } else if (store.otp === otp) {
           onBindSuccess(em);
         } else {
-          showToast('Invalid OTP. Check code.');
+          showToast(t('st_toast_invalid_otp_check'));
         }
       });
   };
@@ -291,7 +293,7 @@ function Settings() {
             <div className="back-btn" onClick={() => navigate(-1)}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
             </div>
-            <span className="page-title">Settings Center</span>
+            <span className="page-title">{t('st_title')}</span>
             <div className="header-right"></div>
           </div>
 
@@ -302,8 +304,8 @@ function Settings() {
                   <img className="avatar-img" src={avatar} alt="Avatar" onError={(e) => { e.currentTarget.style.background = '#2a1a08'; }} />
                 </div>
                 <div className="avatar-label-col">
-                  <span className="avatar-label">Profile photo</span>
-                  <span className="avatar-hint">Change avatar</span>
+                  <span className="avatar-label">{t('st_profile_photo')}</span>
+                  <span className="avatar-hint">{t('st_change_avatar')}</span>
                 </div>
               </div>
               <div className="row-arrow">
@@ -312,7 +314,7 @@ function Settings() {
             </div>
 
             <div className="info-row" onClick={openNicknameModal}>
-              <span className="info-label">Nickname</span>
+              <span className="info-label">{t('st_nickname')}</span>
               <div className="info-right">
                 <span className="info-value">{nickname}</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
@@ -320,7 +322,7 @@ function Settings() {
             </div>
 
             <div className="info-row" style={{ cursor: 'default' }}>
-              <span className="info-label">UID</span>
+              <span className="info-label">{t('acc_uid')}</span>
               <div className="info-right">
                 <span className="info-value">{uid}</span>
                 <div className="uid-copy-btn" onClick={copyUID}>
@@ -332,7 +334,7 @@ function Settings() {
             </div>
           </div>
 
-          <div className="section-label">Security Information</div>
+          <div className="section-label">{t('st_security_info')}</div>
           <div className="settings-list">
             <div className="set-row" onClick={() => openView('password')}>
               <div className="set-ico lock-ico">
@@ -341,11 +343,11 @@ function Settings() {
                 </svg>
               </div>
               <div className="set-text">
-                <div className="set-name">Login Password</div>
-                <div className="set-sub">Change your account password</div>
+                <div className="set-name">{t('st_login_password')}</div>
+                <div className="set-sub">{t('st_change_password_desc')}</div>
               </div>
               <div className="set-right">
-                <span className="set-badge">Edit</span>
+                <span className="set-badge">{t('st_edit')}</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
               </div>
             </div>
@@ -358,11 +360,11 @@ function Settings() {
                 </svg>
               </div>
               <div className="set-text">
-                <div className="set-name">Bind Mailbox</div>
-                <div className="set-sub">{email || 'Bind your email for security'}</div>
+                <div className="set-name">{t('st_bind_mailbox')}</div>
+                <div className="set-sub">{email || t('st_bind_email_desc')}</div>
               </div>
               <div className="set-right">
-                <span className={`set-badge${email ? ' bound' : ' bind'}`}>{email ? 'Bound' : 'To Bind'}</span>
+                <span className={`set-badge${email ? ' bound' : ' bind'}`}>{email ? t('st_bound') : t('st_to_bind')}</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
               </div>
             </div>
@@ -374,8 +376,8 @@ function Settings() {
                 </svg>
               </div>
               <div className="set-text">
-                <div className="set-name">App Version</div>
-                <div className="set-sub">Current version</div>
+                <div className="set-name">{t('st_app_version')}</div>
+                <div className="set-sub">{t('st_current_version')}</div>
               </div>
               <div className="set-right">
                 <span className="set-badge ver">v1.0.9</span>
@@ -391,7 +393,7 @@ function Settings() {
             <div className="back-btn" onClick={() => openView('settings')}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
             </div>
-            <span className="page-title">Change Avatar</span>
+            <span className="page-title">{t('st_change_avatar_title')}</span>
             <div className="header-right"></div>
           </div>
 
@@ -415,7 +417,7 @@ function Settings() {
             <div className="back-btn" onClick={() => openView('settings')}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
             </div>
-            <span className="page-title">Change Login Password</span>
+            <span className="page-title">{t('st_change_login_password')}</span>
             <div className="header-right"></div>
           </div>
 
@@ -425,10 +427,10 @@ function Settings() {
                 <div className="form-label-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" style={{ position: 'relative', zIndex: 2 }}><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                 </div>
-                <span className="form-label-text">Login Password</span>
+                <span className="form-label-text">{t('st_login_password')}</span>
               </div>
               <div className="form-input-wrap">
-                <input className="form-input" type={oldPassVisible ? 'text' : 'password'} placeholder="Enter current password" value={oldPass} onChange={(e) => setOldPass(e.target.value)} />
+                <input className="form-input" type={oldPassVisible ? 'text' : 'password'} placeholder={t('st_current_password_placeholder')} value={oldPass} onChange={(e) => setOldPass(e.target.value)} />
                 <button className="eye-btn" onClick={() => setOldPassVisible((v) => !v)}>{oldPassVisible ? EYE_OPEN : EYE_CLOSED}</button>
               </div>
             </div>
@@ -438,10 +440,10 @@ function Settings() {
                 <div className="form-label-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" style={{ position: 'relative', zIndex: 2 }}><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                 </div>
-                <span className="form-label-text">New Login Password</span>
+                <span className="form-label-text">{t('st_new_login_password')}</span>
               </div>
               <div className="form-input-wrap">
-                <input className="form-input" type={newPassVisible ? 'text' : 'password'} placeholder="Enter new password" value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+                <input className="form-input" type={newPassVisible ? 'text' : 'password'} placeholder={t('st_new_password_placeholder')} value={newPass} onChange={(e) => setNewPass(e.target.value)} />
                 <button className="eye-btn" onClick={() => setNewPassVisible((v) => !v)}>{newPassVisible ? EYE_OPEN : EYE_CLOSED}</button>
               </div>
             </div>
@@ -451,17 +453,17 @@ function Settings() {
                 <div className="form-label-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" style={{ position: 'relative', zIndex: 2 }}><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                 </div>
-                <span className="form-label-text">Confirm New Password</span>
+                <span className="form-label-text">{t('st_confirm_new_password')}</span>
               </div>
               <div className="form-input-wrap">
-                <input className="form-input" type={confirmPassVisible ? 'text' : 'password'} placeholder="Confirm new password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} />
+                <input className="form-input" type={confirmPassVisible ? 'text' : 'password'} placeholder={t('st_confirm_password_placeholder')} value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} />
                 <button className="eye-btn" onClick={() => setConfirmPassVisible((v) => !v)}>{confirmPassVisible ? EYE_OPEN : EYE_CLOSED}</button>
               </div>
             </div>
 
-            <div className="forgot-link">Forgot original login password &rsaquo;</div>
+            <div className="forgot-link">{t('st_forgot_password')}</div>
 
-            <button className="primary-btn" onClick={savePassword}>Save Changes</button>
+            <button className="primary-btn" onClick={savePassword}>{t('st_save_changes')}</button>
           </div>
         </div>
       )}
@@ -472,7 +474,7 @@ function Settings() {
             <div className="back-btn" onClick={() => openView('settings')}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
             </div>
-            <span className="page-title">Bind Mailbox</span>
+            <span className="page-title">{t('st_bind_mailbox')}</span>
             <div className="header-right"></div>
           </div>
 
@@ -485,10 +487,10 @@ function Settings() {
                     <polyline points="22,6 12,13 2,6" />
                   </svg>
                 </div>
-                <span className="form-label-text">Mail</span>
+                <span className="form-label-text">{t('st_mail')}</span>
               </div>
               <div className="form-input-wrap">
-                <input className="form-input" type="email" placeholder="Please input your email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
+                <input className="form-input" type="email" placeholder={t('st_email_placeholder')} value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
               </div>
             </div>
 
@@ -499,18 +501,18 @@ function Settings() {
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   </svg>
                 </div>
-                <span className="form-label-text">Verification Code</span>
+                <span className="form-label-text">{t('st_verification_code')}</span>
               </div>
               <div className="form-input-wrap">
-                <input className="form-input" type="number" placeholder="Please enter the confirmation code" maxLength={6} value={otpInput} onChange={(e) => setOtpInput(e.target.value)} />
-                <button className="send-otp-btn" disabled={otpSecs > 0} onClick={sendOTP}>{otpSecs > 0 ? `${otpSecs}s` : 'Send'}</button>
+                <input className="form-input" type="number" placeholder={t('st_otp_placeholder')} maxLength={6} value={otpInput} onChange={(e) => setOtpInput(e.target.value)} />
+                <button className="send-otp-btn" disabled={otpSecs > 0} onClick={sendOTP}>{otpSecs > 0 ? `${otpSecs}s` : t('st_send')}</button>
               </div>
               {otpSecs <= 0 && getOtpStore() && (
-                <div className="otp-status">Your code has expired. Tap Send to get a new one.</div>
+                <div className="otp-status">{t('st_otp_expired')}</div>
               )}
             </div>
 
-            <button className="primary-btn" onClick={bindEmail}>Bind</button>
+            <button className="primary-btn" onClick={bindEmail}>{t('st_bind')}</button>
           </div>
         </div>
       )}
@@ -521,17 +523,17 @@ function Settings() {
             <div className="modal-handle"></div>
             <div className="modal-title-row">
               <div className="modal-line"></div>
-              <span className="modal-title">Change Nickname</span>
+              <span className="modal-title">{t('st_change_nickname')}</span>
               <div className="modal-line right"></div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               <div style={{ width: 26, height: 26, borderRadius: 8, background: 'linear-gradient(135deg,var(--gold-dark),var(--gold))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
               </div>
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>Nickname</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>{t('st_nickname')}</span>
             </div>
-            <input className="modal-input" type="text" placeholder="Enter new nickname" maxLength={20} value={nicknameInput} onChange={(e) => setNicknameInput(e.target.value)} />
-            <button className="modal-confirm-btn" onClick={confirmNickname}>Confirm</button>
+            <input className="modal-input" type="text" placeholder={t('st_new_nickname_placeholder')} maxLength={20} value={nicknameInput} onChange={(e) => setNicknameInput(e.target.value)} />
+            <button className="modal-confirm-btn" onClick={confirmNickname}>{t('confirm')}</button>
           </div>
         </div>
       )}

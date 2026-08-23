@@ -1,15 +1,17 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './WithdrawHistory.css';
 
-const STATUS_LABELS = { all: 'All', pending: 'Pending', completed: 'Completed', rejected: 'Failed' };
+const STATUS_KEYS = { all: 'hist_all', pending: 'hist_pending', completed: 'hist_completed', rejected: 'hist_failed' };
 
 // Backend status values ('pending' | 'approved' | 'rejected') -> the labels this page uses
 const BACKEND_STATUS_MAP = { pending: 'pending', approved: 'completed', rejected: 'rejected' };
 
 function WithdrawHistory() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [methodFilter, setMethodFilter] = useState('all');
 
@@ -117,7 +119,7 @@ function WithdrawHistory() {
   };
 
   const dateLabel = (() => {
-    if (!selDate) return 'Choose a date';
+    if (!selDate) return t('hist_choose_date');
     const [sy, sm, sd] = selDate.start.split('-');
     let label = `${sy}/${parseInt(sm, 10)}/${parseInt(sd, 10)}`;
     if (selDate.end && selDate.end !== selDate.start) {
@@ -168,14 +170,14 @@ function WithdrawHistory() {
         <button className="header-back" onClick={() => navigate(-1)}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
         </button>
-        <span className="header-title">Withdrawal History</span>
+        <span className="header-title">{t('wd_history_title')}</span>
         <div style={{ width: 36 }}></div>
       </div>
 
       <div className="history-filter-row">
         <div className={`filter-chip${methodFilter === 'all' ? ' active' : ''}`} onClick={() => setMethodFilter('all')}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
-          All
+          {t('hist_all')}
         </div>
         <div className={`filter-chip${methodFilter === 'Easypaisa' ? ' active' : ''}`} onClick={() => setMethodFilter('Easypaisa')}>
           <img src="/image/Easypaisa.png" alt="Easypaisa" />
@@ -189,7 +191,7 @@ function WithdrawHistory() {
 
       <div className="history-controls">
         <button className={`dropdown-btn${selectedStatus !== 'all' ? ' active-filter' : ''}`} onClick={openStatusSheet}>
-          <span className="dropdown-btn-text">{STATUS_LABELS[selectedStatus]}</span>
+          <span className="dropdown-btn-text">{t(STATUS_KEYS[selectedStatus])}</span>
           <svg className="dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
         </button>
         <button className={`dropdown-btn${selDate ? ' active-filter' : ''}`} onClick={openCalendar} style={{ position: 'relative' }}>
@@ -216,11 +218,11 @@ function WithdrawHistory() {
                       <img src={isJC ? '/image/Jazzcash.png' : '/image/Easypaisa.png'} alt={isJC ? 'JC' : 'EP'} />
                     </div>
                     <div className="tx-info">
-                      <div className="tx-name">{tx.method || 'Withdraw'}</div>
+                      <div className="tx-name">{tx.method || t('acc_withdraw')}</div>
                       <div className="tx-time">{tx.time}</div>
-                      {tx.orderNumber && <div className="tx-order">Order: {tx.orderNumber}</div>}
-                      {tx.remarks && <div className="tx-order">Remarks: {tx.remarks}</div>}
-                      <span className={`tx-status ${statusKey}`}>{STATUS_LABELS[statusKey] || 'Pending'}</span>
+                      {tx.orderNumber && <div className="tx-order">{t('wd_order')}: {tx.orderNumber}</div>}
+                      {tx.remarks && <div className="tx-order">{t('wd_remarks')}: {tx.remarks}</div>}
+                      <span className={`tx-status ${statusKey}`}>{t(STATUS_KEYS[statusKey] || 'hist_pending')}</span>
                     </div>
                     <div className="tx-amount">-Rs{parseFloat(tx.amount || 0).toFixed(2)}</div>
                   </div>
@@ -237,9 +239,9 @@ function WithdrawHistory() {
               <polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="12" y2="17" />
             </svg>
           </div>
-          <div className="empty-title">No History Found</div>
-          <p className="empty-desc">Abhi tak koi withdrawal nahi ki. Jab aap withdraw karenge yahan data show hoga.</p>
-          <button className="empty-action-btn" onClick={() => navigate('/account/withdraw')}>Go to Withdraw</button>
+          <div className="empty-title">{t('hist_no_history_found')}</div>
+          <p className="empty-desc">{t('wd_history_empty_desc')}</p>
+          <button className="empty-action-btn" onClick={() => navigate('/account/withdraw')}>{t('wd_go_to_withdraw')}</button>
         </div>
       )}
 
@@ -248,13 +250,13 @@ function WithdrawHistory() {
           <div className="status-sheet">
             <div className="modal-handle"></div>
             <div className="status-sheet-topbar">
-              <button className="status-cancel-btn" onClick={() => setStatusSheetOpen(false)}>Cancel</button>
-              <button className="status-confirm-btn" onClick={confirmStatus}>Confirm</button>
+              <button className="status-cancel-btn" onClick={() => setStatusSheetOpen(false)}>{t('hist_cancel')}</button>
+              <button className="status-confirm-btn" onClick={confirmStatus}>{t('hist_confirm')}</button>
             </div>
             <div className="status-options">
               {Object.entries(STATUS_LABELS).map(([val, label]) => (
                 <button key={val} className={`status-option${pendingStatus === val ? ' selected' : ''}`} onClick={() => setPendingStatus(val)}>
-                  {label}
+                  {t(STATUS_KEYS[val])}
                 </button>
               ))}
             </div>
@@ -266,7 +268,7 @@ function WithdrawHistory() {
         <div className="cal-overlay show" onClick={(e) => { if (e.target === e.currentTarget) setCalOpen(false); }}>
           <div className="cal-modal">
             <div className="cal-header">
-              <span className="cal-title">Calendar</span>
+              <span className="cal-title">{t('hist_calendar')}</span>
               <div className="cal-close-btn" onClick={() => setCalOpen(false)}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
               </div>
@@ -287,7 +289,7 @@ function WithdrawHistory() {
               <div className="cal-weekday">Sat</div>
             </div>
             <div className="cal-days">{renderCalDays()}</div>
-            <button className="cal-confirm-btn" onClick={confirmDateRange}>Confirm</button>
+            <button className="cal-confirm-btn" onClick={confirmDateRange}>{t('hist_confirm')}</button>
           </div>
         </div>
       )}

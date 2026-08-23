@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './Withdraw.css';
 
 const GATEWAYS = ['Easypaisa', 'JazzCash'];
@@ -10,9 +11,9 @@ const GATEWAY_LOGOS = {
 };
 
 const STATUS_OPTIONS = [
-  { val: 'all', label: 'All' },
-  { val: 'pending', label: 'Pending' },
-  { val: 'completed', label: 'Completed' },
+  { val: 'all', labelKey: 'hist_all' },
+  { val: 'pending', labelKey: 'hist_pending' },
+  { val: 'completed', labelKey: 'hist_completed' },
 ];
 
 // Default shape before the real (per-user) accounts load from the backend.
@@ -26,6 +27,7 @@ function loadAccounts() {
 
 function Withdraw() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [view, setView] = useState('main'); // 'main' | 'history'
   const [currentGateway, setCurrentGateway] = useState('Easypaisa');
@@ -103,7 +105,7 @@ function Withdraw() {
   const [calMonth, setCalMonth] = useState(now.getMonth());
   const [calStart, setCalStart] = useState(null);
   const [calEnd, setCalEnd] = useState(null);
-  const [dateLabel, setDateLabel] = useState('Choose a date');
+  const [dateLabel, setDateLabel] = useState('');
 
   const [toast, setToast] = useState({ msg: '', type: '', show: false });
   const toastTimerRef = useRef(null);
@@ -153,14 +155,14 @@ function Withdraw() {
   const GATEWAY_TO_METHOD = { JazzCash: 'jazzcash', Easypaisa: 'easypaisa' };
 
   const executeWithdraw = async () => {
-    if (!acc) { showToast(`Pehle apna ${currentGateway} account add karein!`, 'error'); return; }
+    if (!acc) { showToast(t('wd_toast_add_account_first').replace('{gw}', currentGateway), 'error'); return; }
     const amount = parseInt(withdrawInput, 10);
-    if (!amount || amount < 500) { showToast('Minimum withdrawal Rs500 hai.', 'error'); return; }
-    if (amount > 50000) { showToast('Maximum withdrawal Rs50,000 hai.', 'error'); return; }
-    if (amount > balance) { showToast('Insufficient balance!', 'error'); return; }
+    if (!amount || amount < 500) { showToast(t('wd_toast_min'), 'error'); return; }
+    if (amount > 50000) { showToast(t('wd_toast_max'), 'error'); return; }
+    if (amount > balance) { showToast(t('wd_toast_insufficient'), 'error'); return; }
     const methodRemaining = turnover.dailyLimits?.[GATEWAY_TO_METHOD[currentGateway]]?.remaining;
     if (methodRemaining !== undefined && methodRemaining <= 0) {
-      showToast(`Aaj ${currentGateway} se withdrawal limit khatam ho chuki hai. Raat 12 baje reset hogi.`, 'error');
+      showToast(t('wd_toast_limit_reached').replace('{gw}', currentGateway), 'error');
       return;
     }
 
@@ -195,7 +197,7 @@ function Withdraw() {
         }
       });
 
-      showToast('🎉 Withdrawal request submit ho gayi! Processing mein hai.');
+      showToast(t('wd_toast_submitted'));
       setWithdrawInput('');
       setConfirmPinOpen(false);
       // Backend already deducted the balance — reflect it immediately
@@ -203,7 +205,7 @@ function Withdraw() {
       localStorage.setItem('alfa9_balance', String(data.remainingBalance));
       fetchTurnoverStatus(); // refresh the "remaining today" count
     } catch (err) {
-      setConfirmPinError(err.message || 'Withdrawal request failed. Try again.');
+      setConfirmPinError(err.message || t('wd_toast_failed'));
     } finally {
       setSubmittingWithdraw(false);
     }
@@ -211,8 +213,8 @@ function Withdraw() {
 
   // Sets the fund password for the first time, then immediately proceeds with the withdrawal
   const saveFundPasswordAndWithdraw = async () => {
-    if (!/^\d{6}$/.test(pinDraft)) { setPinError('PIN must be exactly 6 digits'); return; }
-    if (pinDraft !== pinConfirmDraft) { setPinError('PINs do not match'); return; }
+    if (!/^\d{6}$/.test(pinDraft)) { setPinError(t('wd_pin_must_6')); return; }
+    if (pinDraft !== pinConfirmDraft) { setPinError(t('wd_pin_mismatch')); return; }
 
     setPinSaving(true);
     setPinError('');
@@ -220,10 +222,10 @@ function Withdraw() {
       await apiFetch('/safe/set-password', { method: 'POST', body: { pin: pinDraft } });
       setHasFundPassword(true);
       setPinModalOpen(false);
-      showToast('Fund password set! Ab withdrawal submit ho rahi hai...');
+      showToast(t('wd_toast_pin_set'));
       await submitWithdrawWithPin(pinDraft);
     } catch (err) {
-      setPinError(err.message || 'Could not set fund password');
+      setPinError(err.message || t('wd_toast_pin_error'));
     } finally {
       setPinSaving(false);
     }
@@ -240,8 +242,8 @@ function Withdraw() {
   const saveAccount = async () => {
     const name = modalFullName.trim();
     const number = modalAccountNum.trim();
-    if (!name) { showToast('Apna naam darj karein.', 'error'); return; }
-    if (!number || number.length < 10) { showToast('Valid account number darj karein.', 'error'); return; }
+    if (!name) { showToast(t('wd_toast_enter_name'), 'error'); return; }
+    if (!number || number.length < 10) { showToast(t('wd_toast_enter_valid_number'), 'error'); return; }
     try {
       await apiFetch('/user/withdraw-accounts', {
         method: 'POST',
@@ -250,10 +252,10 @@ function Withdraw() {
       const data = { name, number };
       setAccounts((prev) => ({ ...prev, [modalGateway]: data }));
       setAddModalOpen(false);
-      showToast('Account saved successfully!');
+      showToast(t('wd_toast_account_saved'));
       if (modalGateway !== currentGateway) setCurrentGateway(modalGateway);
     } catch (err) {
-      showToast(err.message || 'Could not save account', 'error');
+      showToast(err.message || t('wd_toast_save_failed'), 'error');
     }
   };
 
@@ -265,7 +267,7 @@ function Withdraw() {
     setSelectedStatus(pendingStatus);
     setStatusSheetOpen(false);
   };
-  const statusLabel = STATUS_OPTIONS.find((s) => s.val === selectedStatus)?.label || 'All';
+  const statusLabel = t(STATUS_OPTIONS.find((s) => s.val === selectedStatus)?.labelKey || 'hist_all');
 
   const openCalendar = () => setCalOpen(true);
 
@@ -298,6 +300,7 @@ function Withdraw() {
   const confirmDateRange = () => {
     if (!calStart) { setCalOpen(false); return; }
     const fmt = (o) => `${o.y}/${o.m + 1}/${o.d}`;
+
     let label = fmt(calStart);
     if (calEnd && (calEnd.d !== calStart.d || calEnd.m !== calStart.m || calEnd.y !== calStart.y)) {
       label += ' – ' + fmt(calEnd);
@@ -360,10 +363,10 @@ function Withdraw() {
             <button className="header-back" onClick={() => navigate(-1)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             </button>
-            <span className="header-title">Withdraw</span>
+            <span className="header-title">{t('acc_withdraw')}</span>
             <button className="header-right-btn" onClick={() => navigate('/account/withdraw-history')}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
-              History
+              {t('dep_history_btn')}
             </button>
           </div>
 
@@ -377,7 +380,7 @@ function Withdraw() {
                   <path d="M2 10h20" stroke="rgba(180,110,0,0.5)" strokeWidth="1.5" />
                 </svg>
               </div>
-              <span className="balance-label-text">Available Balance</span>
+              <span className="balance-label-text">{t('wd_available_balance')}</span>
             </div>
             <div className="balance-amount-row">
               <span className="balance-amount">Rs{balance.toFixed(2)}</span>
@@ -390,7 +393,7 @@ function Withdraw() {
             </div>
           </div>
 
-          <div className="section-title">1. Select Payment Method</div>
+          <div className="section-title">{t('wd_select_payment_method')}</div>
           <div className="gateway-tabs">
             {GATEWAYS.map((g) => (
               <div
@@ -404,7 +407,7 @@ function Withdraw() {
             ))}
           </div>
 
-          <div className="section-title">2. Payment Account</div>
+          <div className="section-title">{t('wd_payment_account')}</div>
 
           {acc ? (
             <div className="saved-account-card">
@@ -423,7 +426,7 @@ function Withdraw() {
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C9971F" strokeWidth="2.5" strokeLinecap="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                Locked
+                {t('wd_locked')}
               </div>
             </div>
           ) : (
@@ -433,33 +436,33 @@ function Withdraw() {
                   <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
               </div>
-              <span className="add-account-text">Add payment account</span>
+              <span className="add-account-text">{t('wd_add_payment_account')}</span>
             </div>
           )}
 
-          <div className="section-title">3. Withdraw Amount</div>
+          <div className="section-title">{t('wd_withdraw_amount')}</div>
           <div className="amount-input-section">
             <div className="amount-input-wrap">
               <span className="currency-label">PKR</span>
               <input
                 type="number"
-                placeholder="Enter amount (Min Rs500)"
+                placeholder={t('wd_enter_amount_placeholder')}
                 min="500"
                 max="50000"
                 value={withdrawInput}
                 onChange={(e) => setWithdrawInput(e.target.value)}
               />
-              <button className="all-btn" onClick={setAllAmount}>All</button>
+              <button className="all-btn" onClick={setAllAmount}>{t('all')}</button>
             </div>
           </div>
           <div className="withdrawable-info">
-            <div className="withdrawable-left">Withdrawable balance: <span>Rs{balance.toFixed(2)}</span></div>
-            <div className="withdrawable-right">Received: <span>Rs0.00</span></div>
+            <div className="withdrawable-left">{t('wd_withdrawable_balance')} <span>Rs{balance.toFixed(2)}</span></div>
+            <div className="withdrawable-right">{t('wd_received')} <span>Rs0.00</span></div>
           </div>
 
           <button className="withdraw-btn" onClick={executeWithdraw} disabled={submittingWithdraw}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><polyline points="5 12 12 19 19 12" /></svg>
-            {submittingWithdraw ? 'SUBMITTING...' : 'WITHDRAW'}
+            {submittingWithdraw ? t('dep_submitting') : t('wd_withdraw_btn')}
           </button>
 
           <div className="rules-card">
@@ -467,14 +470,14 @@ function Withdraw() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9971F" strokeWidth="2" strokeLinecap="round">
                 <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
-              Withdrawal Rules
+              {t('wd_rules_title')}
             </div>
-            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">Need to bet <strong>Rs{turnover.remaining.toFixed(2)}</strong> to be able to withdraw</div></div>
-            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">Withdraw time: <strong>00:00 – 23:59</strong></div></div>
-            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">Today remaining withdrawal times ({currentGateway}): <strong>{turnover.dailyLimits?.[GATEWAY_TO_METHOD[currentGateway]]?.remaining ?? 3}</strong> / {turnover.dailyLimits?.[GATEWAY_TO_METHOD[currentGateway]]?.max ?? 3}</div></div>
-            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">Withdrawal amount range: <strong>Rs500 – Rs50,000</strong></div></div>
-            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">Please confirm your account information before withdrawing. Incorrect information — company will not be liable for loss.</div></div>
-            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">If your account info is incorrect, contact <strong>customer service</strong> immediately.</div></div>
+            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_bet_1')} <strong>Rs{turnover.remaining.toFixed(2)}</strong> {t('wd_rule_bet_2')}</div></div>
+            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_time')} <strong>00:00 \u2013 23:59</strong></div></div>
+            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_remaining_1')} ({currentGateway}): <strong>{turnover.dailyLimits?.[GATEWAY_TO_METHOD[currentGateway]]?.remaining ?? 3}</strong> / {turnover.dailyLimits?.[GATEWAY_TO_METHOD[currentGateway]]?.max ?? 3}</div></div>
+            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_range')} <strong>Rs500 \u2013 Rs50,000</strong></div></div>
+            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_confirm_info')}</div></div>
+            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_contact_1')} <strong>{t('wd_rule_contact_2')}</strong> {t('wd_rule_contact_3')}</div></div>
           </div>
 
           <div className="history-section-heading">
@@ -484,7 +487,7 @@ function Withdraw() {
                 <polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="12" y2="17" />
               </svg>
             </div>
-            <span>Withdrawal history</span>
+            <span>{t('wd_history_section')}</span>
           </div>
 
           <div className="mini-history-card">
@@ -496,10 +499,10 @@ function Withdraw() {
               <circle cx="58" cy="42" r="14" fill="#3a2a10" />
               <path d="M52 42h12M58 36v12" stroke="#5A4020" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <div className="mini-history-text">Koi transaction nahi mili</div>
+            <div className="mini-history-text">{t('wd_no_transactions')}</div>
             <button className="all-history-btn" onClick={() => navigate('/account/withdraw-history')}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
-              All history
+              {t('wd_all_history')}
             </button>
           </div>
         </div>
@@ -515,7 +518,7 @@ function Withdraw() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                Add Payment Account
+                {t('wd_add_account_modal_title')}
               </div>
               <div className="modal-close" onClick={() => setAddModalOpen(false)}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round">
@@ -532,7 +535,7 @@ function Withdraw() {
                     key={g}
                     className={`method-pill${modalGateway === g ? ' active' : ''}${isLocked ? ' disabled' : ''}`}
                     onClick={() => { if (!isLocked) setModalGateway(g); }}
-                    title={isLocked ? `${g} account already set — locked` : ''}
+                    title={isLocked ? t('wd_locked_tooltip').replace('{gw}', g) : ''}
                   >
                     <img src={GATEWAY_LOGOS[g]} alt={g} onError={(e) => { e.target.style.display = 'none'; }} />
                     <span className="method-pill-name">{g.toUpperCase()}</span>
@@ -543,17 +546,17 @@ function Withdraw() {
             </div>
 
             <div className="modal-field">
-              <label>Full Name</label>
-              <input className="modal-input" type="text" placeholder="Enter your full name" value={modalFullName} onChange={(e) => setModalFullName(e.target.value)} />
+              <label>{t('wd_full_name')}</label>
+              <input className="modal-input" type="text" placeholder={t('wd_full_name_placeholder')} value={modalFullName} onChange={(e) => setModalFullName(e.target.value)} />
             </div>
             <div className="modal-field">
-              <label>Account Number</label>
+              <label>{t('dep_account_number')}</label>
               <input className="modal-input" type="tel" placeholder="03XXXXXXXXX" value={modalAccountNum} onChange={(e) => setModalAccountNum(e.target.value)} />
             </div>
 
             <button className="modal-save-btn" onClick={saveAccount}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-              SAVE ACCOUNT
+              {t('wd_save_account')}
             </button>
           </div>
         </div>
@@ -565,8 +568,8 @@ function Withdraw() {
           <div className="status-sheet">
             <div className="modal-handle"></div>
             <div className="status-sheet-topbar">
-              <button className="status-cancel-btn" onClick={() => setStatusSheetOpen(false)}>Cancel</button>
-              <button className="status-confirm-btn" onClick={confirmStatus}>Confirm</button>
+              <button className="status-cancel-btn" onClick={() => setStatusSheetOpen(false)}>{t('hist_cancel')}</button>
+              <button className="status-confirm-btn" onClick={confirmStatus}>{t('hist_confirm')}</button>
             </div>
             <div className="status-options">
               {STATUS_OPTIONS.map((s) => (
@@ -575,7 +578,7 @@ function Withdraw() {
                   className={`status-option${pendingStatus === s.val ? ' selected' : ''}`}
                   onClick={() => setPendingStatus(s.val)}
                 >
-                  {s.label}
+                  {t(s.labelKey)}
                 </button>
               ))}
             </div>
@@ -588,7 +591,7 @@ function Withdraw() {
         <div className="cal-overlay show" onClick={(e) => { if (e.target === e.currentTarget) setCalOpen(false); }}>
           <div className="cal-modal">
             <div className="cal-header">
-              <span className="cal-title">Calendar</span>
+              <span className="cal-title">{t('hist_calendar')}</span>
               <div className="cal-close-btn" onClick={() => setCalOpen(false)}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -605,15 +608,15 @@ function Withdraw() {
               </button>
             </div>
             <div className="cal-weekdays">
-              <div className="cal-weekday">Sun</div><div className="cal-weekday">Mon</div>
-              <div className="cal-weekday">Tue</div><div className="cal-weekday">Wed</div>
-              <div className="cal-weekday">Thu</div><div className="cal-weekday">Fri</div>
-              <div className="cal-weekday">Sat</div>
+              <div className="cal-weekday">{t('wd_sun')}</div><div className="cal-weekday">{t('wd_mon')}</div>
+              <div className="cal-weekday">{t('wd_tue')}</div><div className="cal-weekday">{t('wd_wed')}</div>
+              <div className="cal-weekday">{t('wd_thu')}</div><div className="cal-weekday">{t('wd_fri')}</div>
+              <div className="cal-weekday">{t('wd_sat')}</div>
             </div>
             <div className="cal-days">{renderCalDays()}</div>
             <button className="cal-confirm-btn" onClick={confirmDateRange}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-              Confirm
+              {t('hist_confirm')}
             </button>
           </div>
         </div>
@@ -629,7 +632,7 @@ function Withdraw() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                Set Fund Password
+                {t('wd_set_fund_password')}
               </div>
               <div className="modal-close" onClick={() => setPinModalOpen(false)}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round">
@@ -638,10 +641,10 @@ function Withdraw() {
               </div>
             </div>
             <p style={{ color: '#8B7355', fontSize: 13, margin: '0 0 14px' }}>
-              6-digit PIN banao — yeh har withdrawal pe apni identity confirm karne ke liye chahiye hoga.
+              {t('wd_pin_setup_desc')}
             </p>
             <div className="modal-field">
-              <label>6-digit PIN</label>
+              <label>{t('wd_pin_label')}</label>
               <input
                 className="modal-input"
                 type="password"
@@ -653,7 +656,7 @@ function Withdraw() {
               />
             </div>
             <div className="modal-field">
-              <label>Confirm PIN</label>
+              <label>{t('wd_confirm_pin_label')}</label>
               <input
                 className="modal-input"
                 type="password"
@@ -666,7 +669,7 @@ function Withdraw() {
             </div>
             {pinError && <div style={{ color: '#e05252', fontSize: 12.5, marginBottom: 10 }}>{pinError}</div>}
             <button className="modal-save-btn" disabled={pinSaving} onClick={saveFundPasswordAndWithdraw}>
-              {pinSaving ? 'Saving...' : 'Set PIN & Withdraw'}
+              {pinSaving ? t('wd_saving') : t('wd_set_pin_withdraw')}
             </button>
           </div>
         </div>
@@ -682,7 +685,7 @@ function Withdraw() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                Enter Fund Password
+                {t('wd_enter_fund_password')}
               </div>
               <div className="modal-close" onClick={() => setConfirmPinOpen(false)}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round">
@@ -691,7 +694,7 @@ function Withdraw() {
               </div>
             </div>
             <div className="modal-field">
-              <label>6-digit PIN</label>
+              <label>{t('wd_pin_label')}</label>
               <input
                 className="modal-input"
                 type="password"
@@ -709,7 +712,7 @@ function Withdraw() {
               disabled={submittingWithdraw || confirmPinValue.length !== 6}
               onClick={() => submitWithdrawWithPin(confirmPinValue)}
             >
-              {submittingWithdraw ? 'Submitting...' : 'Confirm Withdrawal'}
+              {submittingWithdraw ? t('wd_submitting_dots') : t('wd_confirm_withdrawal')}
             </button>
           </div>
         </div>

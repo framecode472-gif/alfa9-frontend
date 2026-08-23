@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './GameHistory.css';
 
 const ICON_GRID = (
@@ -77,6 +78,7 @@ const TAB_DATA = {
 const TAB_ORDER = ['lottery', 'casino', 'fishing', 'rummy', 'original', 'slots'];
 
 function GameHistory() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState('lottery');
   const [selectedGame, setSelectedGame] = useState(() => {
@@ -158,7 +160,7 @@ function GameHistory() {
   const selectGame = (g) => {
     setSelectedGame((prev) => ({ ...prev, [currentTab]: g.id }));
     setGameSheetOpen(false);
-    showToast(g.label + ' selected');
+    showToast(g.label + ' ' + t('gh_selected'));
   };
 
   const openDateFilter = () => setDateSheetOpen(true);
@@ -238,7 +240,7 @@ function GameHistory() {
       <div className="content-area">
         {betsLoading ? (
           <div className="empty-state">
-            <div className="empty-text">Loading…</div>
+            <div className="empty-text">{t('gh_loading')}</div>
           </div>
         ) : bets.length > 0 ? (
           <>
@@ -250,7 +252,7 @@ function GameHistory() {
                 return (
                   <div className={`hist-card${isOpen ? ' open' : ''}`} key={b.id}>
                     <div className="hist-row" onClick={() => toggleBetDetail(b.id, b.game)}>
-                      <div className={`hist-badge ${won ? 'win' : 'lose'}`}>{won ? 'Win' : 'Loss'}</div>
+                      <div className={`hist-badge ${won ? 'win' : 'lose'}`}>{won ? t('gh_win') : t('gh_loss')}</div>
                       <div className="hist-row-main">
                         <div className="hist-row-period">{b.game?.toUpperCase()} · {b.period}</div>
                         <div className="hist-row-date">{new Date(b.createdAt).toLocaleString()}</div>
@@ -263,17 +265,17 @@ function GameHistory() {
                     {isOpen && (
                       <div className="hist-detail">
                         {detailLoadingId === b.id ? (
-                          <div className="hist-detail-loading">Loading…</div>
+                          <div className="hist-detail-loading">{t('gh_loading')}</div>
                         ) : detail && !detail.error ? (
                           <>
-                            <div className="hist-detail-row"><span>Type</span><span>{b.game?.toUpperCase()} {b.duration}</span></div>
-                            <div className="hist-detail-row"><span>Period</span><span>{detail.period}</span></div>
-                            <div className="hist-detail-row"><span>Order number</span><span className="mono">{detail.orderNumber}</span></div>
-                            <div className="hist-detail-row"><span>Select</span><span style={{ textTransform: 'capitalize' }}>{detail.select?.value}</span></div>
-                            <div className="hist-detail-row"><span>Total bet</span><span>Rs{detail.purchaseAmount?.toFixed(2)}</span></div>
+                            <div className="hist-detail-row"><span>{t('gh_type')}</span><span>{b.game?.toUpperCase()} {b.duration}</span></div>
+                            <div className="hist-detail-row"><span>{t('gh_period')}</span><span>{detail.period}</span></div>
+                            <div className="hist-detail-row"><span>{t('gh_order_number')}</span><span className="mono">{detail.orderNumber}</span></div>
+                            <div className="hist-detail-row"><span>{t('gh_select')}</span><span style={{ textTransform: 'capitalize' }}>{detail.select?.value}</span></div>
+                            <div className="hist-detail-row"><span>{t('gh_total_bet')}</span><span>Rs{detail.purchaseAmount?.toFixed(2)}</span></div>
                             {detail.result && (
                               <div className="hist-detail-result">
-                                <span className="hist-detail-result-label">Lottery results</span>
+                                <span className="hist-detail-result-label">{t('gh_lottery_results')}</span>
                                 <span className="hist-detail-result-value">
                                   {detail.result.digits ? detail.result.digits.join(' ')
                                     : detail.result.dice ? detail.result.dice.join(' ')
@@ -285,19 +287,19 @@ function GameHistory() {
                             )}
                             <div className="hist-detail-grid">
                               <div className="hist-detail-box">
-                                <div className="hist-detail-box-label">Actual amount</div>
+                                <div className="hist-detail-box-label">{t('gh_actual_amount')}</div>
                                 <div className="hist-detail-box-value">Rs{detail.amountAfterTax?.toFixed(2)}</div>
                               </div>
                               <div className="hist-detail-box">
-                                <div className="hist-detail-box-label">Winnings</div>
+                                <div className="hist-detail-box-label">{t('gh_winnings')}</div>
                                 <div className="hist-detail-box-value">Rs{Math.max(0, detail.winLose).toFixed(2)}</div>
                               </div>
                               <div className="hist-detail-box">
-                                <div className="hist-detail-box-label">Handling fee</div>
+                                <div className="hist-detail-box-label">{t('gh_handling_fee')}</div>
                                 <div className="hist-detail-box-value">Rs{detail.tax?.toFixed(2)}</div>
                               </div>
                               <div className="hist-detail-box">
-                                <div className="hist-detail-box-label">Profit/loss</div>
+                                <div className="hist-detail-box-label">{t('gh_profit_loss')}</div>
                                 <div className={`hist-detail-box-value ${detail.winLose >= 0 ? 'win' : 'lose'}`}>
                                   {detail.winLose >= 0 ? '+' : ''}Rs{detail.winLose.toFixed(2)}
                                 </div>
@@ -305,7 +307,7 @@ function GameHistory() {
                             </div>
                           </>
                         ) : (
-                          <div className="hist-detail-loading">Could not load details.</div>
+                          <div className="hist-detail-loading">{t('gh_could_not_load')}</div>
                         )}
                       </div>
                     )}
@@ -332,8 +334,8 @@ function GameHistory() {
                 <rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><path d="M7 8h2M7 11h5" />
               </svg>
             </div>
-            <div className="empty-text">No data</div>
-            <div className="empty-sub">No records found for selected filters</div>
+            <div className="empty-text">{t('gh_no_data')}</div>
+            <div className="empty-sub">{t('gh_no_records')}</div>
           </div>
         )}
       </div>
@@ -343,7 +345,7 @@ function GameHistory() {
         <div className="sheet-overlay open" onClick={(e) => { if (e.target === e.currentTarget) setGameSheetOpen(false); }}>
           <div className="bottom-sheet">
             <div className="sheet-handle"></div>
-            <div className="sheet-title">{TAB_DATA[currentTab].label} Games</div>
+            <div className="sheet-title">{TAB_DATA[currentTab].label} {t('gh_games_suffix')}</div>
             <div className="provider-grid">
               {TAB_DATA[currentTab].games.map((g) => (
                 <div

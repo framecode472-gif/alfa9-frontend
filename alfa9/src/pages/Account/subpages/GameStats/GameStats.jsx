@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './GameStats.css';
 
 const GAME_KEYS = ['lottery', 'video', 'slot', 'fish', 'sport', 'chess'];
-const GAME_NAMES = { lottery: 'Lottery', video: 'Video', slot: 'Slot', fish: 'Fish', sport: 'Sport', chess: 'ChessCard' };
+const GAME_NAME_KEYS = { lottery: 'gs_lottery', video: 'gs_video', slot: 'gs_slot', fish: 'gs_fish', sport: 'gs_sport', chess: 'gs_chess' };
 const GAME_ICON_SRC = {
   lottery: '/image/iconLottery.webp',
   video: '/image/iconRealPerson.webp',
@@ -13,7 +14,7 @@ const GAME_ICON_SRC = {
   sport: '/image/iconPhysics.webp',
   chess: '/image/iconChess.webp',
 };
-const PERIOD_LABELS = { today: 'Today', yesterday: 'Yesterday', week: 'This week', month: 'This month' };
+const PERIOD_KEYS = { today: 'gs_today', yesterday: 'gs_yesterday', week: 'gs_this_week', month: 'gs_this_month' };
 const PERIODS = ['today', 'yesterday', 'week', 'month'];
 
 const RING_R = 74;
@@ -48,6 +49,7 @@ function vibrate(ms) {
 
 function GameStats() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [period, setPeriod] = useState('today');
   const [periodStats, setPeriodStats] = useState({});
   const tabsRef = useRef(null);
@@ -126,7 +128,7 @@ function GameStats() {
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </div>
-        <span className="header-title">Game Statistics</span>
+        <span className="header-title">{t('gs_title')}</span>
         <div style={{ width: 36 }}></div>
       </div>
 
@@ -139,15 +141,15 @@ function GameStats() {
             className={`period-tab${period === p ? ' active' : ''}`}
             onClick={(e) => selectPeriod(p, e)}
           >
-            {PERIOD_LABELS[p]}
+            {t(PERIOD_KEYS[p])}
           </button>
         ))}
       </div>
 
       <div className="ring-card">
         <div className="ring-title-row">
-          <span className="ring-title">Bet Distribution</span>
-          <span className="ring-period-echo">{PERIOD_LABELS[period]}</span>
+          <span className="ring-title">{t('gs_bet_distribution')}</span>
+          <span className="ring-period-echo">{t(PERIOD_KEYS[period])}</span>
         </div>
 
         <div className="ring-wrap">
@@ -166,13 +168,13 @@ function GameStats() {
           <div className="ring-center">
             {computed.totalBet > 0 ? (
               <>
-                <div className="ring-total-label">Total Bet</div>
+                <div className="ring-total-label">{t('gs_total_bet')}</div>
                 <div className="ring-total-amount">
                   <span style={{ fontSize: 14, opacity: 0.7 }}>Rs</span>{formatMoney(computed.totalBet)}
                 </div>
               </>
             ) : (
-              <div className="ring-empty-msg show">No games played<br />in this period</div>
+              <div className="ring-empty-msg show">{t('gs_no_games_played')}<br />{t('gs_in_this_period')}</div>
             )}
           </div>
         </div>
@@ -180,7 +182,7 @@ function GameStats() {
         <div className="ring-legend">
           {GAME_KEYS.map((key) => (
             <div className="legend-chip" key={key}>
-              <div className="legend-dot" style={{ background: `var(--c-${key})` }}></div>{GAME_NAMES[key]}
+              <div className="legend-dot" style={{ background: `var(--c-${key})` }}></div>{t(GAME_NAME_KEYS[key])}
             </div>
           ))}
         </div>
@@ -188,16 +190,16 @@ function GameStats() {
         <div className="ring-meta">
           <div className="ring-meta-pill">
             <div className="ring-meta-val">{formatInt(computed.totalBets)}</div>
-            <div className="ring-meta-lbl">Number of Bets</div>
+            <div className="ring-meta-lbl">{t('gs_number_of_bets')}</div>
           </div>
           <div className="ring-meta-pill">
             <div className="ring-meta-val green">{formatMoney(computed.totalWin)}</div>
-            <div className="ring-meta-lbl">Total Winning</div>
+            <div className="ring-meta-lbl">{t('gs_total_winning')}</div>
           </div>
         </div>
       </div>
 
-      <div className="section-title">Games Breakdown</div>
+      <div className="section-title">{t('gs_games_breakdown')}</div>
 
       {GAME_KEYS.map((key, i) => {
         const { bet, count, win } = computed.vals[key];
@@ -209,17 +211,17 @@ function GameStats() {
               <div className={`game-icon ${key}`}><img src={GAME_ICON_SRC[key]} alt={key} /></div>
               <div className="game-name-col">
                 <div className="game-name-row">
-                  <span className="game-name">{GAME_NAMES[key]}</span>
-                  <span className={`top-badge${isTop ? ' show' : ''}`}>★ TOP</span>
+                  <span className="game-name">{t(GAME_NAME_KEYS[key])}</span>
+                  <span className={`top-badge${isTop ? ' show' : ''}`}>{t('gs_top')}</span>
                 </div>
                 <div className="game-share-line">
-                  {computed.totalBet > 0 ? `${(share * 100).toFixed(1)}% of total bets` : 'No bets yet'}
+                  {computed.totalBet > 0 ? `${(share * 100).toFixed(1)}% ${t('gs_of_total_bets')}` : t('gs_no_bets_yet')}
                 </div>
               </div>
               <div className="game-win-badge">
-                <span className="game-win-label">Winning</span>
+                <span className="game-win-label">{t('gs_winning')}</span>
                 <span className="game-win-val">{formatMoney(win)}</span>
-                <span className="game-return">{bet > 0 ? `${((win / bet) * 100).toFixed(1)}% return` : '—'}</span>
+                <span className="game-return">{bet > 0 ? `${((win / bet) * 100).toFixed(1)}% ${t('gs_return')}` : '\u2014'}</span>
               </div>
             </div>
             <div className="share-bar-track">
@@ -228,15 +230,15 @@ function GameStats() {
             <div className="stat-rows">
               <div className="stat-row">
                 <div className="timeline-col"><div className="tl-dot"></div><div className="tl-line"></div></div>
-                <div className="stat-content"><span className="stat-label">Total bet</span><span className="stat-value gold-val">{formatMoney(bet)}</span></div>
+                <div className="stat-content"><span className="stat-label">{t('gs_total_bet_row')}</span><span className="stat-value gold-val">{formatMoney(bet)}</span></div>
               </div>
               <div className="stat-row">
                 <div className="timeline-col"><div className="tl-dot"></div><div className="tl-line"></div></div>
-                <div className="stat-content"><span className="stat-label">Number of bets</span><span className="stat-value">{formatInt(count)}</span></div>
+                <div className="stat-content"><span className="stat-label">{t('gs_number_of_bets_row')}</span><span className="stat-value">{formatInt(count)}</span></div>
               </div>
               <div className="stat-row">
                 <div className="timeline-col"><div className="tl-dot"></div></div>
-                <div className="stat-content"><span className="stat-label">Winning amount</span><span className="stat-value win">{formatMoney(win)}</span></div>
+                <div className="stat-content"><span className="stat-label">{t('gs_winning_amount')}</span><span className="stat-value win">{formatMoney(win)}</span></div>
               </div>
             </div>
           </div>

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './AboutUs.css';
 
 function AboutUs() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [page, setPage] = useState('page-main');
   const [logoError, setLogoError] = useState(false);
   const [confIconError, setConfIconError] = useState(false);
@@ -25,8 +27,8 @@ function AboutUs() {
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </div>
-            <div className="header-title">About Us</div>
-            <div className="header-sub">Alfa9 — Pakistan's Premier Gaming Platform</div>
+            <div className="header-title">{t('au_title')}</div>
+            <div className="header-sub">{t('au_subtitle')}</div>
           </div>
 
           {/* Hero Banner */}
@@ -36,10 +38,10 @@ function AboutUs() {
                 <img src="/image/ultraalf9.png" alt="Alfa9" onError={() => setLogoError(true)} />
               )}
             </div>
-            <div className="about-app-name">ALFA9</div>
-            <div className="about-version">Version 1.0.0 &nbsp;•&nbsp; Established 2024</div>
+            <div className="about-app-name">{t('au_app_name')}</div>
+            <div className="about-version">{t('au_version')} &nbsp;\u2022&nbsp; {t('au_established')}</div>
             <div className="about-tagline">
-              Pakistan's trusted online gaming platform offering exciting games, fair play, and fast payouts — all in one place.
+              {t('au_tagline')}
             </div>
           </div>
 
@@ -47,20 +49,20 @@ function AboutUs() {
           <div className="stats-row">
             <div className="stat-card">
               <div className="stat-num">50K+</div>
-              <div className="stat-label">Active Users</div>
+              <div className="stat-label">{t('au_active_users')}</div>
             </div>
             <div className="stat-card">
               <div className="stat-num">24/7</div>
-              <div className="stat-label">Support</div>
+              <div className="stat-label">{t('au_support')}</div>
             </div>
             <div className="stat-card">
               <div className="stat-num">5 Min</div>
-              <div className="stat-label">Fast Payout</div>
+              <div className="stat-label">{t('au_fast_payout')}</div>
             </div>
           </div>
 
           {/* Documents */}
-          <div className="section-label">Legal Documents</div>
+          <div className="section-label">{t('au_legal_documents')}</div>
           <div className="menu-list">
             <div className="menu-item" onClick={() => showPage('page-confidentiality')}>
               <div className="menu-icon">
@@ -79,8 +81,8 @@ function AboutUs() {
                 )}
               </div>
               <div className="menu-text">
-                <div className="menu-title">Confidentiality Agreement</div>
-                <div className="menu-sub">Privacy & data protection policy</div>
+                <div className="menu-title">{t('au_confidentiality_title')}</div>
+                <div className="menu-sub">{t('au_confidentiality_sub')}</div>
               </div>
               <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2">
                 <polyline points="9 18 15 12 9 6" />
@@ -106,8 +108,8 @@ function AboutUs() {
                 )}
               </div>
               <div className="menu-text">
-                <div className="menu-title">Risk Disclosure Agreement</div>
-                <div className="menu-sub">Terms, risks & conditions of use</div>
+                <div className="menu-title">{t('au_risk_title')}</div>
+                <div className="menu-sub">{t('au_risk_sub')}</div>
               </div>
               <svg className="menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A4020" strokeWidth="2">
                 <polyline points="9 18 15 12 9 6" />
@@ -126,8 +128,8 @@ function AboutUs() {
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </div>
-            <div className="inner-title">Confidentiality Agreement</div>
-            <div className="inner-date">Last updated: January 2024</div>
+            <div className="inner-title">{t('au_confidentiality_title')}</div>
+            <div className="inner-date">{t('au_last_updated')}</div>
           </div>
 
           <div className="agree-badge">
@@ -137,7 +139,7 @@ function AboutUs() {
               </svg>
             </div>
             <div className="agree-badge-text">
-              By using Alfa9, you agree that your data is handled as described in this <strong>Confidentiality Agreement</strong>.
+              {t('au_conf_badge')} <strong>{t('au_confidentiality_title')}</strong>.
             </div>
           </div>
 
@@ -148,12 +150,12 @@ function AboutUs() {
                 Information We Collect
               </div>
               <div className="agreement-text">
-                <p>Alfa9 collects information necessary to provide you with our gaming services. This includes:</p>
+                <p>{t('au_c1_intro')}</p>
                 <ul>
-                  <li>Phone number and account credentials</li>
-                  <li>Transaction history and financial records</li>
-                  <li>Device information and IP address</li>
-                  <li>Gaming activity and preferences</li>
+                  <li>{t('au_c1_i1')}</li>
+                  <li>{t('au_c1_i2')}</li>
+                  <li>{t('au_c1_i3')}</li>
+                  <li>{t('au_c1_i4')}</li>
                 </ul>
               </div>
             </div>
@@ -164,14 +166,14 @@ function AboutUs() {
                 How We Use Your Information
               </div>
               <div className="agreement-text">
-                <p>Your personal information is used <strong>only</strong> for the following purposes:</p>
+                <p>{t('au_c2_intro_1')} <strong>{t('au_c2_intro_2')}</strong> {t('au_c2_intro_3')}</p>
                 <ul>
-                  <li>Processing deposits, withdrawals, and game transactions</li>
-                  <li>Verifying your identity and preventing fraud</li>
-                  <li>Sending account notifications and promotional offers</li>
-                  <li>Improving our platform and customer support</li>
+                  <li>{t('au_c2_i1')}</li>
+                  <li>{t('au_c2_i2')}</li>
+                  <li>{t('au_c2_i3')}</li>
+                  <li>{t('au_c2_i4')}</li>
                 </ul>
-                <p>We <strong>do not sell</strong> your personal data to third parties for marketing purposes.</p>
+                <p>{t('au_c2_outro_1')} <strong>{t('au_c2_outro_2')}</strong> {t('au_c2_outro_3')}</p>
               </div>
             </div>
 
@@ -181,12 +183,12 @@ function AboutUs() {
                 Data Security
               </div>
               <div className="agreement-text">
-                <p>Alfa9 employs industry-standard security measures to protect your personal information:</p>
+                <p>{t('au_c3_intro')}</p>
                 <ul>
-                  <li>All data transmitted using <strong>SSL encryption</strong></li>
-                  <li>Passwords are stored in encrypted format</li>
-                  <li>Regular security audits and monitoring</li>
-                  <li>Two-factor authentication available</li>
+                  <li>{t('au_c3_i1')} <strong>{t('au_c3_i1b')}</strong></li>
+                  <li>{t('au_c3_i2')}</li>
+                  <li>{t('au_c3_i3')}</li>
+                  <li>{t('au_c3_i4')}</li>
                 </ul>
               </div>
             </div>
@@ -198,9 +200,7 @@ function AboutUs() {
               </div>
               <div className="agreement-text">
                 <p>
-                  We retain your account data for as long as your account is active or as required by applicable law. Upon
-                  account deletion request, your personal data will be removed within <strong>30 days</strong>, except where
-                  retention is required for legal compliance.
+                  {t('au_c4_text_1')} <strong>{t('au_c4_text_2')}</strong>{t('au_c4_text_3')}
                 </p>
               </div>
             </div>
@@ -211,14 +211,14 @@ function AboutUs() {
                 Your Rights
               </div>
               <div className="agreement-text">
-                <p>You have the right to:</p>
+                <p>{t('au_c5_intro')}</p>
                 <ul>
-                  <li>Access the personal data we hold about you</li>
-                  <li>Request correction of inaccurate information</li>
-                  <li>Request deletion of your account and data</li>
-                  <li>Opt out of promotional communications</li>
+                  <li>{t('au_c5_i1')}</li>
+                  <li>{t('au_c5_i2')}</li>
+                  <li>{t('au_c5_i3')}</li>
+                  <li>{t('au_c5_i4')}</li>
                 </ul>
-                <p>To exercise these rights, contact our support team via Telegram or WhatsApp.</p>
+                <p>{t('au_c5_outro')}</p>
               </div>
             </div>
 
@@ -228,7 +228,7 @@ function AboutUs() {
                 Contact Us
               </div>
               <div className="agreement-text">
-                <p>For any privacy-related questions or concerns, please contact us:</p>
+                <p>{t('au_c6_intro')}</p>
                 <ul>
                   <li><strong>Telegram:</strong> @the_john_David</li>
                   <li><strong>WhatsApp:</strong> +92 328 2287821</li>
@@ -248,8 +248,8 @@ function AboutUs() {
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </div>
-            <div className="inner-title">Risk Disclosure Agreement</div>
-            <div className="inner-date">Last updated: January 2024</div>
+            <div className="inner-title">{t('au_risk_title')}</div>
+            <div className="inner-date">{t('au_last_updated')}</div>
           </div>
 
           <div className="agree-badge">
@@ -261,7 +261,7 @@ function AboutUs() {
               </svg>
             </div>
             <div className="agree-badge-text">
-              Please read this <strong>Risk Disclosure Agreement</strong> carefully before using Alfa9 gaming services.
+              {t('au_risk_badge')} <strong>{t('au_risk_title')}</strong> {t('au_risk_badge_2')}
             </div>
           </div>
 
@@ -273,10 +273,9 @@ function AboutUs() {
               </div>
               <div className="agreement-text">
                 <p>
-                  Online gaming and betting involves <strong>financial risk</strong>. You may lose some or all of the money
-                  you deposit. Only participate with funds you can afford to lose.
+                  {t('au_r1_p1_1')} <strong>{t('au_r1_p1_2')}</strong>{t('au_r1_p1_3')}
                 </p>
-                <p>Alfa9 is intended for entertainment purposes. We strongly encourage responsible gaming at all times.</p>
+                <p>{t('au_r1_p2')}</p>
               </div>
             </div>
 
@@ -286,12 +285,12 @@ function AboutUs() {
                 Eligibility Requirements
               </div>
               <div className="agreement-text">
-                <p>By using Alfa9, you confirm that:</p>
+                <p>{t('au_r2_intro')}</p>
                 <ul>
-                  <li>You are <strong>18 years of age or older</strong></li>
-                  <li>You are legally permitted to participate in online gaming in your region</li>
-                  <li>You are acting on your own behalf and not on behalf of any third party</li>
-                  <li>Your funds are from legitimate sources</li>
+                  <li>{t('au_r2_i1_1')} <strong>{t('au_r2_i1_2')}</strong></li>
+                  <li>{t('au_r2_i2')}</li>
+                  <li>{t('au_r2_i3')}</li>
+                  <li>{t('au_r2_i4')}</li>
                 </ul>
               </div>
             </div>
@@ -302,12 +301,12 @@ function AboutUs() {
                 Financial Risks
               </div>
               <div className="agreement-text">
-                <p>You acknowledge and accept the following financial risks:</p>
+                <p>{t('au_r3_intro')}</p>
                 <ul>
-                  <li>Game outcomes are determined by <strong>random chance</strong> — no outcome is guaranteed</li>
-                  <li>Past wins do not guarantee future results</li>
-                  <li>Bonus funds are subject to wagering requirements before withdrawal</li>
-                  <li>Transaction fees may apply depending on your payment method</li>
+                  <li>{t('au_r3_i1_1')} <strong>{t('au_r3_i1_2')}</strong> {t('au_r3_i1_3')}</li>
+                  <li>{t('au_r3_i2')}</li>
+                  <li>{t('au_r3_i3')}</li>
+                  <li>{t('au_r3_i4')}</li>
                 </ul>
               </div>
             </div>
@@ -318,12 +317,12 @@ function AboutUs() {
                 Responsible Gaming
               </div>
               <div className="agreement-text">
-                <p>Alfa9 promotes responsible gaming. We recommend:</p>
+                <p>{t('au_r4_intro')}</p>
                 <ul>
-                  <li>Setting a <strong>daily/weekly budget</strong> for gaming</li>
-                  <li>Never chasing losses — take breaks when needed</li>
-                  <li>Keeping gaming as entertainment, not a source of income</li>
-                  <li>Seeking help if gaming affects your daily life or finances</li>
+                  <li>{t('au_r4_i1_1')} <strong>{t('au_r4_i1_2')}</strong> {t('au_r4_i1_3')}</li>
+                  <li>{t('au_r4_i2')}</li>
+                  <li>{t('au_r4_i3')}</li>
+                  <li>{t('au_r4_i4')}</li>
                 </ul>
               </div>
             </div>
@@ -334,12 +333,12 @@ function AboutUs() {
                 Account Responsibility
               </div>
               <div className="agreement-text">
-                <p>You are fully responsible for:</p>
+                <p>{t('au_r5_intro')}</p>
                 <ul>
-                  <li>All activity that occurs under your account</li>
-                  <li>Keeping your login credentials secure and confidential</li>
-                  <li>Reporting any unauthorized access immediately to support</li>
-                  <li>Ensuring your account information remains accurate and up-to-date</li>
+                  <li>{t('au_r5_i1')}</li>
+                  <li>{t('au_r5_i2')}</li>
+                  <li>{t('au_r5_i3')}</li>
+                  <li>{t('au_r5_i4')}</li>
                 </ul>
               </div>
             </div>
@@ -350,13 +349,13 @@ function AboutUs() {
                 Limitation of Liability
               </div>
               <div className="agreement-text">
-                <p>Alfa9 shall not be liable for any losses arising from:</p>
+                <p>{t('au_r6_intro')}</p>
                 <ul>
-                  <li>Technical failures, server outages, or connection interruptions</li>
-                  <li>Unauthorized access to your account due to your negligence</li>
-                  <li>Decisions made based on game outcomes or bonus promotions</li>
+                  <li>{t('au_r6_i1')}</li>
+                  <li>{t('au_r6_i2')}</li>
+                  <li>{t('au_r6_i3')}</li>
                 </ul>
-                <p>By continuing to use Alfa9, you <strong>accept all terms</strong> stated in this Risk Disclosure Agreement.</p>
+                <p>{t('au_r6_outro_1')} <strong>{t('au_r6_outro_2')}</strong> {t('au_r6_outro_3')}</p>
               </div>
             </div>
           </div>

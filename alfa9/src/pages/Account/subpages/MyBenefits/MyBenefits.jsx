@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './MyBenefits.css';
 
 const IMG = {
@@ -14,6 +15,7 @@ const IMG = {
 
 function MyBenefits() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -30,7 +32,7 @@ function MyBenefits() {
         // page opens showing rewards that are actually relevant to them
         setSelectedLevel((prev) => (prev === 1 && data.level > 1 ? data.level : prev));
       })
-      .catch((err) => setLoadError(err.message || 'Could not load your VIP status'))
+      .catch((err) => setLoadError(err.message || t('mb_error_load')))
       .finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
@@ -58,10 +60,10 @@ function MyBenefits() {
     setBusy('levelup');
     try {
       const data = await apiFetch('/vip/claim-levelup', { method: 'POST', body: { level: selectedLevel } });
-      showToast(`+Rs${data.coins} & ${data.freeSpins} free spins credited!`);
+      showToast(`+Rs${data.coins} & ${data.freeSpins} free spins ${t('mb_toast_credited')}`);
       load();
     } catch (err) {
-      showToast(err.message || 'Could not claim right now');
+      showToast(err.message || t('mb_toast_error'));
     } finally {
       setBusy('');
     }
@@ -72,10 +74,10 @@ function MyBenefits() {
     setBusy('monthly');
     try {
       const data = await apiFetch('/vip/claim-monthly', { method: 'POST' });
-      showToast(`+Rs${data.coins} & ${data.freeSpins} free spins credited!`);
+      showToast(`+Rs${data.coins} & ${data.freeSpins} free spins ${t('mb_toast_credited')}`);
       load();
     } catch (err) {
-      showToast(err.message || 'Could not claim right now');
+      showToast(err.message || t('mb_toast_error'));
     } finally {
       setBusy('');
     }
@@ -84,15 +86,15 @@ function MyBenefits() {
   // What each claim button should say/do, purely a function of the
   // SELECTED level vs the member's ACHIEVED level:
   const levelUpBtn = (() => {
-    if (selectedLevel > myLevel) return { label: `Reach VIP${selectedLevel} first`, cls: 'mb-btn-locked', disabled: true };
-    if (levelUpClaimed) return { label: 'Received', cls: 'mb-btn-received', disabled: true };
-    return { label: busy === 'levelup' ? 'Claiming…' : 'Claim now', cls: 'mb-btn-claim', disabled: busy === 'levelup' };
+    if (selectedLevel > myLevel) return { label: t('mb_reach_vip_first').replace('{level}', selectedLevel), cls: 'mb-btn-locked', disabled: true };
+    if (levelUpClaimed) return { label: t('mb_received'), cls: 'mb-btn-received', disabled: true };
+    return { label: busy === 'levelup' ? t('mb_claiming') : t('mb_claim_now'), cls: 'mb-btn-claim', disabled: busy === 'levelup' };
   })();
   const monthlyBtn = (() => {
-    if (selectedLevel > myLevel) return { label: `Reach VIP${selectedLevel} first`, cls: 'mb-btn-locked', disabled: true };
-    if (selectedLevel < myLevel) return { label: 'View only', cls: 'mb-btn-locked', disabled: true };
-    if (monthlyClaimed) return { label: 'Received', cls: 'mb-btn-received', disabled: true };
-    return { label: busy === 'monthly' ? 'Claiming…' : 'Claim now', cls: 'mb-btn-claim', disabled: busy === 'monthly' };
+    if (selectedLevel > myLevel) return { label: t('mb_reach_vip_first').replace('{level}', selectedLevel), cls: 'mb-btn-locked', disabled: true };
+    if (selectedLevel < myLevel) return { label: t('mb_view_only'), cls: 'mb-btn-locked', disabled: true };
+    if (monthlyClaimed) return { label: t('mb_received'), cls: 'mb-btn-received', disabled: true };
+    return { label: busy === 'monthly' ? t('mb_claiming') : t('mb_claim_now'), cls: 'mb-btn-claim', disabled: busy === 'monthly' };
   })();
 
   return (
@@ -112,11 +114,11 @@ function MyBenefits() {
       </div>
 
       {loading ? (
-        <div className="mb-loading">Loading your benefits…</div>
+        <div className="mb-loading">{t('mb_loading')}</div>
       ) : loadError ? (
         <div className="mb-error">
           <div>⚠ {loadError}</div>
-          <button className="mb-btn mb-btn-outline" onClick={() => { setLoading(true); load(); }}>Retry</button>
+          <button className="mb-btn mb-btn-outline" onClick={() => { setLoading(true); load(); }}>{t('mb_retry')}</button>
         </div>
       ) : (
         <>
@@ -143,8 +145,8 @@ function MyBenefits() {
                 <div className="mb-tag mb-tag-coin"><img className="mb-tag-icon" style={{ width: 23, height: 23, objectFit: 'contain' }} src={IMG.spin} alt="" onError={(e) => { e.target.style.display = 'none'; }} /> {tier ? tier.levelUpFreeSpins.toLocaleString() : 0}</div>
               </div>
               <div className="mb-body">
-                <div className="mb-name">Level up rewards</div>
-                <div className="mb-desc">Each account can only receive 1 time per level</div>
+                <div className="mb-name">{t('mb_level_up_rewards')}</div>
+                <div className="mb-desc">{t('mb_level_up_desc')}</div>
               </div>
               <button className={`mb-btn ${levelUpBtn.cls}`} onClick={claimLevelUp} disabled={levelUpBtn.disabled}>{levelUpBtn.label}</button>
             </div>
@@ -157,8 +159,8 @@ function MyBenefits() {
                 <div className="mb-tag mb-tag-coin"><img className="mb-tag-icon" src={IMG.wallet} alt="" onError={(e) => { e.target.style.display = 'none'; }} /> {tier ? tier.monthlyCoins.toLocaleString() : 0}</div>
               </div>
               <div className="mb-body">
-                <div className="mb-name">Monthly reward</div>
-                <div className="mb-desc">Each account can only receive 1 time per month</div>
+                <div className="mb-name">{t('mb_monthly_reward')}</div>
+                <div className="mb-desc">{t('mb_monthly_desc')}</div>
               </div>
               <button className={`mb-btn ${monthlyBtn.cls}`} onClick={claimMonthly} disabled={monthlyBtn.disabled}>{monthlyBtn.label}</button>
             </div>
@@ -171,10 +173,10 @@ function MyBenefits() {
                 <div className="mb-tag mb-tag-rate">{tier ? tier.safeRate : '0%'}</div>
               </div>
               <div className="mb-body">
-                <div className="mb-name">Safe</div>
-                <div className="mb-desc">Increase the extra income of the safe</div>
+                <div className="mb-name">{t('mb_safe')}</div>
+                <div className="mb-desc">{t('mb_safe_desc')}</div>
               </div>
-              <button className="mb-btn mb-btn-outline" onClick={() => navigate('/account/safe')}>Open Safe</button>
+              <button className="mb-btn mb-btn-outline" onClick={() => navigate('/account/safe')}>{t('mb_open_safe')}</button>
             </div>
 
             {/* Rebate rate */}
@@ -185,10 +187,10 @@ function MyBenefits() {
                 <div className="mb-tag mb-tag-rate">{tier ? tier.rebateRate : '0%'}</div>
               </div>
               <div className="mb-body">
-                <div className="mb-name">Rebate rate</div>
-                <div className="mb-desc">Increase income of rebate</div>
+                <div className="mb-name">{t('mb_rebate_rate')}</div>
+                <div className="mb-desc">{t('mb_rebate_desc')}</div>
               </div>
-              <button className="mb-btn mb-btn-outline" onClick={() => navigate('/promotion/rebate-ratio')}>Check the details</button>
+              <button className="mb-btn mb-btn-outline" onClick={() => navigate('/promotion/rebate-ratio')}>{t('mb_check_details')}</button>
             </div>
           </div>
         </>

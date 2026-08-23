@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './Transaction.css';
 
 const TX_TYPES = [
@@ -69,6 +70,7 @@ function loadTransactions() {
 
 function Transaction() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [selectedType, setSelectedType] = useState('All');
   const [tempType, setTempType] = useState('All');
@@ -169,7 +171,7 @@ function Transaction() {
     return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]));
   }, [filtered]);
 
-  const dateLabel = selectedDate ? `${TODAY_Y}-${pad2(selectedDate.m)}-${pad2(selectedDate.d)}` : 'Choose a date';
+  const dateLabel = selectedDate ? `${TODAY_Y}-${pad2(selectedDate.m)}-${pad2(selectedDate.d)}` : t('tx_choose_date');
 
   return (
     <div className="transaction-page">
@@ -177,21 +179,21 @@ function Transaction() {
         <div className="back-btn" onClick={() => navigate(-1)}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
         </div>
-        <div className="header-title">Transaction History</div>
+        <div className="header-title">{t('tx_title')}</div>
       </div>
 
       <div className="filter-bar">
         <div className="filter-btn" onClick={openTypeSheet}>
           <div>
             <div className="filter-btn-text">{selectedType}</div>
-            <div className="filter-btn-sub">Transaction type</div>
+            <div className="filter-btn-sub">{t('tx_type_label')}</div>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
         </div>
         <div className="filter-btn" onClick={openDateSheet}>
           <div>
             <div className="filter-btn-text">{dateLabel}</div>
-            <div className="filter-btn-sub">Filter by date</div>
+            <div className="filter-btn-sub">{t('tx_filter_by_date')}</div>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
         </div>
@@ -238,7 +240,7 @@ function Transaction() {
             <rect x="14.5" y="84" width="3" height="6" rx="1" fill="rgba(212,175,55,0.28)" />
             <rect x="98" y="76" width="16" height="14" rx="2" fill="rgba(212,175,55,0.18)" stroke="rgba(212,175,55,0.32)" strokeWidth="1" />
           </svg>
-          <div className="empty-text">No data</div>
+          <div className="empty-text">{t('tx_no_data')}</div>
         </div>
       )}
 
@@ -248,9 +250,9 @@ function Transaction() {
           <div className="bottom-sheet">
             <div className="sheet-handle" />
             <div className="sheet-header">
-              <span className="sheet-cancel" onClick={() => setTypeSheetOpen(false)}>Cancel</span>
-              <span className="sheet-title">Select Type</span>
-              <span className="sheet-confirm" onClick={confirmType}>Confirm</span>
+              <span className="sheet-cancel" onClick={() => setTypeSheetOpen(false)}>{t('hist_cancel')}</span>
+              <span className="sheet-title">{t('tx_select_type')}</span>
+              <span className="sheet-confirm" onClick={confirmType}>{t('hist_confirm')}</span>
             </div>
             <div className="sheet-list">
               {TX_TYPES.map((t) => (
@@ -276,14 +278,14 @@ function Transaction() {
         <div className="modal-overlay open" onClick={(e) => { if (e.target === e.currentTarget) setDateSheetOpen(false); }}>
           <div className="date-sheet">
             <div className="sheet-header">
-              <span className="sheet-cancel" onClick={() => setDateSheetOpen(false)}>Cancel</span>
-              <span className="sheet-title">Choose a date</span>
-              <span className="sheet-confirm" onClick={confirmDate}>Confirm</span>
+              <span className="sheet-cancel" onClick={() => setDateSheetOpen(false)}>{t('hist_cancel')}</span>
+              <span className="sheet-title">{t('tx_choose_date')}</span>
+              <span className="sheet-confirm" onClick={confirmDate}>{t('hist_confirm')}</span>
             </div>
             <div className="picker-labels">
-              <div className="picker-label">Year</div>
-              <div className="picker-label">Month</div>
-              <div className="picker-label">Day</div>
+              <div className="picker-label">{t('tx_year')}</div>
+              <div className="picker-label">{t('tx_month')}</div>
+              <div className="picker-label">{t('tx_day')}</div>
             </div>
             <div className="picker-outer">
               <div className="picker-cols">

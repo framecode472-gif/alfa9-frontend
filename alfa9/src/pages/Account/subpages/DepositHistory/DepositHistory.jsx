@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './DepositHistory.css';
 
-const STATUS_LABELS = { all: 'All', pending: 'To Be Paid', success: 'Completed', failed: 'Failed' };
+const STATUS_KEYS = { all: 'hist_all', pending: 'hist_to_be_paid', success: 'hist_completed', failed: 'hist_failed' };
 
 // Backend status values ('pending' | 'approved' | 'rejected') -> the labels this page already uses
 const BACKEND_STATUS_MAP = { pending: 'pending', approved: 'success', rejected: 'failed' };
@@ -12,6 +13,7 @@ function pad2(n) { return String(n).padStart(2, '0'); }
 
 function DepositHistory() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [curMethod, setCurMethod] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -112,7 +114,7 @@ function DepositHistory() {
   };
 
   const dateLabel = (() => {
-    if (!selDate) return 'Choose a date';
+    if (!selDate) return t('hist_choose_date');
     const [sy, sm, sd] = selDate.start.split('-');
     let label = `${sy}/${parseInt(sm, 10)}/${parseInt(sd, 10)}`;
     if (selDate.end && selDate.end !== selDate.start) {
@@ -163,14 +165,14 @@ function DepositHistory() {
         <button onClick={() => navigate(-1)} className="header-back" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
         </button>
-        <span className="header-title">Deposit History</span>
+        <span className="header-title">{t('dep_history_title')}</span>
         <div style={{ width: 36 }}></div>
       </div>
 
       <div className="history-filter-row">
         <div className={`filter-chip${curMethod === 'all' ? ' active' : ''}`} onClick={() => setCurMethod('all')}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
-          All
+          {t('hist_all')}
         </div>
         <div className={`filter-chip${curMethod === 'JazzCash' ? ' active' : ''}`} onClick={() => setCurMethod('JazzCash')}>
           <img src="/image/Jazzcash.png" alt="JazzCash" />
@@ -184,7 +186,7 @@ function DepositHistory() {
 
       <div className="history-controls">
         <button className={`dropdown-btn${selectedStatus !== 'all' ? ' active-filter' : ''}`} onClick={openStatusSheet}>
-          <span className="dropdown-btn-text">{STATUS_LABELS[selectedStatus]}</span>
+          <span className="dropdown-btn-text">{t(STATUS_KEYS[selectedStatus])}</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
         </button>
         <button className={`dropdown-btn${selDate ? ' active-filter' : ''}`} onClick={openCalendar} style={{ position: 'relative' }}>
@@ -213,7 +215,7 @@ function DepositHistory() {
                     <div className="tx-info">
                       <div className="tx-name">{tx.method || 'Deposit'}</div>
                       <div className="tx-time">{(tx.time || '').split(' ')[1] || ''}</div>
-                      <span className={`tx-status ${statusKey}`}>{STATUS_LABELS[statusKey] || 'Completed'}</span>
+                      <span className={`tx-status ${statusKey}`}>{t(STATUS_KEYS[statusKey] || 'hist_completed')}</span>
                     </div>
                     <div className="tx-amount">+Rs{parseFloat(tx.amount || 0).toFixed(2)}</div>
                   </div>
@@ -230,9 +232,9 @@ function DepositHistory() {
               <polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="12" y2="17" />
             </svg>
           </div>
-          <div className="empty-title">No History Found</div>
-          <p className="empty-desc">Abhi tak koi deposit nahi ki. Jab aap deposit karenge yahan data show hoga.</p>
-          <button className="empty-action-btn" onClick={() => navigate('/account/deposit')}>Go to Deposit</button>
+          <div className="empty-title">{t('hist_no_history_found')}</div>
+          <p className="empty-desc">{t('dep_history_empty_desc')}</p>
+          <button className="empty-action-btn" onClick={() => navigate('/account/deposit')}>{t('dep_go_to_deposit')}</button>
         </div>
       )}
 
@@ -242,9 +244,9 @@ function DepositHistory() {
           <div className="bottom-sheet">
             <div className="modal-handle"></div>
             <div className="sheet-topbar">
-              <button className="sheet-cancel-btn" onClick={() => setStatusSheetOpen(false)}>Cancel</button>
-              <span className="sheet-title-text">Payment Status</span>
-              <button className="sheet-confirm-btn" onClick={confirmStatus}>Confirm</button>
+              <button className="sheet-cancel-btn" onClick={() => setStatusSheetOpen(false)}>{t('hist_cancel')}</button>
+              <span className="sheet-title-text">{t('hist_payment_status')}</span>
+              <button className="sheet-confirm-btn" onClick={confirmStatus}>{t('hist_confirm')}</button>
             </div>
             <div className="sheet-options">
               {Object.entries(STATUS_LABELS).map(([val, label]) => (
@@ -253,7 +255,7 @@ function DepositHistory() {
                   className={`sheet-option${pendingStatus === val ? ' selected' : ''}`}
                   onClick={() => setPendingStatus(val)}
                 >
-                  {label}
+                  {t(STATUS_KEYS[val])}
                 </button>
               ))}
             </div>
@@ -266,7 +268,7 @@ function DepositHistory() {
         <div className="cal-overlay show" onClick={(e) => { if (e.target === e.currentTarget) setCalOpen(false); }}>
           <div className="cal-modal">
             <div className="cal-header">
-              <span className="cal-title">Choose a Date</span>
+              <span className="cal-title">{t('hist_choose_date_title')}</span>
               <div className="cal-close-btn" onClick={() => setCalOpen(false)}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
               </div>
@@ -287,7 +289,7 @@ function DepositHistory() {
               <div className="cal-weekday">Sat</div>
             </div>
             <div className="cal-days">{renderCalDays()}</div>
-            <button className="cal-confirm-btn" onClick={confirmDateRange}>Confirm</button>
+            <button className="cal-confirm-btn" onClick={confirmDateRange}>{t('hist_confirm')}</button>
           </div>
         </div>
       )}
