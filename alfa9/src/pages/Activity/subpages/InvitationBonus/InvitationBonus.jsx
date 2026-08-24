@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '../../../../utils/api';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './InvitationBonus.css';
 
 const rechargeMap = (i) => (i <= 5 ? 2000 : i <= 10 ? 2000 : i <= 15 ? 3000 : i <= 20 ? 3000 : i <= 25 ? 5000 : i <= 30 ? 5000 : i <= 35 ? 8000 : i <= 40 ? 10000 : 15000);
@@ -19,13 +20,9 @@ const RULES_DATA = [
   [20000, 2000, 600000], [25000, 2000, 1000000],
 ];
 
-const PAGE_TITLES = { main: 'Invitation bonus', rules: 'Invitation reward rules', record: 'Invitation record' };
-const HERO_TITLES = { main: 'Invite friends and deposit', rules: 'Invitation Reward Rules', record: 'Invitation Record' };
-const HERO_DESCS = {
-  main: 'Both parties can receive rewards\nInvite friends to register and recharge to receive rewards',
-  rules: 'Invite friends and recharge to get additional platform rewards!',
-  record: 'Your invited friends will be shown here.',
-};
+const PAGE_TITLE_KEYS = { main: 'act_invitation_bonus_1', rules: 'ib_reward_rules', record: 'ib_record' };
+const HERO_TITLE_KEYS = { main: 'ib_hero_main_title', rules: 'ib_hero_rules_title', record: 'ib_hero_record_title' };
+const HERO_DESC_KEYS = { main: 'ib_hero_main_desc', rules: 'ib_hero_rules_desc', record: 'ib_hero_record_desc' };
 
 function RecordEmptySvg() {
   return (
@@ -43,6 +40,7 @@ function RecordEmptySvg() {
 }
 
 function InvitationBonus() {
+  const { t } = useLanguage();
   const [page, setPage] = useState('main'); // 'main' | 'rules' | 'record'
   const [bonusCards, setBonusCards] = useState(
     Array.from({ length: 45 }, (_, idx) => {
@@ -68,7 +66,7 @@ function InvitationBonus() {
   const claimMilestone = (milestone) => {
     apiFetch('/activity/invitation-bonus/claim', { method: 'POST', body: { milestone } })
       .then(() => loadMilestones())
-      .catch((err) => alert(err.message || 'Requirements not yet met'));
+      .catch((err) => alert(err.message || t('ib_toast_requirements')));
   };
 
   return (
@@ -83,17 +81,17 @@ function InvitationBonus() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 12H4M4 12L10 6M4 12L10 18" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         )}
-        <span className="top-title">{PAGE_TITLES[page]}</span>
+        <span className="top-title">{page === 'main' ? t('act_invitation_bonus_1') + ' ' + t('act_invitation_bonus_2') : t(PAGE_TITLE_KEYS[page])}</span>
       </div>
 
       <div className="hero-banner">
         <img src="/image/bouns.webp" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
         <div className="hero-overlay">
-          <div className="hero-title">{HERO_TITLES[page]}</div>
-          <div className="hero-desc">{HERO_DESCS[page]}</div>
+          <div className="hero-title">{t(HERO_TITLE_KEYS[page])}</div>
+          <div className="hero-desc">{t(HERO_DESC_KEYS[page])}</div>
           {page === 'main' && (
             <>
-              <div className="hero-date-label">activity date</div>
+              <div className="hero-date-label">{t('ib_activity_date')}</div>
               <div className="hero-date">2026-05-28 — 2031-01-01</div>
             </>
           )}
@@ -114,7 +112,7 @@ function InvitationBonus() {
                   <path d="M21 25 L23 27 L27 23" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                 </svg>
               </div>
-              <span className="icon-btn-label">Invitation reward rules</span>
+              <span className="icon-btn-label">{t('ib_reward_rules')}</span>
             </button>
 
             <button className="icon-btn" onClick={() => setPage('record')}>
@@ -130,7 +128,7 @@ function InvitationBonus() {
                   <rect x="10" y="24" width="7" height="1.8" rx="0.9" fill="rgba(255,255,255,0.2)" />
                 </svg>
               </div>
-              <span className="icon-btn-label">Invitation record</span>
+              <span className="icon-btn-label">{t('ib_record')}</span>
             </button>
           </div>
 
@@ -139,7 +137,7 @@ function InvitationBonus() {
               <div className="bonus-card" key={i}>
                 <div className="bonus-header">
                   <div className="bonus-tag">
-                    <span className="bonus-tag-main">Bonus</span>
+                    <span className="bonus-tag-main">{t('ib_bonus_tag')}</span>
                     <span className="bonus-tag-num">{i}</span>
                     <div className="bonus-tag-x">
                       <svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L8 8M8 2L2 8" stroke="rgba(255,243,205,0.7)" strokeWidth="1.5" strokeLinecap="round" /></svg>
@@ -148,19 +146,19 @@ function InvitationBonus() {
                   <span className="bonus-amount">Rs{a}.00</span>
                 </div>
                 <div className="bonus-body">
-                  <div className="info-row"><span className="info-label">Number of invitees</span><span className="info-val">{i}</span></div>
-                  <div className="info-row"><span className="info-label">Recharge per people</span><span className="info-val gold">Rs{r.toLocaleString()}.00</span></div>
+                  <div className="info-row"><span className="info-label">{t('ib_number_of_invitees')}</span><span className="info-val">{i}</span></div>
+                  <div className="info-row"><span className="info-label">{t('ib_recharge_per_people')}</span><span className="info-val gold">Rs{r.toLocaleString()}.00</span></div>
                   <hr className="divider" />
                   <div className="progress-row">
-                    <div className="progress-cell"><div className="progress-frac">{inviteesProgress} / {i}</div><div className="progress-lbl">Number of invitees</div></div>
-                    <div className="progress-cell"><div className="progress-frac">{depositProgress} / {i}</div><div className="progress-lbl">Deposit number</div></div>
+                    <div className="progress-cell"><div className="progress-frac">{inviteesProgress} / {i}</div><div className="progress-lbl">{t('ib_number_of_invitees')}</div></div>
+                    <div className="progress-cell"><div className="progress-frac">{depositProgress} / {i}</div><div className="progress-lbl">{t('ib_deposit_number')}</div></div>
                   </div>
                   <button
                     className={claimed ? 'unfinished-btn' : eligible ? 'unfinished-btn eligible' : 'unfinished-btn'}
                     disabled={!eligible || claimed}
                     onClick={() => claimMilestone(i)}
                   >
-                    {claimed ? 'Claimed ✓' : eligible ? 'Claim' : 'Unfinished'}
+                    {claimed ? t('ib_claimed') : eligible ? t('ib_claim') : t('ib_unfinished')}
                   </button>
                 </div>
               </div>
@@ -174,17 +172,17 @@ function InvitationBonus() {
         <div>
           <div className="rules-info-box">
             <div className="rules-info-text">
-              Invite friends and recharge to get additional platform rewards!<br />
-              After being claimed, the rewards will be directly distributed to the wallet balance within 10 minutes.
+              {t('ib_rules_info')}<br />
+              {t('ib_rules_info_2')}
             </div>
           </div>
           <div className="rules-table-wrap">
             <table className="rules-table">
-              <thead><tr><th>Invite account</th><th>Deposit amount</th><th>Bonus</th></tr></thead>
+              <thead><tr><th>{t('ib_invite_account')}</th><th>{t('ib_deposit_amount')}</th><th>{t('ib_bonus_col')}</th></tr></thead>
               <tbody>
                 {RULES_DATA.map(([p, d, b], idx) => (
                   <tr key={idx}>
-                    <td>{p}People</td>
+                    <td>{p}{t('ib_people_suffix')}</td>
                     <td>Rs{d.toLocaleString()}.00</td>
                     <td>Rs{b.toLocaleString()}.00</td>
                   </tr>
@@ -192,12 +190,12 @@ function InvitationBonus() {
               </tbody>
             </table>
           </div>
-          <div className="rules-section-header"><span className="rules-section-title">📋 Rules</span></div>
+          <div className="rules-section-header"><span className="rules-section-title">{t('ib_rules_header')}</span></div>
           <div className="rules-points">
-            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">Only when the number of invited accounts is reached and each account can meet the recharge amount can you receive the bonus.</span></div>
-            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">The invitation account meets the requirements, but the recharge amount of the account does not meet the requirements, and the bonus cannot be claimed.</span></div>
-            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">Please claim the event bonus within the event period. All bonuses will be cleared after the event expires.</span></div>
-            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">Please complete the task within the event period. After the event expires, the invitation record will be cleared.</span></div>
+            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">{t('ib_rule_1')}</span></div>
+            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">{t('ib_rule_2')}</span></div>
+            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">{t('ib_rule_3')}</span></div>
+            <div className="rules-point"><span className="rules-diamond">◆</span><span className="rules-point-text">{t('ib_rule_4')}</span></div>
           </div>
           <div className="bottom-spacer"></div>
         </div>
@@ -207,7 +205,7 @@ function InvitationBonus() {
         <div>
           <div className="record-empty">
             <RecordEmptySvg />
-            <div className="record-empty-text">No more</div>
+            <div className="record-empty-text">{t('ib_no_more')}</div>
           </div>
           <div className="bottom-spacer"></div>
         </div>

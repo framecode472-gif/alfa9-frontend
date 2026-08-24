@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './ActivityAward.css';
 
 const MISSIONS = [
@@ -64,6 +65,7 @@ function EmptySvg() {
 }
 
 function ActivityAward() {
+  const { t } = useLanguage();
   const [page, setPage] = useState('award'); // 'award' | 'collection'
   const [tab, setTab] = useState('weekly'); // 'weekly' | 'daily'
   const [missions, setMissions] = useState(MISSIONS.map((m, i) => ({
@@ -98,10 +100,10 @@ function ActivityAward() {
 
   const tryComplete = (i) => {
     const m = missions[i];
-    if (!m.eligible) { alert('Please complete deposit and bet requirements first.'); return; }
+    if (!m.eligible) { alert(t('aa_toast_requirements')); return; }
     apiFetch('/activity/mission-award/claim', { method: 'POST', body: { index: i } })
       .then(() => loadMissions())
-      .catch((err) => alert(err.message || 'Could not claim reward'));
+      .catch((err) => alert(err.message || t('aa_toast_claim_error')));
   };
 
   return (
@@ -113,21 +115,21 @@ function ActivityAward() {
         {page === 'award' ? (
           <button className="collection-btn" onClick={() => setPage('collection')}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-            Collection record
+            {t('aa_collection_record')}
           </button>
         ) : (
-          <span className="top-title">Collection Record</span>
+          <span className="top-title">{t('aa_collection_record')}</span>
         )}
       </div>
 
       <div className="hero-banner">
         <img src="/image/Award.webp" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
         <div className="hero-overlay">
-          <div className="hero-title">{page === 'award' ? 'Activity Award' : 'Collection Record'}</div>
+          <div className="hero-title">{page === 'award' ? t('act_activity_award') : t('aa_collection_record')}</div>
           <div className="hero-desc">
             {page === 'award'
-              ? <>Complete weekly/daily tasks to receive rich rewards.<br />Weekly rewards cannot be accumulated to the next week,<br />and daily rewards cannot be accumulated to the next day.</>
-              : 'View your weekly and daily reward collection history.'}
+              ? <>{t('aa_hero_desc')}<br />{t('aa_hero_desc_2')}<br />{t('aa_hero_desc_3')}</>
+              : t('aa_view_history')}
           </div>
         </div>
       </div>
@@ -137,24 +139,24 @@ function ActivityAward() {
           {missions.map((m, i) => (
             <div className="mission-card" key={i}>
               <div className="mission-header">
-                <span className="mission-tag">Daily mission</span>
-                <span className={`mission-status ${m.claimed ? 'done' : ''}`}>{m.claimed ? 'Finished' : 'Unfinished'}</span>
+                <span className="mission-tag">{t('aa_daily_mission')}</span>
+                <span className={`mission-status ${m.claimed ? 'done' : ''}`}>{m.claimed ? t('aa_finished') : t('aa_unfinished')}</span>
               </div>
               <div className="mission-body">
                 <div className="mission-name-row">
                   <ChestIcon />
-                  <span className="mission-name">Daily Slots Treasure Chest Challenge</span>
+                  <span className="mission-name">{t('aa_mission_name')}</span>
                 </div>
-                <div className="stat-row"><span className="stat-label">Deposit</span><span className="stat-val">{m.depositProgress}/{m.depositTarget}</span></div>
-                <div className="stat-row"><span className="stat-label">Bet</span><span className="stat-val">{m.betProgress}/{m.betTarget}</span></div>
+                <div className="stat-row"><span className="stat-label">{t('aa_deposit')}</span><span className="stat-val">{m.depositProgress}/{m.depositTarget}</span></div>
+                <div className="stat-row"><span className="stat-label">{t('aa_bet')}</span><span className="stat-val">{m.betProgress}/{m.betTarget}</span></div>
                 <div className="progress-wrap"><div className="progress-bg"><div className="progress-fill"></div></div></div>
-                <div className="mission-desc-box">Recharge and play Slots games every day to unlock exciting Treasure Chest rewards! Complete Slot challenges, open mystery treasure chests, and win amazing cash bonuses. The more you play, the bigger the rewards you can unlock! Join now and start your Treasure Chest adventure!</div>
+                <div className="mission-desc-box">{t('aa_mission_desc')}</div>
                 <div className="award-row">
-                  <span className="award-label">Award amount</span>
+                  <span className="award-label">{t('aa_award_amount')}</span>
                   <span className="award-val"><WalletIcon /> {m.rewardLabel}</span>
                 </div>
                 <button className="complete-btn" disabled={m.claimed} onClick={() => tryComplete(i)}>
-                  {m.claimed ? 'Claimed ✓' : 'to complete'}
+                  {m.claimed ? t('aa_claimed') : t('aa_to_complete')}
                 </button>
               </div>
             </div>
@@ -166,8 +168,8 @@ function ActivityAward() {
       {page === 'collection' && (
         <div>
           <div className="tabs-row">
-            <button className={`tab-btn ${tab === 'weekly' ? 'active' : ''}`} onClick={() => setTab('weekly')}>Weekly</button>
-            <button className={`tab-btn ${tab === 'daily' ? 'active' : ''}`} onClick={() => setTab('daily')}>Daily</button>
+            <button className={`tab-btn ${tab === 'weekly' ? 'active' : ''}`} onClick={() => setTab('weekly')}>{t('aa_weekly')}</button>
+            <button className={`tab-btn ${tab === 'daily' ? 'active' : ''}`} onClick={() => setTab('daily')}>{t('aa_daily')}</button>
           </div>
           <div className="tab-content">
             {history.length > 0 ? (
@@ -175,7 +177,7 @@ function ActivityAward() {
                 {history.map((h) => (
                   <div className="mission-card" key={h._id}>
                     <div className="mission-body" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Mission {(h.refIndex ?? 0) + 1}</span>
+                      <span>{t('aa_mission_label')} {(h.refIndex ?? 0) + 1}</span>
                       <span className="award-val">Rs{Number(h.amount).toFixed(2)}</span>
                       <span className="stat-label">{new Date(h.claimedAt).toLocaleString()}</span>
                     </div>
@@ -185,7 +187,7 @@ function ActivityAward() {
             ) : (
               <div className="empty-state">
                 <EmptySvg />
-                <span className="empty-text">No data</span>
+                <span className="empty-text">{t('bd_no_data')}</span>
               </div>
             )}
           </div>

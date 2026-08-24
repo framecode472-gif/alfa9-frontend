@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './WinStreak.css';
 
 function WinStreak() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="ad-page">
@@ -12,14 +14,14 @@ function WinStreak() {
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <h1 className="ad-title">Activity details</h1>
+        <h1 className="ad-title">{t('act_details_header')}</h1>
       </header>
 
       <div className="ad-banner">
         <img src="/image/activity-5.png" alt="WIN STREAK BONUS" />
       </div>
 
-      <div className="ad-section-title">WIN STREAK BONUS</div>
+      <div className="ad-section-title">{t('act_win_streak')}</div>
 
       <div className="ad-body">
         {/* Placeholder — replace with the real info graphic for this activity */}
