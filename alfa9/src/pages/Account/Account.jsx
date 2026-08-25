@@ -425,7 +425,7 @@ const confirmLogout = () => {
               <circle cx="23" cy="2" r="2" fill="url(#account-gold-5d)" /><circle cx="11" cy="7" r="1.5" fill="url(#account-gold-5d)" /><circle cx="35" cy="7" r="1.5" fill="url(#account-gold-5d)" />
               <path d="M9 34H37V36H9V34Z" fill="url(#account-gold-5d)" />
             </svg>
-            <span className="casino-nav-text">Home</span>
+            <span className="casino-nav-text">{t('nav_home')}</span>
           </Link>
           <Link to="/activity" className="casino-nav-item" style={{ textDecoration: 'none' }}>
             <svg className="casino-nav-svg" width="28" height="26" viewBox="0 0 46 42" fill="none" filter="url(#account-luxury-3d)">
@@ -434,11 +434,11 @@ const confirmLogout = () => {
               <rect x="22.25" y="9" width="1.5" height="22.5" fill="url(#account-gold-5d)" />
               <path d="M23 3L26 6L23 9L20 6L23 3Z" fill="url(#account-gold-5d)" />
             </svg>
-            <span className="casino-nav-text">Activity</span>
+            <span className="casino-nav-text">{t('nav_activity')}</span>
           </Link>
           <Link to="/spin" className="casino-wheel-wrapper">
             <div className="wheel-image-container"><img className="wheel-img" src="./image/Spin Wheel.png" alt="Spin" /></div>
-            <span className="wheel-text">Get Rs3,000</span>
+            <span className="wheel-text">{t('nav_spin')}</span>
           </Link>
           <Link to="/promotion" className="casino-nav-item" style={{ textDecoration: 'none' }}>
             <svg className="casino-nav-svg" width="28" height="26" viewBox="0 0 45 42" fill="none" filter="url(#account-luxury-3d)">
@@ -446,7 +446,7 @@ const confirmLogout = () => {
               <circle cx="22.5" cy="25.5" r="6" fill="url(#account-gold-5d)" />
               <text x="22.5" y="28.5" fontFamily="sans-serif" fontSize="9px" fontWeight="bold" fill="#140A03" textAnchor="middle">$</text>
             </svg>
-            <span className="casino-nav-text">Promotion</span>
+            <span className="casino-nav-text">{t('nav_promotion')}</span>
           </Link>
           <Link to="/account" className="casino-nav-item active-tab" style={{ textDecoration: 'none' }}>
             <svg className="casino-nav-svg" width="28" height="26" viewBox="0 0 45 42" fill="none" filter="url(#account-luxury-3d)">
@@ -456,7 +456,7 @@ const confirmLogout = () => {
               <circle cx="22.5" cy="23.5" r="3" fill="url(#account-gold-5d)" />
               <path d="M16 31.5C18 29.5 27 29.5 29 31.5V33.5H16V31.5Z" fill="url(#account-gold-5d)" />
             </svg>
-            <span className="casino-nav-text" style={{ color: '#FFF3CD' }}>Account</span>
+            <span className="casino-nav-text" style={{ color: '#FFF3CD' }}>{t('nav_account')}</span>
           </Link>
         </div>
         <svg width="0" height="0" style={{ position: 'absolute' }}>

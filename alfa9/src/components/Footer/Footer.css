@@ -16,6 +16,11 @@
   justify-content: center;
   width: 100%;
   margin-bottom: 10px;
+  pointer-events: none; /* only the pill button itself should be clickable —
+    this div spans the full width, and without this, its transparent
+    left/right areas (and any gap above the nav bar) silently swallow
+    clicks meant for content underneath, since this whole footer sits
+    in a position:fixed, z-index:9999 container. */
 }
 
 .add-to-desktop-btn {
@@ -29,6 +34,7 @@
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   margin-bottom: 35px;
+  pointer-events: auto; /* re-enable just for the visible pill */
 }
 
 .add-to-desktop-btn:hover {
