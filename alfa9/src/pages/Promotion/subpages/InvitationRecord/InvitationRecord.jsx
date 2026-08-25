@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './InvitationRecord.css';
 
 function InvitationRecord() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [records, setRecords] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -25,7 +27,7 @@ function InvitationRecord() {
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </div>
-          <span className="top-title">Invitation record</span>
+          <span className="top-title">{t('ir_title')}</span>
         </div>
 
         {/* EMPTY STATE */}
@@ -44,8 +46,8 @@ function InvitationRecord() {
                 </defs>
               </svg>
             </div>
-            <div className="empty-label">No invitation</div>
-            <div className="empty-sub">Members you invite will show up here</div>
+            <div className="empty-label">{t('ir_no_invitation')}</div>
+            <div className="empty-sub">{t('ir_empty_sub')}</div>
           </div>
         )}
 
@@ -60,23 +62,23 @@ function InvitationRecord() {
                 </div>
 
                 <div className="record-row">
-                  <span className="record-row-label">Registration time</span>
+                  <span className="record-row-label">{t('ir_reg_time')}</span>
                   <span className="record-row-value">{new Date(r.registeredAt).toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '')}</span>
                 </div>
                 <div className="record-row">
-                  <span className="record-row-label">1st deposit amount</span>
+                  <span className="record-row-label">{t('ir_1st_deposit')}</span>
                   <span className={`record-row-value ${r.firstDepositAmount > 0 ? 'green' : 'red'}`}>Rs{r.firstDepositAmount.toFixed(2)}</span>
                 </div>
                 <div className="record-row">
-                  <span className="record-row-label">2nd deposit amount</span>
+                  <span className="record-row-label">{t('ir_2nd_deposit')}</span>
                   <span className={`record-row-value ${r.secondDepositAmount > 0 ? 'green' : 'red'}`}>Rs{r.secondDepositAmount.toFixed(2)}</span>
                 </div>
                 <div className="record-row">
-                  <span className="record-row-label">3rd deposit amount</span>
+                  <span className="record-row-label">{t('ir_3rd_deposit')}</span>
                   <span className={`record-row-value ${r.thirdDepositAmount > 0 ? 'green' : 'red'}`}>Rs{r.thirdDepositAmount.toFixed(2)}</span>
                 </div>
                 <div className="record-row">
-                  <span className="record-row-label">Turnover</span>
+                  <span className="record-row-label">{t('ir_turnover')}</span>
                   <span className="record-row-value gold">Rs{r.turnover.toFixed(2)}</span>
                 </div>
               </div>

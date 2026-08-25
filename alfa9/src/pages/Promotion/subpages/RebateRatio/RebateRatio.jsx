@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './RebateRatio.css';
 
 const LOTTERY_DATA = [
@@ -29,11 +30,11 @@ const CASINO_DATA = [
 ];
 
 const TABS = [
-  { id: 'lottery', label: 'Lottery', data: LOTTERY_DATA },
-  { id: 'casino', label: 'Casino', data: CASINO_DATA },
-  { id: 'sports', label: 'Sports', data: CASINO_DATA },
-  { id: 'rummy', label: 'Rummy', data: CASINO_DATA },
-  { id: 'slots', label: 'Slots', data: CASINO_DATA },
+  { id: 'lottery', labelKey: 'cat_lottery', data: LOTTERY_DATA },
+  { id: 'casino', labelKey: 'cat_casino', data: CASINO_DATA },
+  { id: 'sports', labelKey: 'cat_sports', data: CASINO_DATA },
+  { id: 'rummy', labelKey: 'cat_rummy', data: CASINO_DATA },
+  { id: 'slots', labelKey: 'cat_slots', data: CASINO_DATA },
 ];
 
 const TAB_ICONS = {
@@ -88,25 +89,19 @@ const TAB_ICONS = {
   ),
 };
 
-const ROW_LABELS = [
-  '1 level lower level commission rebate',
-  '2 level lower level commission rebate',
-  '3 level lower level commission rebate',
-  '4 level lower level commission rebate',
-  '5 level lower level commission rebate',
-  '6 level lower level commission rebate',
-];
+const ROW_LABEL_KEYS = ['rr_row_1', 'rr_row_2', 'rr_row_3', 'rr_row_4', 'rr_row_5', 'rr_row_6'];
 
 function LevelCard({ level, values }) {
+  const { t } = useLanguage();
   return (
     <div className="level-card">
-      <div className="level-header"><span className="level-title">Rebate level</span><span className="level-num">{level}</span></div>
+      <div className="level-header"><span className="level-title">{t('rr_level')}</span><span className="level-num">{level}</span></div>
       <div className="rebate-rows">
         {values.map((pct, i) => (
           <div className="rebate-row" key={i}>
             <div className="row-left">
               <div className="dot-wrap"><div className="dot-circle"><div className="dot-inner"></div></div></div>
-              <span className="rebate-label">{ROW_LABELS[i]}</span>
+              <span className="rebate-label">{t(ROW_LABEL_KEYS[i])}</span>
             </div>
             <span className={`rebate-pct${i === 0 ? ' gold' : ''}`}>{pct}</span>
           </div>
@@ -118,6 +113,7 @@ function LevelCard({ level, values }) {
 
 function RebateRatio() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('lottery');
   const tabRefs = useRef({});
 
@@ -136,7 +132,7 @@ function RebateRatio() {
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </a>
-        <span className="top-title">Rebate Ratio</span>
+        <span className="top-title">{t('rr_title')}</span>
       </div>
 
       <div className="tabs-outer">
@@ -149,7 +145,7 @@ function RebateRatio() {
               onClick={() => handleTabClick(tab.id)}
             >
               <div className="tab-icon">{TAB_ICONS[tab.id](activeTab === tab.id)}</div>
-              <span className="tab-label">{tab.label}</span>
+              <span className="tab-label">{t(tab.labelKey)}</span>
             </div>
           ))}
         </div>

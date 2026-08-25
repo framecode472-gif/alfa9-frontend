@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './SubordinateData.css';
 
 const TIERS = ['All', 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', 'Tier 6'];
@@ -8,12 +9,12 @@ const YEARS = [2023, 2024, 2025, 2026, 2027, 2028];
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const STATS = [
-  { label: 'Deposit number', val: 0 },
-  { label: 'Deposit amount', val: 0 },
-  { label: 'Number of bettors', val: 0 },
-  { label: 'Total bet', val: 0 },
-  { label: 'Number of people making first deposit', val: 0 },
-  { label: 'First deposit amount', val: 0 },
+  { labelKey: 'sd_deposit_number', val: 0 },
+  { labelKey: 'sd_deposit_amount', val: 0 },
+  { labelKey: 'sd_number_of_bettors', val: 0 },
+  { labelKey: 'sd_total_bet', val: 0 },
+  { labelKey: 'sd_first_deposit_people', val: 0 },
+  { labelKey: 'sd_first_deposit_amount', val: 0 },
 ];
 
 function getCenter(colEl) {
@@ -52,6 +53,7 @@ function PickerColumn({ items, selected, onSelect, formatter, colRef }) {
 
 function SubordinateData() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [tierLabel, setTierLabel] = useState('All');
   const [dateLabel, setDateLabel] = useState('2026-06-29');
@@ -78,12 +80,12 @@ function SubordinateData() {
       .then((data) => {
         const s = data.stats || {};
         setStats([
-          { label: 'Deposit number', val: s.depositNumber || 0 },
-          { label: 'Deposit amount', val: s.depositAmount || 0 },
-          { label: 'Number of bettors', val: s.numberOfBettors || 0 },
-          { label: 'Total bet', val: s.totalBet || 0 },
-          { label: 'Number of people making first deposit', val: s.firstDepositCount || 0 },
-          { label: 'First deposit amount', val: s.firstDepositAmount || 0 },
+          { labelKey: 'sd_deposit_number', val: s.depositNumber || 0 },
+          { labelKey: 'sd_deposit_amount', val: s.depositAmount || 0 },
+          { labelKey: 'sd_number_of_bettors', val: s.numberOfBettors || 0 },
+          { labelKey: 'sd_total_bet', val: s.totalBet || 0 },
+          { labelKey: 'sd_first_deposit_people', val: s.firstDepositCount || 0 },
+          { labelKey: 'sd_first_deposit_amount', val: s.firstDepositAmount || 0 },
         ]);
       })
       .catch(() => {});
@@ -143,11 +145,11 @@ function SubordinateData() {
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </a>
-        <span className="top-title">Subordinate data</span>
+        <span className="top-title">{t('sd_title')}</span>
       </div>
 
       <div className="search-bar">
-        <input className="search-input" placeholder="Search subordinate UID" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <input className="search-input" placeholder={t('sd_search_placeholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
         <div className="search-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#140A03" strokeWidth="2.5" strokeLinecap="round">
             <circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -157,7 +159,7 @@ function SubordinateData() {
 
       <div className="filter-row">
         <div className="filter-select" onClick={openTierSheet}>
-          <span>{tierLabel}</span>
+          <span>{tierLabel === 'All' ? t('sd_all') : tierLabel}</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B7355" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
         </div>
         <div className="filter-select" onClick={openDateSheet}>
@@ -171,7 +173,7 @@ function SubordinateData() {
           {stats.map((s) => (
             <div className="sc2-cell" key={s.label}>
               <div className="sc2-num">{s.val}</div>
-              <div className="sc2-label">{s.label}</div>
+              <div className="sc2-label">{t(s.labelKey)}</div>
             </div>
           ))}
         </div>
@@ -186,7 +188,7 @@ function SubordinateData() {
           <rect x="20" y="70" width="14" height="16" fill="#221408" stroke="#2A1A08" strokeWidth="2" />
           <rect x="86" y="70" width="14" height="16" fill="#221408" stroke="#2A1A08" strokeWidth="2" />
         </svg>
-        <span className="empty-text">No data</span>
+        <span className="empty-text">{t('bd_no_data')}</span>
       </div>
 
       {/* TIER SHEET */}
@@ -194,9 +196,9 @@ function SubordinateData() {
         <div className="sheet-overlay show" onClick={(e) => { if (e.target === e.currentTarget) setTierOpen(false); }}>
           <div className="sheet-panel">
             <div className="sheet-header">
-              <span className="sheet-cancel" onClick={() => setTierOpen(false)}>Cancel</span>
-              <span className="sheet-title">Select Tier</span>
-              <span className="sheet-confirm" onClick={confirmTier}>Confirm</span>
+              <span className="sheet-cancel" onClick={() => setTierOpen(false)}>{t('hist_cancel')}</span>
+              <span className="sheet-title">{t('sd_select_tier')}</span>
+              <span className="sheet-confirm" onClick={confirmTier}>{t('hist_confirm')}</span>
             </div>
             <div className="picker-columns single">
               <div className="picker-highlight"></div>
@@ -211,9 +213,9 @@ function SubordinateData() {
         <div className="sheet-overlay show" onClick={(e) => { if (e.target === e.currentTarget) setDateOpen(false); }}>
           <div className="sheet-panel">
             <div className="sheet-header">
-              <span className="sheet-cancel" onClick={() => setDateOpen(false)}>Cancel</span>
-              <span className="sheet-title">Choose a date</span>
-              <span className="sheet-confirm" onClick={confirmDate}>Confirm</span>
+              <span className="sheet-cancel" onClick={() => setDateOpen(false)}>{t('hist_cancel')}</span>
+              <span className="sheet-title">{t('hist_choose_date')}</span>
+              <span className="sheet-confirm" onClick={confirmDate}>{t('hist_confirm')}</span>
             </div>
             <div className="picker-columns triple">
               <div className="picker-highlight"></div>

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './CommissionDetail.css';
 
 const YEARS = [2023, 2024, 2025, 2026, 2027, 2028];
@@ -41,6 +42,7 @@ function PickerColumn({ items, selected, onSelect, formatter, colRef }) {
 
 function CommissionDetail() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [dateLabel, setDateLabel] = useState('2026-06-29');
   const [dateOpen, setDateOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState({ year: 2026, month: 6, day: 29 });
@@ -98,7 +100,7 @@ function CommissionDetail() {
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </a>
-        <span className="top-title">Commission Details</span>
+        <span className="top-title">{t('cd_title')}</span>
       </div>
 
       <div className="date-select" onClick={openDateSheet}>
@@ -116,7 +118,7 @@ function CommissionDetail() {
             <rect x="20" y="70" width="14" height="16" fill="#221408" stroke="#2A1A08" strokeWidth="2" />
             <rect x="86" y="70" width="14" height="16" fill="#221408" stroke="#2A1A08" strokeWidth="2" />
           </svg>
-          <span className="empty-text">No data</span>
+          <span className="empty-text">{t('bd_no_data')}</span>
         </div>
       ) : (
         <div className="commission-list">
@@ -136,9 +138,9 @@ function CommissionDetail() {
         <div className="sheet-overlay show" onClick={(e) => { if (e.target === e.currentTarget) setDateOpen(false); }}>
           <div className="sheet-panel">
             <div className="sheet-header">
-              <span className="sheet-cancel" onClick={() => setDateOpen(false)}>Cancel</span>
-              <span className="sheet-title">Choose a date</span>
-              <span className="sheet-confirm" onClick={confirmDate}>Confirm</span>
+              <span className="sheet-cancel" onClick={() => setDateOpen(false)}>{t('hist_cancel')}</span>
+              <span className="sheet-title">{t('hist_choose_date')}</span>
+              <span className="sheet-confirm" onClick={confirmDate}>{t('hist_confirm')}</span>
             </div>
             <div className="picker-columns">
               <div className="picker-highlight"></div>

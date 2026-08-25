@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../../../utils/api';
+import { useLanguage } from '../../../../context/LanguageContext.jsx';
 import './NewSubordinates.css';
 
 const FILTERS = ['Today', 'Yesterday', 'This month'];
+const FILTER_KEYS = { Today: 'ns_today', Yesterday: 'ns_yesterday', 'This month': 'ns_this_month' };
 
 function NewSubordinates() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('Today');
   const [subordinates, setSubordinates] = useState([]);
 
@@ -34,7 +37,7 @@ function NewSubordinates() {
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </div>
-          <span className="top-title">New subordinates</span>
+          <span className="top-title">{t('ns_title')}</span>
         </div>
 
         {/* FILTER TABS */}
@@ -45,7 +48,7 @@ function NewSubordinates() {
               className={`filter-tab ${activeFilter === f ? 'active' : ''}`}
               onClick={() => setActiveFilter(f)}
             >
-              {f}
+              {t(FILTER_KEYS[f])}
             </div>
           ))}
         </div>
@@ -72,7 +75,7 @@ function NewSubordinates() {
                 </defs>
               </svg>
             </div>
-            <div className="empty-label">No data</div>
+            <div className="empty-label">{t('ns_no_data')}</div>
           </div>
         )}
 
