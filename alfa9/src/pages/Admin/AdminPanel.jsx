@@ -102,6 +102,7 @@ const NAV_ITEMS = [
   { key: 'gifts', label: 'Gift codes', icon: 'ticket' },
   { key: 'games', label: 'Games', icon: 'dice' },
   { key: 'points', label: 'Give Points', icon: 'wallet' },
+  { key: 'promoboost', label: 'Referral Boost', icon: 'users' },
 ];
 
 function Icon({ name }) {
@@ -679,6 +680,79 @@ export default function AdminPanel() {
     }
   };
 
+  // ===== REFERRAL BOOST (manually set a user's Promotion-page stats) =====
+  const [boostUid, setBoostUid] = useState('');
+  const [boostUser, setBoostUser] = useState(null);   // { id, uid, name, email, phone }
+  const [boostReal, setBoostReal] = useState(null);   // real live direct/team numbers, for reference
+  const [boostForm, setBoostForm] = useState({
+    direct: { register: '', depositNumber: '', depositAmount: '', firstDeposit: '' },
+    team: { register: '', depositNumber: '', depositAmount: '', firstDeposit: '' },
+    note: ''
+  });
+  const [boostMsg, setBoostMsg] = useState('');
+  const [boostLoading, setBoostLoading] = useState(false);
+
+  const lookupBoostUser = async () => {
+    if (!boostUid.trim()) return;
+    setBoostMsg('');
+    setBoostUser(null);
+    setBoostReal(null);
+    try {
+      const data = await apiFetch(`/promotion-boost/${boostUid.trim()}`);
+      setBoostUser(data.user);
+      setBoostReal(data.real);
+      const toStr = (o) => ({
+        register: String(o.register || 0),
+        depositNumber: String(o.depositNumber || 0),
+        depositAmount: String(o.depositAmount || 0),
+        firstDeposit: String(o.firstDeposit || 0)
+      });
+      setBoostForm({
+        direct: toStr(data.boost.direct || {}),
+        team: toStr(data.boost.team || {}),
+        note: data.boost.note || ''
+      });
+    } catch (err) {
+      setBoostMsg(err.message || 'User not found');
+    }
+  };
+
+  const saveBoost = async () => {
+    if (!boostUid.trim() || !boostUser) {
+      setBoostMsg('Paste a valid user ID first');
+      return;
+    }
+    setBoostLoading(true);
+    setBoostMsg('');
+    try {
+      const num = (v) => Number(v) || 0;
+      const data = await apiFetch(`/promotion-boost/${boostUid.trim()}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          direct: {
+            register: num(boostForm.direct.register),
+            depositNumber: num(boostForm.direct.depositNumber),
+            depositAmount: num(boostForm.direct.depositAmount),
+            firstDeposit: num(boostForm.direct.firstDeposit)
+          },
+          team: {
+            register: num(boostForm.team.register),
+            depositNumber: num(boostForm.team.depositNumber),
+            depositAmount: num(boostForm.team.depositAmount),
+            firstDeposit: num(boostForm.team.firstDeposit)
+          },
+          note: boostForm.note
+        })
+      });
+      setBoostMsg(data.message);
+      showToast(data.message);
+    } catch (err) {
+      setBoostMsg(err.message || 'Could not save boost');
+    } finally {
+      setBoostLoading(false);
+    }
+  };
+
   const fetchGiftCodes = async () => {
     try {
       const data = await apiFetch('/gift-codes');
@@ -1021,6 +1095,21 @@ export default function AdminPanel() {
               foundUser={foundUser}
               pointsMsg={pointsMsg}
               pointsLoading={pointsLoading}
+            />
+          )}
+
+          {activeNav === 'promoboost' && (
+            <PromoBoostView
+              boostUid={boostUid}
+              setBoostUid={setBoostUid}
+              lookupBoostUser={lookupBoostUser}
+              saveBoost={saveBoost}
+              boostUser={boostUser}
+              boostReal={boostReal}
+              boostForm={boostForm}
+              setBoostForm={setBoostForm}
+              boostMsg={boostMsg}
+              boostLoading={boostLoading}
             />
           )}
         </div>
@@ -1962,6 +2051,104 @@ function PointsView({ pointsForm, setPointsForm, lookupUser, givePoints, foundUs
         <button className="btn btn-gold" onClick={givePoints} disabled={pointsLoading}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <Icon name="plus" />{pointsLoading ? 'Sending…' : 'Done — give points'}
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ===== REFERRAL BOOST =====
+   Paste a user's ID, then set exactly how many "register / deposit number /
+   deposit amount / first deposit" the Direct and Team tabs on THEIR
+   Promotion page should show — on top of whatever is real. Saving replaces
+   the previous boost for that user (the current values are pre-filled from
+   the last save, so it's an edit, not a blind overwrite). */
+function PromoBoostView({
+  boostUid, setBoostUid, lookupBoostUser, saveBoost,
+  boostUser, boostReal, boostForm, setBoostForm, boostMsg, boostLoading
+}) {
+  const setField = (scope, key, value) =>
+    setBoostForm((f) => ({ ...f, [scope]: { ...f[scope], [key]: value } }));
+
+  const row = (scope, label) => (
+    <div className="form-grid" style={{ marginBottom: 8 }}>
+      <div className="field">
+        <label>{label} — Number of register</label>
+        <input type="number" placeholder="0" value={boostForm[scope].register}
+          onChange={(e) => setField(scope, 'register', e.target.value)} />
+      </div>
+      <div className="field">
+        <label>{label} — Deposit number</label>
+        <input type="number" placeholder="0" value={boostForm[scope].depositNumber}
+          onChange={(e) => setField(scope, 'depositNumber', e.target.value)} />
+      </div>
+      <div className="field">
+        <label>{label} — Deposit amount (Rs)</label>
+        <input type="number" placeholder="0" value={boostForm[scope].depositAmount}
+          onChange={(e) => setField(scope, 'depositAmount', e.target.value)} />
+      </div>
+      <div className="field">
+        <label>{label} — People who made first deposit</label>
+        <input type="number" placeholder="0" value={boostForm[scope].firstDeposit}
+          onChange={(e) => setField(scope, 'firstDeposit', e.target.value)} />
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="panel">
+      <div className="panel-header"><div className="panel-title">Set a member's referral stats (Promotion page)</div></div>
+      <div className="panel-body padded">
+        <div className="form-grid" style={{ marginBottom: 14 }}>
+          <div className="field">
+            <label>Member user ID</label>
+            <input
+              type="text"
+              placeholder="Paste the user's ID"
+              value={boostUid}
+              onChange={(e) => setBoostUid(e.target.value)}
+              onBlur={lookupBoostUser}
+            />
+          </div>
+        </div>
+
+        {boostUser && (
+          <div className="code-row" style={{ marginBottom: 14 }}>
+            <span className="code-user-tag"><Icon name="users" />{boostUser.name || boostUser.email} (UID: {boostUser.uid})</span>
+            {boostReal && (
+              <div className="code-meta">
+                <span>Real direct <b>{boostReal.direct.register}</b></span>
+                <span>Real team <b>{boostReal.team.register}</b></span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {boostUser && (
+          <>
+            <p className="field-hint" style={{ marginBottom: 10 }}>
+              These numbers are ADDED on top of the real numbers above — set them to whatever this user should see.
+            </p>
+            {row('direct', 'Direct')}
+            {row('team', 'Team')}
+            <div className="field" style={{ marginBottom: 14 }}>
+              <label>Note (optional, admin-only)</label>
+              <input
+                type="text"
+                placeholder="e.g. Reason for boosting this user's stats"
+                value={boostForm.note}
+                onChange={(e) => setBoostForm((f) => ({ ...f, note: e.target.value }))}
+              />
+            </div>
+          </>
+        )}
+
+        {boostMsg && <p className="field-hint" style={{ marginBottom: 14 }}>{boostMsg}</p>}
+
+        <button className="btn btn-gold" onClick={saveBoost} disabled={boostLoading || !boostUser}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Icon name="check" />{boostLoading ? 'Saving…' : 'Save referral stats'}
           </span>
         </button>
       </div>
