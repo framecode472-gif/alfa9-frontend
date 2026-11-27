@@ -475,7 +475,7 @@ function Withdraw() {
             <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_bet_1')} <strong>Rs{turnover.remaining.toFixed(2)}</strong> {t('wd_rule_bet_2')}</div></div>
             <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_time')} <strong>00:00 \u2013 23:59</strong></div></div>
             <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_remaining_1')} ({currentGateway}): <strong>{turnover.dailyLimits?.[GATEWAY_TO_METHOD[currentGateway]]?.remaining ?? 3}</strong> / {turnover.dailyLimits?.[GATEWAY_TO_METHOD[currentGateway]]?.max ?? 3}</div></div>
-            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_range')} <strong>Rs500 \u2013 Rs50,000</strong></div></div>
+            <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_range')} <strong>Rs500 \ Rs50,000</strong></div></div>
             <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_confirm_info')}</div></div>
             <div className="rule-item"><div className="rule-dot"></div><div className="rule-text">{t('wd_rule_contact_1')} <strong>{t('wd_rule_contact_2')}</strong> {t('wd_rule_contact_3')}</div></div>
           </div>
